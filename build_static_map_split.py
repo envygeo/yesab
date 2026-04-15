@@ -18,7 +18,6 @@ import zipfile
 from datetime import UTC, datetime, timedelta, timezone
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parent
 DATA_DIR = ROOT / "data"
 API_CACHE_FILE = DATA_DIR / "api" / "projects_merged.json"
@@ -26,7 +25,9 @@ API_STATE_FILE = DATA_DIR / "api" / "state.json"
 ZIP_STATE_FILE = DATA_DIR / "yesab_all_zip.state.json"
 DEFAULT_OUTPUT_DIR = Path("./out/yesab-map")
 PROJECT_MAP_PAGE_URL = "https://yesab.ca/project-map"
-PROJECT_MAP_ARCHIVE_URL = "https://yesab.ca/wp-content/plugins/yesab-map-wp-plugin/geojson/all.zip"
+PROJECT_MAP_ARCHIVE_URL = (
+    "https://yesab.ca/wp-content/plugins/yesab-map-wp-plugin/geojson/all.zip"
+)
 REGISTRY_FRONT_URL = "https://yesabregistry.ca/"
 REGISTRY_API_URL = "https://yesabregistry.ca/api/integration/projects"
 YST = timezone(timedelta(hours=-7), name="YST")
@@ -97,7 +98,9 @@ def format_yukon_time(value: str) -> str:
         return ""
     parsed: datetime | None = None
     try:
-        parsed = datetime.strptime(value, "%a, %d %b %Y %H:%M:%S GMT").replace(tzinfo=UTC)
+        parsed = datetime.strptime(value, "%a, %d %b %Y %H:%M:%S GMT").replace(
+            tzinfo=UTC
+        )
     except ValueError:
         pass
     if parsed is None:
@@ -128,16 +131,26 @@ def load_source_info() -> dict[str, object]:
             "label": "YESAB Project Map File",
             "pageUrl": PROJECT_MAP_PAGE_URL,
             "dataUrl": PROJECT_MAP_ARCHIVE_URL,
-            "sourceDate": format_yukon_time(zip_state.get("last_modified", "")) if isinstance(zip_state, dict) else "",
-            "contentLength": zip_state.get("content_length", "") if isinstance(zip_state, dict) else "",
+            "sourceDate": format_yukon_time(zip_state.get("last_modified", ""))
+            if isinstance(zip_state, dict)
+            else "",
+            "contentLength": zip_state.get("content_length", "")
+            if isinstance(zip_state, dict)
+            else "",
         },
         "registry": {
             "label": "YESAB Online Registry",
             "pageUrl": REGISTRY_FRONT_URL,
             "apiUrl": REGISTRY_API_URL,
-            "sourceDate": format_yukon_time(merged.get("generatedAt", "")) if isinstance(merged, dict) else "",
-            "bucketCount": merged.get("bucketCount", 0) if isinstance(merged, dict) else 0,
-            "projectCount": merged.get("projectCount", 0) if isinstance(merged, dict) else 0,
+            "sourceDate": format_yukon_time(merged.get("generatedAt", ""))
+            if isinstance(merged, dict)
+            else "",
+            "bucketCount": merged.get("bucketCount", 0)
+            if isinstance(merged, dict)
+            else 0,
+            "projectCount": merged.get("projectCount", 0)
+            if isinstance(merged, dict)
+            else 0,
         },
     }
 
@@ -165,7 +178,9 @@ def qa_project_summary(project: dict[str, object]) -> dict[str, object]:
         "projectTypeName": project.get("projectTypeName", ""),
         "proponentName": project.get("proponentName", ""),
         "stageName": project.get("stage", {}).get("name", ""),
-        "districts": [item.get("name", "") for item in project.get("assessmentDistricts", [])],
+        "districts": [
+            item.get("name", "") for item in project.get("assessmentDistricts", [])
+        ],
         "sectors": [item.get("name", "") for item in project.get("sectors", [])],
         "locationCount": len(project.get("locations", [])),
     }
@@ -249,12 +264,12 @@ def build_qa_html(qa_payload: dict[str, object], title: str) -> str:
       <h1>{title}</h1>
       <p>QA summary for cached YESAB API matching against shapefile-derived geometries.</p>
       <div class="stats">
-        <div class="stat"><strong>{qa_payload['summary']['cachedApiProjectCount']}</strong><span>cached API projects</span></div>
-        <div class="stat"><strong>{qa_payload['summary']['matchedApiProjectCount']}</strong><span>API projects matched to geometry</span></div>
-        <div class="stat"><strong>{qa_payload['summary']['unmatchedApiProjectCount']}</strong><span>cached API projects with no geometry match</span></div>
-        <div class="stat"><strong>{qa_payload['summary']['matchedFeatureCount']}</strong><span>geometry features linked to cached API records</span></div>
+        <div class="stat"><strong>{qa_payload["summary"]["cachedApiProjectCount"]}</strong><span>cached API projects</span></div>
+        <div class="stat"><strong>{qa_payload["summary"]["matchedApiProjectCount"]}</strong><span>API projects matched to geometry</span></div>
+        <div class="stat"><strong>{qa_payload["summary"]["unmatchedApiProjectCount"]}</strong><span>cached API projects with no geometry match</span></div>
+        <div class="stat"><strong>{qa_payload["summary"]["matchedFeatureCount"]}</strong><span>geometry features linked to cached API records</span></div>
       </div>
-      <p>Coverage: <code>{qa_payload['summary']['matchedApiProjectCount']}/{qa_payload['summary']['cachedApiProjectCount']}</code> cached API projects matched.</p>
+      <p>Coverage: <code>{qa_payload["summary"]["matchedApiProjectCount"]}/{qa_payload["summary"]["cachedApiProjectCount"]}</code> cached API projects matched.</p>
     </section>
     <section>
       <h2>Matched Projects</h2>
@@ -323,18 +338,31 @@ def read_shp(data: bytes) -> list[dict[str, object]]:
             x, y = struct.unpack("<2d", rec[4:20])
             features.append(
                 {
-                    "geometry": {"type": "Point", "coordinates": [round_coord(x), round_coord(y)]},
-                    "bbox": [round_coord(x), round_coord(y), round_coord(x), round_coord(y)],
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [round_coord(x), round_coord(y)],
+                    },
+                    "bbox": [
+                        round_coord(x),
+                        round_coord(y),
+                        round_coord(x),
+                        round_coord(y),
+                    ],
                 }
             )
             continue
         if shape_type not in (3, 5):
             raise ValueError(f"Unsupported shape type: {shape_type}")
 
-        xmin, ymin, xmax, ymax, num_parts, num_points = struct.unpack("<4d2i", rec[4:44])
+        xmin, ymin, xmax, ymax, num_parts, num_points = struct.unpack(
+            "<4d2i", rec[4:44]
+        )
         parts_idx = list(struct.unpack(f"<{num_parts}i", rec[44 : 44 + 4 * num_parts]))
         points_raw = rec[44 + 4 * num_parts : 44 + 4 * num_parts + 16 * num_points]
-        points = [[round_coord(x), round_coord(y)] for x, y in struct.iter_unpack("<2d", points_raw)]
+        points = [
+            [round_coord(x), round_coord(y)]
+            for x, y in struct.iter_unpack("<2d", points_raw)
+        ]
         parts: list[list[list[float]]] = []
         for i, start in enumerate(parts_idx):
             end = parts_idx[i + 1] if i + 1 < len(parts_idx) else len(points)
@@ -343,8 +371,16 @@ def read_shp(data: bytes) -> list[dict[str, object]]:
                 parts.append(part)
         features.append(
             {
-                "geometry": {"type": "LineString" if shape_type == 3 else "Polygon", "coordinates": parts},
-                "bbox": [round_coord(xmin), round_coord(ymin), round_coord(xmax), round_coord(ymax)],
+                "geometry": {
+                    "type": "LineString" if shape_type == 3 else "Polygon",
+                    "coordinates": parts,
+                },
+                "bbox": [
+                    round_coord(xmin),
+                    round_coord(ymin),
+                    round_coord(xmax),
+                    round_coord(ymax),
+                ],
             }
         )
     return features
@@ -378,7 +414,9 @@ def load_payload() -> dict[str, object]:
                     props = clean_props(records[idx] if idx < len(records) else {})
                     bbox = geom["bbox"]
                     project_number = project_number_for(props)
-                    api_project_number = project_number if project_number in api_projects else ""
+                    api_project_number = (
+                        project_number if project_number in api_projects else ""
+                    )
                     if api_project_number:
                         matched_project_numbers.add(api_project_number)
                     features.append(
@@ -405,8 +443,12 @@ def load_payload() -> dict[str, object]:
                     api_project_number = feature["apiProjectNumber"]
                     if api_project_number:
                         matched_feature_count += 1
-                        matched_project_features[api_project_number] = matched_project_features.get(api_project_number, 0) + 1
-                        matched_project_layers.setdefault(api_project_number, set()).add(layer_name)
+                        matched_project_features[api_project_number] = (
+                            matched_project_features.get(api_project_number, 0) + 1
+                        )
+                        matched_project_layers.setdefault(
+                            api_project_number, set()
+                        ).add(layer_name)
                 layers.append(
                     {
                         "name": layer_name,
@@ -430,7 +472,9 @@ def load_payload() -> dict[str, object]:
             {
                 "projectNumber": project_number,
                 "featureCount": matched_project_features.get(project_number, 0),
-                "layerNames": ", ".join(sorted(matched_project_layers.get(project_number, set()))),
+                "layerNames": ", ".join(
+                    sorted(matched_project_layers.get(project_number, set()))
+                ),
             }
             for project_number in sorted(matched_project_numbers)
         ],
@@ -653,8 +697,14 @@ dd {
 
 def site_html(layer_scripts: list[str], include_api_projects: bool) -> str:
     """Return the split-site HTML shell and script tags for each layer file."""
-    scripts = "\n".join(f'    <script src="data/{name}.js"></script>' for name in layer_scripts)
-    api_script = '    <script src="data/api_projects.js"></script>\n' if include_api_projects else ""
+    scripts = "\n".join(
+        f'    <script src="data/{name}.js"></script>' for name in layer_scripts
+    )
+    api_script = (
+        '    <script src="data/api_projects.js"></script>\n'
+        if include_api_projects
+        else ""
+    )
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -674,7 +724,7 @@ def site_html(layer_scripts: list[str], include_api_projects: bool) -> str:
         <button id="toggleBtn" type="button">Toggle All</button>
       </div>
       <div class="subtools">
-        <a href="#" id="aboutLink">About data sources</a>
+        <a href="#" id="aboutLink">About this map</a>
       </div>
       <div class="layers" id="layers"></div>
       <div class="details" id="details">
@@ -759,6 +809,11 @@ def site_js() -> str:
     return key ? `https://yesabregistry.ca/api/integration/projects/${encodeURIComponent(key)}` : "";
   }
 
+  function registryPageUrl(api) {
+    const key = (api && api.projectId) || "";
+    return key ? `https://yesabregistry.ca/projects/${encodeURIComponent(key)}` : "";
+  }
+
   function renderApiDetails(api) {
     if (!api) return "";
     const districts = listText(api.assessmentDistricts, (item) => item.name);
@@ -793,8 +848,13 @@ def site_js() -> str:
       .map(([key, value]) => `<dt>${esc(key)}</dt><dd>${esc(value)}</dd>`)
       .join("");
     const summary = api.projectScope && api.projectScope.summary ? `<p>${esc(api.projectScope.summary)}</p>` : "";
-    const link = apiUrl(api);
-    const linkHtml = link ? `<p><a href="${link}" target="_blank" rel="noreferrer">Registry record</a></p>` : "";
+    const apiLink = apiUrl(api);
+    const pageLink = registryPageUrl(api);
+    const links = [
+      pageLink ? `<a href="${pageLink}" target="_blank" rel="noreferrer">Registry page</a>` : "",
+      apiLink ? `<a href="${apiLink}" target="_blank" rel="noreferrer">API record</a>` : ""
+    ].filter(Boolean).join(" | ");
+    const linkHtml = links ? `<p>${links}</p>` : "";
     return `
       <h2>Registry</h2>
       ${api.title ? `<p><strong>${esc(api.title)}</strong></p>` : ""}
@@ -814,6 +874,7 @@ def site_js() -> str:
     aboutContent.innerHTML = `
       <h2>About This Map</h2>
       <p>This page combines YESAB project-map shapefile geometry with cached YESAB registry metadata when a project-number match is available.</p>
+      <p>This is not a finished product - it is a toy proof-of-concept that happens to have a little usefulness.</p>
       <dl>
         <dt>Page build date</dt><dd>${esc(info.pageBuiltAt || "")}</dd>
         <dt>Map file date</dt><dd>${esc(shapefile.sourceDate || "Unknown")}</dd>
@@ -1226,9 +1287,11 @@ def write_data_files(payload: dict[str, object], output_data_dir: Path) -> list[
             for layer in payload["layers"]
         ],
     }
-    manifest_js = "window.YESAB_MAP_DATA = window.YESAB_MAP_DATA || {}; window.YESAB_MAP_DATA.manifest = " + json.dumps(
-        manifest, separators=(",", ":")
-    ) + ";\n"
+    manifest_js = (
+        "window.YESAB_MAP_DATA = window.YESAB_MAP_DATA || {}; window.YESAB_MAP_DATA.manifest = "
+        + json.dumps(manifest, separators=(",", ":"))
+        + ";\n"
+    )
     (output_data_dir / "manifest.js").write_text(manifest_js, encoding="utf-8")
 
     if payload["apiProjects"]:
@@ -1293,7 +1356,9 @@ def build_site(output_dir: Path) -> None:
     )
 
     total = sum(layer["count"] for layer in payload["layers"])
-    print(f"Wrote {output_dir} with {len(payload['layers'])} layers and {total} features.")
+    print(
+        f"Wrote {output_dir} with {len(payload['layers'])} layers and {total} features."
+    )
     print("Wrote QA artifacts: qa_report.html, qa_report.json")
 
 
