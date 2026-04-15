@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>YESAB Map + API Progress Report</title>
+  <style>
+    :root {
+      --bg: #f4efe7;
+      --paper: rgba(255, 251, 245, 0.92);
+      --ink: #1e293b;
+      --muted: #5b6472;
+      --line: rgba(30, 41, 59, 0.12);
+      --accent: #9f3a22;
+      --accent-2: #1b5f57;
+      --gold: #b2862f;
+      --shadow: 0 18px 50px rgba(43, 36, 30, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      font-family: Georgia, "Times New Roman", serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(255,255,255,0.9), transparent 34%),
+        linear-gradient(135deg, #e9ddca 0%, #f8f5ef 48%, #ebe2d3 100%);
+    }
+
+    .page {
+      width: min(1180px, calc(100vw - 32px));
+      margin: 22px auto 40px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .hero,
+    .panel,
+    .card {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+
+    .hero {
+      padding: 28px 30px 26px;
+      background:
+        radial-gradient(circle at top right, rgba(159, 58, 34, 0.12), transparent 24%),
+        radial-gradient(circle at bottom left, rgba(27, 95, 87, 0.12), transparent 22%),
+        var(--paper);
+    }
+
+    .eyebrow {
+      margin: 0 0 10px;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    h1, h2, h3 { margin: 0; line-height: 1.04; }
+    h1 { font-size: clamp(2rem, 4vw, 3.6rem); max-width: 14ch; }
+    h2 { font-size: 1.4rem; margin-bottom: 12px; }
+    h3 { font-size: 1.15rem; margin-bottom: 8px; }
+
+    p, li {
+      color: var(--muted);
+      line-height: 1.48;
+    }
+
+    .hero p {
+      max-width: 78ch;
+      margin: 14px 0 0;
+      font-size: 1.02rem;
+    }
+
+    .grid-4,
+    .grid-3,
+    .grid-2 {
+      display: grid;
+      gap: 18px;
+    }
+
+    .grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+    .panel { padding: 22px; }
+    .card { padding: 18px 18px 16px; }
+
+    .stat {
+      padding: 14px 14px 12px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.62);
+      border: 1px solid rgba(30, 41, 59, 0.08);
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 1.5rem;
+      margin-bottom: 4px;
+      color: var(--ink);
+    }
+
+    ul {
+      margin: 10px 0 0;
+      padding-left: 18px;
+    }
+
+    li + li { margin-top: 8px; }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid rgba(30, 41, 59, 0.1);
+      border-radius: 999px;
+      padding: 7px 11px;
+      background: rgba(255,255,255,0.7);
+      font-size: 0.9rem;
+      color: var(--ink);
+    }
+
+    .decision {
+      margin-top: 14px;
+      padding-left: 14px;
+      border-left: 4px solid var(--gold);
+      color: var(--ink);
+    }
+
+    code {
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 0.95em;
+      background: rgba(31, 41, 55, 0.06);
+      padding: 0.05em 0.3em;
+      border-radius: 0.35em;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 0.96rem;
+    }
+
+    th, td {
+      text-align: left;
+      vertical-align: top;
+      padding: 10px 10px;
+      border-top: 1px solid rgba(30, 41, 59, 0.09);
+    }
+
+    th {
+      color: var(--ink);
+      font-size: 0.84rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .mono { font-family: Consolas, "Courier New", monospace; font-size: 0.94rem; }
+
+    @media (max-width: 960px) {
+      .grid-4,
+      .grid-3,
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <section class="hero">
+      <p class="eyebrow">YESAB Map + API Follow-Up · 2026-04-15</p>
+      <h1>What Has Been Built Since The First Report</h1>
+      <p>
+        The first report framed options for tying the YESAB registry API into the static project-map
+        viewer. Since then, the project has moved from exploration to implementation: a local API cache
+        exists, both map builds consume it, QA artifacts are generated, registry-linked features are
+        highlighted in the map, and the UI now exposes source metadata and direct registry links.
+      </p>
+      <div class="badge-row">
+        <span class="badge">Static shapefile map retained</span>
+        <span class="badge">API cache added</span>
+        <span class="badge">Map/API join implemented</span>
+        <span class="badge">QA reports added</span>
+        <span class="badge">Hover UX fixed</span>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Current State</h2>
+      <div class="grid-4">
+        <div class="stat">
+          <strong>4,377</strong>
+          <span>Cached API projects in the merged local registry dataset.</span>
+        </div>
+        <div class="stat">
+          <strong>3,209</strong>
+          <span>Cached API projects matched to at least one feature in the map data.</span>
+        </div>
+        <div class="stat">
+          <strong>3,759</strong>
+          <span>Geometry features currently highlighted as registry-linked in the map.</span>
+        </div>
+        <div class="stat">
+          <strong>1,168</strong>
+          <span>Cached API projects with no current shapefile match, surfaced in QA outputs.</span>
+        </div>
+      </div>
+      <p class="decision">
+        The practical result is a hybrid model: the shapefile archive remains the geometry backbone,
+        while the YESAB registry API now provides live-ish status and metadata enrichment through a
+        local cache.
+      </p>
+    </section>
+
+    <section class="grid-3">
+      <article class="card">
+        <h3>1. API Cache Layer</h3>
+        <p>
+          A lightweight bucketed cache was added in <code>cache_yesab_api.py</code>. It stores year-window
+          API responses under <code>data/api/buckets/</code>, tracks state in <code>data/api/state.json</code>,
+          and emits a merged dataset at <code>data/api/projects_merged.json</code>.
+        </p>
+        <ul>
+          <li>Designed to avoid full refetches.</li>
+          <li>Works by year buckets rather than a complex per-project sync engine.</li>
+          <li>Known constraint: refresh must be sequential because runs share one state file.</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <h3>2. Map Enrichment</h3>
+        <p>
+          Both builders now load the merged API cache when present and join registry records to shapefile
+          features by project-number style fields already present in the map data.
+        </p>
+        <ul>
+          <li>Registry-linked features are visually highlighted in gold.</li>
+          <li>Details panels show stage, outcomes, proponent, districts, sectors, and more.</li>
+          <li>Details now link to both the API endpoint and the human-facing registry page.</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <h3>3. QA Layer</h3>
+        <p>
+          QA outputs were added to make the shapefile/API overlap inspectable instead of assumed.
+          This is important because the two sources do not line up perfectly.
+        </p>
+        <ul>
+          <li>Matched and unmatched API projects are summarized in JSON and HTML.</li>
+          <li>Per-project layer coverage is reported for matched records.</li>
+          <li>The mismatch list helps distinguish real gaps from join-field issues.</li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="grid-2">
+      <article class="panel">
+        <h2>Output Layout</h2>
+        <p>
+          The build outputs were reorganized so the single-file and split builds can coexist safely.
+          The split builder only recreates its own directory.
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>Artifact</th>
+              <th>Location</th>
+              <th>Purpose</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Single-file map</td>
+              <td class="mono">out/yesab-map-in-one.html</td>
+              <td>Self-contained viewer suitable for direct file opening and sharing.</td>
+            </tr>
+            <tr>
+              <td>Split map app</td>
+              <td class="mono">out/yesab-map/</td>
+              <td>USB/file-share friendly version with separate HTML, CSS, JS, and data files.</td>
+            </tr>
+            <tr>
+              <td>Single-file QA</td>
+              <td class="mono">out/yesab-map-in-one.qa.html<br>out/yesab-map-in-one.qa.json</td>
+              <td>Coverage and mismatch reporting for the in-one build.</td>
+            </tr>
+            <tr>
+              <td>Split QA</td>
+              <td class="mono">out/yesab-map/qa_report.html<br>out/yesab-map/qa_report.json</td>
+              <td>Coverage and mismatch reporting for the split build.</td>
+            </tr>
+          </tbody>
+        </table>
+      </article>
+
+      <article class="panel">
+        <h2>UX And Source Clarity</h2>
+        <p>
+          After enrichment was in place, the map UI received targeted fixes and traceability improvements.
+        </p>
+        <ul>
+          <li>Hover popup jitter in narrow windows was fixed by constraining tooltip placement to the map viewport.</li>
+          <li>The popup now tracks canvas hover rather than global mouse movement.</li>
+          <li>An <code>About data sources</code> panel was added to both builds.</li>
+          <li>The About panel now shows page build date, map file date, and registry cache date in Yukon Standard Time.</li>
+          <li>Registry-linked details now offer both a human-facing registry page link and the raw API endpoint.</li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="panel">
+      <h2>Implementation Timeline</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Commit</th>
+            <th>Change</th>
+            <th>Why It Mattered</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="mono">88ca71e</td>
+            <td>Add YESAB API cache script</td>
+            <td>Established a low-complexity local registry cache instead of repeated full API fetches.</td>
+          </tr>
+          <tr>
+            <td class="mono">dfb350d</td>
+            <td>Enrich static maps from cached YESAB API</td>
+            <td>Turned the cache into visible map value by joining records into feature details.</td>
+          </tr>
+          <tr>
+            <td class="mono">f93c052</td>
+            <td>Separate map outputs and add API match QA</td>
+            <td>Made both build modes safe to keep and added objective overlap reporting.</td>
+          </tr>
+          <tr>
+            <td class="mono">a50c93a</td>
+            <td>Clarify README and add agent guide</td>
+            <td>Documented the repo for both human operators and automated contributors.</td>
+          </tr>
+          <tr>
+            <td class="mono">e80de7c</td>
+            <td>Improve map hover UX and add source info panel</td>
+            <td>Fixed a real interaction bug and made the page self-describing about its data sources.</td>
+          </tr>
+          <tr>
+            <td class="mono">913be8e</td>
+            <td>Add registry page links to map details</td>
+            <td>Connected each matched feature to both the machine endpoint and the user-facing registry page.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="grid-2">
+      <article class="panel">
+        <h2>What This Means</h2>
+        <p>
+          The project is no longer at the “should we integrate the API?” stage. A working hybrid has been
+          built. It keeps the stable geometry of the project map archive while layering in newer process
+          state from the registry where a join is possible.
+        </p>
+        <ul>
+          <li>The map can now answer more than “where is the project?”</li>
+          <li>It can also answer “what stage is it in?” and “where do I go next?”</li>
+          <li>The QA outputs make it possible to improve source overlap methodically rather than by guesswork.</li>
+        </ul>
+      </article>
+
+      <article class="panel">
+        <h2>Remaining Gaps / Next Moves</h2>
+        <ul>
+          <li>Backfill or refresh additional API buckets if older-year completeness matters beyond the current cache coverage.</li>
+          <li>Investigate unmatched API projects to separate true no-geometry cases from join-field normalization problems.</li>
+          <li>Consider a registry-first “current activity” view for recent projects that may not yet exist in the shapefile archive.</li>
+          <li>Optionally surface stage/status filters directly in the UI now that stage metadata is already present.</li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="panel">
+      <h2>Snapshot Used For This Report</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>First report</td>
+            <td class="mono">journal/2026-04-14_yesab_api_options.html</td>
+          </tr>
+          <tr>
+            <td>Follow-up report</td>
+            <td class="mono">journal/2026-04-15_yesab_progress_report.html</td>
+          </tr>
+          <tr>
+            <td>Current merged API count</td>
+            <td>4,377 projects across 5 cached buckets</td>
+          </tr>
+          <tr>
+            <td>Current build targets</td>
+            <td class="mono">out/yesab-map-in-one.html<br>out/yesab-map/index.html</td>
+          </tr>
+          <tr>
+            <td>Latest map rebuilds</td>
+            <td>Single-file rebuilt 2026-04-15 09:46 YST; split build rebuilt 2026-04-15 09:45 YST</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </div>
+</body>
+</html>

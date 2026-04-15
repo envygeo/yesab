@@ -31,5 +31,5 @@
 
 ## Generated Artifacts
 
-- Treat `out/`, `data/api/`, `reports/`, and ad hoc probe JSON files as generated or local-working artifacts unless the task says otherwise.
+- Treat `out/`, `data/api/`, `journal/`, and ad hoc probe JSON files as generated or local-working artifacts unless the task says otherwise.
 - Do not delete or overwrite unrelated generated artifacts casually.
