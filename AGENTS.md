@@ -2,6 +2,9 @@
 
 `README.md` is the human-facing overview. This file only captures agent-relevant operating constraints and repo conventions.
 
+Preference order for accessing or getting supporting tools:
+  uvx > npx > uv tool install > pip install > npm install
+
 ## Working Rules
 
 - Preserve the current output split:
