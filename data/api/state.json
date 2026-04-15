@@ -1,0 +1,74 @@
+{
+  "buckets": {
+    "2006-2011": {
+      "content_length": "1900228",
+      "content_type": "application/json",
+      "endYear": 2011,
+      "fetched_at": "2026-04-15T15:56:37Z",
+      "path": "A:\\yg\\yesab\\data\\api\\buckets\\projects_2006-2011.json",
+      "record_count": 1681,
+      "sha256": "74b9ac97fc8db642dace861a98c5080bf0385bb866ec69aa10d39d260b0d7aa4",
+      "startYear": 2006,
+      "url": "https://yesabregistry.ca/api/integration/projects?startYear=2006&endYear=2011"
+    },
+    "2012-2017": {
+      "content_length": "2816449",
+      "content_type": "application/json",
+      "endYear": 2017,
+      "fetched_at": "2026-04-15T15:56:49Z",
+      "path": "A:\\yg\\yesab\\data\\api\\buckets\\projects_2012-2017.json",
+      "record_count": 1256,
+      "sha256": "fbd87be6ad675a2f9c76d5fa251acdad5df0547eef5ca1c0bf218c2aa4a84ff4",
+      "startYear": 2012,
+      "url": "https://yesabregistry.ca/api/integration/projects?startYear=2012&endYear=2017"
+    },
+    "2018-2023": {
+      "content_length": "5240597",
+      "content_type": "application/json",
+      "endYear": 2023,
+      "fetched_at": "2026-04-15T15:56:14Z",
+      "path": "A:\\yg\\yesab\\data\\api\\buckets\\projects_2018-2023.json",
+      "record_count": 1185,
+      "sha256": "69b434e5b9afe60b418638dd8b597c1e23cb0448b70f183fac0a44631649b69a",
+      "startYear": 2018,
+      "url": "https://yesabregistry.ca/api/integration/projects?startYear=2018&endYear=2023"
+    },
+    "2025-2025": {
+      "content_length": "989313",
+      "content_type": "application/json",
+      "endYear": 2025,
+      "fetched_at": "2026-04-15T15:38:45Z",
+      "path": "A:\\yg\\yesab\\data\\api\\buckets\\projects_2025-2025.json",
+      "record_count": 176,
+      "sha256": "0a9315a96c92d4b4829babac9b1b9a6f395cff3ee4f0e3650bf490ecc235c388",
+      "startYear": 2025,
+      "url": "https://yesabregistry.ca/api/integration/projects?startYear=2025&endYear=2025"
+    },
+    "2026-2026": {
+      "content_length": "99505",
+      "content_type": "application/json",
+      "endYear": 2026,
+      "fetched_at": "2026-04-15T15:38:45Z",
+      "path": "A:\\yg\\yesab\\data\\api\\buckets\\projects_2026-2026.json",
+      "record_count": 79,
+      "sha256": "2abfa9d8766b78235f41519ff199f7fc7f4fb96bb8672de6d45c2abc6fa4d262",
+      "startYear": 2026,
+      "url": "https://yesabregistry.ca/api/integration/projects?startYear=2026&endYear=2026"
+    }
+  },
+  "merged": {
+    "bucketCount": 5,
+    "buckets": [
+      "2006-2011",
+      "2012-2017",
+      "2018-2023",
+      "2025-2025",
+      "2026-2026"
+    ],
+    "generatedAt": "2026-04-15T15:56:50Z",
+    "path": "A:\\yg\\yesab\\data\\api\\projects_merged.json",
+    "projectCount": 4377,
+    "projectIdCount": 4377,
+    "projectNumberCount": 4377
+  }
+}

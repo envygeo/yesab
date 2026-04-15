@@ -1,200 +1,251 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>YESAB Map Package</title>
-  <style>
-    :root {
-      --bg: #f4efe7;
-      --paper: rgba(255, 251, 245, 0.94);
-      --ink: #1e293b;
-      --muted: #5b6472;
-      --line: rgba(30, 41, 59, 0.12);
-      --accent: #9f3a22;
-      --shadow: 0 18px 50px rgba(43, 36, 30, 0.12);
-    }
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>YESAB Map Package</title>
+        <style>
+            :root {
+                --bg: #f4efe7;
+                --paper: rgba(255, 251, 245, 0.94);
+                --ink: #1e293b;
+                --muted: #5b6472;
+                --line: rgba(30, 41, 59, 0.12);
+                --accent: #9f3a22;
+                --shadow: 0 18px 50px rgba(43, 36, 30, 0.12);
+            }
 
-    * { box-sizing: border-box; }
-    html, body { margin: 0; min-height: 100%; }
-    body {
-      font-family: Georgia, "Times New Roman", serif;
-      color: var(--ink);
-      background:
-        radial-gradient(circle at top left, rgba(255,255,255,0.9), transparent 34%),
-        linear-gradient(135deg, #e9ddca 0%, #f8f5ef 48%, #ebe2d3 100%);
-    }
+            * {
+                box-sizing: border-box;
+            }
+            html,
+            body {
+                margin: 0;
+                min-height: 100%;
+            }
+            body {
+                font-family: Georgia, "Times New Roman", serif;
+                color: var(--ink);
+                background:
+                    radial-gradient(circle at top left, rgba(255, 255, 255, 0.9), transparent 34%),
+                    linear-gradient(135deg, #e9ddca 0%, #f8f5ef 48%, #ebe2d3 100%);
+            }
 
-    .page {
-      width: min(1120px, calc(100vw - 32px));
-      margin: 24px auto 40px;
-      display: grid;
-      gap: 18px;
-    }
+            .page {
+                width: min(1120px, calc(100vw - 32px));
+                margin: 24px auto 40px;
+                display: grid;
+                gap: 18px;
+            }
 
-    .hero, .panel, .card {
-      background: var(--paper);
-      border: 1px solid var(--line);
-      border-radius: 24px;
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(10px);
-    }
+            .hero,
+            .panel,
+            .card {
+                background: var(--paper);
+                border: 1px solid var(--line);
+                border-radius: 24px;
+                box-shadow: var(--shadow);
+                backdrop-filter: blur(10px);
+            }
 
-    .hero, .panel { padding: 24px 26px; }
-    .grid {
-      display: grid;
-      gap: 18px;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
+            .hero,
+            .panel {
+                padding: 24px 26px;
+            }
+            .grid {
+                display: grid;
+                gap: 18px;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
 
-    .eyebrow {
-      margin: 0 0 10px;
-      color: var(--accent);
-      text-transform: uppercase;
-      letter-spacing: 0.16em;
-      font-size: 0.78rem;
-      font-weight: 700;
-    }
+            .eyebrow {
+                margin: 0 0 10px;
+                color: var(--accent);
+                text-transform: uppercase;
+                letter-spacing: 0.16em;
+                font-size: 0.78rem;
+                font-weight: 700;
+            }
 
-    h1, h2, h3 {
-      margin: 0;
-      line-height: 1.05;
-    }
+            h1,
+            h2,
+            h3 {
+                margin: 0;
+                line-height: 1.05;
+            }
 
-    h1 {
-      font-size: clamp(2rem, 4vw, 3.4rem);
-      max-width: 12ch;
-    }
+            h1 {
+                font-size: clamp(2rem, 4vw, 3.4rem);
+                max-width: 12ch;
+            }
 
-    h2 {
-      font-size: 1.35rem;
-      margin-bottom: 10px;
-    }
+            h2 {
+                font-size: 1.35rem;
+                margin-bottom: 10px;
+            }
 
-    p, li {
-      color: var(--muted);
-      line-height: 1.48;
-    }
+            p,
+            li {
+                color: var(--muted);
+                line-height: 1.48;
+            }
 
-    .hero p {
-      max-width: 74ch;
-      margin: 14px 0 0;
-      font-size: 1.02rem;
-    }
+            .hero p {
+                max-width: 74ch;
+                margin: 14px 0 0;
+                font-size: 1.02rem;
+            }
 
-    .links {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 16px;
-    }
+            .links {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                margin-top: 16px;
+            }
 
-    .links a, .card a {
-      color: var(--ink);
-      text-decoration: none;
-      border: 1px solid rgba(30, 41, 59, 0.12);
-      border-radius: 999px;
-      padding: 9px 13px;
-      background: rgba(255,255,255,0.72);
-    }
+            .links a,
+            .card a {
+                color: var(--ink);
+                text-decoration: none;
+                border: 1px solid rgba(30, 41, 59, 0.12);
+                border-radius: 999px;
+                padding: 9px 13px;
+                background: rgba(255, 255, 255, 0.72);
+            }
 
-    .card {
-      padding: 18px;
-    }
+            .card {
+                padding: 18px;
+            }
 
-    .card h3 {
-      margin-bottom: 12px;
-    }
+            .card h3 {
+                margin-bottom: 12px;
+            }
 
-    .launch-link {
-      display: inline-flex;
-      align-items: center;
-      margin-bottom: 10px;
-    }
+            .launch-link {
+                display: inline-flex;
+                align-items: center;
+                margin-bottom: 10px;
+            }
 
-    .preview {
-      display: block;
-      width: min(100%, 420px);
-      border-radius: 16px;
-      border: 1px solid rgba(30, 41, 59, 0.1);
-      box-shadow: 0 10px 28px rgba(43, 36, 30, 0.12);
-      margin: 14px 0 12px;
-    }
+            .preview {
+                display: block;
+                width: min(100%, 420px);
+                border-radius: 16px;
+                border: 1px solid rgba(30, 41, 59, 0.1);
+                box-shadow: 0 10px 28px rgba(43, 36, 30, 0.12);
+                margin: 14px 0 12px;
+            }
 
-    .mini {
-      font-size: 0.94rem;
-    }
+            .mini {
+                font-size: 0.94rem;
+            }
 
-    ul {
-      margin: 10px 0 0;
-      padding-left: 18px;
-    }
+            ul {
+                margin: 10px 0 0;
+                padding-left: 18px;
+            }
 
-    li + li { margin-top: 8px; }
+            li + li {
+                margin-top: 8px;
+            }
 
-    code {
-      font-family: Consolas, "Courier New", monospace;
-      font-size: 0.95em;
-      background: rgba(31, 41, 55, 0.06);
-      padding: 0.05em 0.3em;
-      border-radius: 0.35em;
-    }
+            code {
+                font-family: Consolas, "Courier New", monospace;
+                font-size: 0.95em;
+                background: rgba(31, 41, 55, 0.06);
+                padding: 0.05em 0.3em;
+                border-radius: 0.35em;
+            }
 
-    @media (max-width: 920px) {
-      .grid { grid-template-columns: 1fr; }
-    }
-  </style>
-</head>
-<body>
-  <div class="page">
-    <section class="hero">
-      <p class="eyebrow">YESAB Share Package</p>
-      <h1>YESAB Project Map Viewer</h1>
-      <p>
-        This package contains two static versions of the YESAB project map viewer. Both use the YESAB
-        project map geometry and can enrich matching features with cached registry metadata such as
-        stage, proponent, sectors, districts, and direct links back to the YESAB registry.
-      </p>
-      <div class="links">
-        <a href="yesab-map-in-one.html">Open single-file map</a>
-        <a href="yesab-map/index.html">Open split map</a>
-        <a href="yesab-map-in-one.qa.html">Open QA summary</a>
-        <a href="previews/yesab-browser-demo.mp4">Play short video</a>
-      </div>
-    </section>
+            @media (max-width: 920px) {
+                .grid {
+                    grid-template-columns: 1fr;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="page">
+            <section class="hero">
+                <p class="eyebrow">YESAB Share Package</p>
+                <h1>YESAB Project Map Viewer</h1>
+                <p>
+                    This package contains two static versions of the YESAB project map viewer. Both
+                    use the YESAB project map geometry and can enrich matching features with cached
+                    registry metadata such as stage, proponent, sectors, districts, and direct links
+                    back to the YESAB registry.<br />
+                    This is not a finished product - it is a toy proof-of-concept that happens to
+                    have a little usefulness.
+                </p>
+                <div class="links">
+                    <a href="yesab-map-in-one.html">Open single-file map</a>
+                    <a href="yesab-map/index.html">Open split map</a>
+                    <a href="yesab-map-in-one.qa.html">Open QA summary</a>
+                    <a href="previews/yesab-browser-demo.mp4">Play short video</a>
+                </div>
+            </section>
 
-    <section class="panel">
-      <h2>What Is Here</h2>
-      <ul>
-        <li><strong>Single-file map:</strong> one self-contained HTML page that is easiest to share and open directly.</li>
-        <li><strong>Split map:</strong> the same viewer broken into separate files for USB or file-share use.</li>
-        <li><strong>QA output:</strong> supporting pages that summarize which cached API projects do and do not match map geometry.</li>
-      </ul>
-    </section>
+            <section class="panel">
+                <h2>What Is Here</h2>
+                <ul>
+                    <li>
+                        <strong>Single-file map:</strong> one self-contained HTML page that is
+                        easiest to share and open directly.
+                    </li>
+                    <li>
+                        <strong>Split map:</strong> the same viewer broken into separate files for
+                        USB or file-share use.
+                    </li>
+                    <li>
+                        <strong>QA output:</strong> supporting pages that summarize which cached API
+                        projects do and do not match map geometry.
+                    </li>
+                </ul>
+            </section>
 
-    <section class="grid">
-      <article class="card">
-        <h3>Single-File Viewer</h3>
-        <a class="mini launch-link" href="yesab-map-in-one.html">Launch <code>yesab-map-in-one.html</code></a>
-        <img class="preview" src="previews/yesab-map-in-one.png" alt="Preview of the single-file YESAB map viewer">
-        <img class="preview" src="previews/yesab-map-in-one-active.png" alt="Preview of the single-file YESAB map viewer with selection and hover details">
-        <p class="mini">
-          Best when you want one portable file. This version embeds the application and map data into a
-          single HTML document.
-        </p>
-      </article>
+            <section class="grid">
+                <article class="card">
+                    <h3>Single-File Viewer</h3>
+                    <a class="mini launch-link" href="yesab-map-in-one.html"
+                        >Launch <code>yesab-map-in-one.html</code></a
+                    >
+                    <img
+                        class="preview"
+                        src="previews/yesab-map-in-one.png"
+                        alt="Preview of the single-file YESAB map viewer"
+                    />
+                    <img
+                        class="preview"
+                        src="previews/yesab-map-in-one-active.png"
+                        alt="Preview of the single-file YESAB map viewer with selection and hover details"
+                    />
+                    <p class="mini">
+                        Best when you want one portable file. This version embeds the application
+                        and map data into a single HTML document.
+                    </p>
+                </article>
 
-      <article class="card">
-        <h3>Split Viewer</h3>
-        <a class="mini launch-link" href="yesab-map/index.html">Launch <code>yesab-map/index.html</code></a>
-        <img class="preview" src="previews/yesab-map-split.png" alt="Preview of the split YESAB map viewer">
-        <img class="preview" src="previews/yesab-map-split-active.png" alt="Preview of the split YESAB map viewer with selection and hover details">
-        <p class="mini">
-          Best when you want the viewer and data separated into files. It presents the same map with a
-          lighter top-level HTML shell.
-        </p>
-      </article>
-    </section>
-  </div>
-</body>
+                <article class="card">
+                    <h3>Split Viewer</h3>
+                    <a class="mini launch-link" href="yesab-map/index.html"
+                        >Launch <code>yesab-map/index.html</code></a
+                    >
+                    <img
+                        class="preview"
+                        src="previews/yesab-map-split.png"
+                        alt="Preview of the split YESAB map viewer"
+                    />
+                    <img
+                        class="preview"
+                        src="previews/yesab-map-split-active.png"
+                        alt="Preview of the split YESAB map viewer with selection and hover details"
+                    />
+                    <p class="mini">
+                        Best when you want the viewer and data separated into files. It presents the
+                        same map with a lighter top-level HTML shell.
+                    </p>
+                </article>
+            </section>
+        </div>
+    </body>
 </html>

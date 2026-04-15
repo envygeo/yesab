@@ -1,0 +1,5042 @@
+{
+  "cachedAt": "2026-04-15T15:38:45Z",
+  "endYear": 2026,
+  "records": [
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "36fe3ef0-fbd2-4fb2-b75e-4ab48008e50f",
+          "name": "Whitehorse"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [
+        "Ta'an Kw\u00e4ch'\u00e4n Council",
+        "Kwanlin D\u00fcn First Nation"
+      ],
+      "locations": [
+        {
+          "latitude": 60.7104,
+          "longitude": -135.0679
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "8a22e8af-3c79-4894-9a56-191d659df1bd",
+      "projectNumber": "2026-0064",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "YG Highways & Public Works - Capital Infrastructure Delivery Office",
+      "sectors": [
+        {
+          "name": "Utilities - Water and Wastewater",
+          "sectorId": "0e9bde29-76d0-4a76-90e6-a221dc7407db"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 12,
+        "extended": false,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1774626077652,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1774474952983
+        },
+        {
+          "extended": false,
+          "stageEnd": 1774474952982,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1774474951096
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Dewatering Activities - Erik Nielsen Whitehorse International Airport"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "757a5115-beee-40f7-af71-b3faf0bd356f",
+          "name": "Teslin"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [
+        "Carcross/Tagish First Nation"
+      ],
+      "locations": [
+        {
+          "latitude": 60.19626,
+          "longitude": -135.36772
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "6443cdd3-1276-4333-83e5-2935e32b3d49",
+      "projectNumber": "2026-0051",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Whitehorse Gold (Yukon) Corp.",
+      "sectors": [
+        {
+          "name": "Mining - Quartz",
+          "sectorId": "bca2424f-12c5-41e9-82e9-1a31b68abbd0"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 47,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1772558984514,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1772235569210
+        },
+        {
+          "extended": false,
+          "stageEnd": 1772235569209,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1772231213400
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Quartz Exploration - Steller Gold Project"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "b9d1ad56-661b-450d-a5be-b1d5bda05390",
+          "name": "Dawson"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [
+        "First Nation of Na-Cho Ny\u00e4k Dun",
+        "Tr'ond\u00ebk Hw\u00ebch'in"
+      ],
+      "locations": [
+        {
+          "latitude": 63.92557,
+          "longitude": -138.55538
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [
+        "Dawson Regional Planning Commission"
+      ],
+      "projectId": "fb40d951-d5cf-45bb-8171-a2cffc8fb0c7",
+      "projectNumber": "2026-0046",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Dulac Mining",
+      "sectors": [
+        {
+          "name": "Mining - Placer",
+          "sectorId": "a962ed4b-1223-40f2-81ca-027046576935"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 43,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1772206608818,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1772060176467
+        },
+        {
+          "extended": false,
+          "stageEnd": 1772060176466,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1772060176448
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Placer Mine - Flat Creek"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "b9d1ad56-661b-450d-a5be-b1d5bda05390",
+          "name": "Dawson"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [
+        "Tr'ond\u00ebk Hw\u00ebch'in"
+      ],
+      "locations": [
+        {
+          "latitude": 64.03827,
+          "longitude": -139.1495
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "39e8ae53-fdc6-4793-8e89-2a8706a43661",
+      "projectNumber": "2026-0031",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Tr'ond\u00ebk Hw\u00ebch'in Government",
+      "sectors": [
+        {
+          "name": "Residential, Commercial, and Industrial Land Development",
+          "sectorId": "45a93ca0-2007-466d-81fb-d8c4fbe48215"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 28,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1770922854786,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1770757317318
+        },
+        {
+          "extended": false,
+          "stageEnd": 1770757317317,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1770746636349
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "TH Farm Flood Mitigation"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "36fe3ef0-fbd2-4fb2-b75e-4ab48008e50f",
+          "name": "Whitehorse"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [
+        "Ta'an Kw\u00e4ch'\u00e4n Council",
+        "Kwanlin D\u00fcn First Nation"
+      ],
+      "locations": [
+        {
+          "latitude": 60.6453,
+          "longitude": -135.0265
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "beb1dc9d-1f46-4f02-be8a-c92b9139385d",
+      "projectNumber": "2026-0020",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Graham Putland",
+      "sectors": [
+        {
+          "name": "Residential, Commercial, and Industrial Land Development",
+          "sectorId": "45a93ca0-2007-466d-81fb-d8c4fbe48215"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 15,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1769797577676,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1769751870371
+        },
+        {
+          "extended": false,
+          "stageEnd": 1769751870370,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1769748728874
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Lot Enlargement Mount Sima -16 Collins Lane"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "b9d1ad56-661b-450d-a5be-b1d5bda05390",
+          "name": "Dawson"
+        }
+      ],
+      "decisionBodies": [
+        "DFO Referrals Pacific",
+        "Transport Canada",
+        "YG EMR Minerals Resources Branch"
+      ],
+      "indigenousGovernments": [
+        "First Nation of Na-Cho Ny\u00e4k Dun",
+        "Tr'ond\u00ebk Hw\u00ebch'in"
+      ],
+      "locations": [
+        {
+          "latitude": 63.83888,
+          "longitude": -138.94236
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [
+        "Dawson Regional Planning Commission"
+      ],
+      "projectId": "ed09d0c7-d762-4c30-8055-ead135a4ef2d",
+      "projectNumber": "2026-0018",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "837482 Yukon Inc",
+      "sectors": [
+        {
+          "name": "Mining - Placer",
+          "sectorId": "a962ed4b-1223-40f2-81ca-027046576935"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 13,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1769642013821,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1769623632349
+        },
+        {
+          "extended": false,
+          "stageEnd": 1769623632348,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1769014900650
+        },
+        {
+          "extended": false,
+          "stageEnd": 1769014900649,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1768851287153
+        },
+        {
+          "extended": false,
+          "stageEnd": 1768851287152,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1768847031879
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Placer Mine - Upper Sulphur Creek"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "3a238322-8075-4058-8553-7f44ecb01bd2",
+          "name": "Watson Lake"
+        }
+      ],
+      "decisionBodies": [
+        "DFO Referrals Pacific",
+        "Transport Canada",
+        "YG EMR Minerals Resources Branch"
+      ],
+      "indigenousGovernments": [
+        "Liard First Nation",
+        "Ross River Dena Council"
+      ],
+      "locations": [
+        {
+          "latitude": 60.5859,
+          "longitude": -127.8303
+        },
+        {
+          "latitude": 60.5887,
+          "longitude": -127.9342
+        },
+        {
+          "latitude": 60.3678,
+          "longitude": -127.9276
+        },
+        {
+          "latitude": 60.2145,
+          "longitude": -127.4136
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "d61ebff2-2a43-4c54-9ee2-76fd8927f480",
+      "projectNumber": "2026-0034",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Banyan Gold Corp",
+      "sectors": [
+        {
+          "name": "Mining - Quartz",
+          "sectorId": "bca2424f-12c5-41e9-82e9-1a31b68abbd0"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 34,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1771347028565,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1771216829285
+        },
+        {
+          "extended": false,
+          "stageEnd": 1771216829284,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1771216828788
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Quartz Exploration - Hyland Gold Project"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "ec31872e-2d70-4c4b-8097-f4006eb92fc9",
+          "name": "Haines Junction"
+        },
+        {
+          "assessmentDistrictId": "b9d1ad56-661b-450d-a5be-b1d5bda05390",
+          "name": "Dawson"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [
+        "First Nation of Na-Cho Ny\u00e4k Dun",
+        "Tr'ond\u00ebk Hw\u00ebch'in",
+        "Champagne and Aishihik First Nations"
+      ],
+      "locations": [
+        {
+          "latitude": 60.1182,
+          "longitude": -137.0841
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "670a0798-fc1f-4166-a110-9a69b120712f",
+      "projectNumber": "2026-0030",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Environment and Climate Change Canada",
+      "sectors": [
+        {
+          "name": "Utilities - Water and Wastewater",
+          "sectorId": "0e9bde29-76d0-4a76-90e6-a221dc7407db"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 27,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1770824870326,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1770659522624
+        },
+        {
+          "extended": false,
+          "stageEnd": 1770659522623,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1770659522260
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Hydrometric Cableway Reconstructions and Relocations - Aishihik, Blackstone and Tatshenshini Rivers"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "36fe3ef0-fbd2-4fb2-b75e-4ab48008e50f",
+          "name": "Whitehorse"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [
+        "Ta'an Kw\u00e4ch'\u00e4n Council",
+        "Kwanlin D\u00fcn First Nation"
+      ],
+      "locations": [
+        {
+          "latitude": 61.41236,
+          "longitude": -134.35866
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "79092876-e782-4bae-98ff-dec2cffd64e6",
+      "projectNumber": "2026-0006",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Star Mountain Resources Inc",
+      "sectors": [
+        {
+          "name": "Mining - Placer",
+          "sectorId": "a962ed4b-1223-40f2-81ca-027046576935"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 58,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1768321429459,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1768305960479
+        },
+        {
+          "extended": false,
+          "stageEnd": 1768305960478,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1768262597531
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Placer Mine - Cottoneva and Little Violet Creek"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "3a238322-8075-4058-8553-7f44ecb01bd2",
+          "name": "Watson Lake"
+        },
+        {
+          "assessmentDistrictId": "d2ebaae3-6422-4598-92e1-f0b6d61df474",
+          "name": "Mayo"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [
+        "First Nation of Na-Cho Ny\u00e4k Dun",
+        "Liard First Nation",
+        "Ross River Dena Council"
+      ],
+      "locations": [
+        {
+          "latitude": 63.18208,
+          "longitude": -130.97511
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "9bad4aea-99f5-4f79-92d4-8b06e7dc5365",
+      "projectNumber": "2026-0050",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Senoa Gold Corp.",
+      "sectors": [
+        {
+          "name": "Transportation - Roads, Access Roads and Trails",
+          "sectorId": "41ffc2b0-c99e-416c-be0a-96327eb26408"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 47,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1772488683089,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1772143547669
+        },
+        {
+          "extended": false,
+          "stageEnd": 1772143547668,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1772134063982
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Plata Trail Geotechnical Investigation"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "b9d1ad56-661b-450d-a5be-b1d5bda05390",
+          "name": "Dawson"
+        }
+      ],
+      "decisionBodies": [
+        "DFO Referrals Pacific",
+        "Transport Canada",
+        "YG EMR Minerals Resources Branch"
+      ],
+      "indigenousGovernments": [
+        "Tr'ond\u00ebk Hw\u00ebch'in"
+      ],
+      "locations": [
+        {
+          "latitude": 63.94735,
+          "longitude": -138.97687
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [
+        "Dawson Regional Planning Commission"
+      ],
+      "projectId": "71134f48-09c5-4461-bea0-d862586fc772",
+      "projectNumber": "2026-0058",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "David Millar",
+      "sectors": [
+        {
+          "name": "Mining - Placer",
+          "sectorId": "a962ed4b-1223-40f2-81ca-027046576935"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 2,
+        "extended": false,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1773942036086,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1773766959744
+        },
+        {
+          "extended": false,
+          "stageEnd": 1773766959743,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1773766505390
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": " Placer Mine - Gold Bottom and Hunker Creek"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "b9d1ad56-661b-450d-a5be-b1d5bda05390",
+          "name": "Dawson"
+        }
+      ],
+      "decisionBodies": [
+        "DFO Referrals Pacific",
+        "Transport Canada",
+        "YG EMR Minerals Resources Branch"
+      ],
+      "indigenousGovernments": [
+        "Tr'ond\u00ebk Hw\u00ebch'in"
+      ],
+      "locations": [
+        {
+          "latitude": 63.77952,
+          "longitude": -139.5823
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [
+        "Dawson Regional Planning Commission"
+      ],
+      "projectId": "24ff2a37-2c5f-40e1-8fc8-70824811e9f8",
+      "projectNumber": "2026-0039",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Slate River Mining Ltd.",
+      "sectors": [
+        {
+          "name": "Mining - Placer",
+          "sectorId": "a962ed4b-1223-40f2-81ca-027046576935"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 35,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1771526933663,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1771447343029
+        },
+        {
+          "extended": false,
+          "stageEnd": 1771447343028,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1769013246012
+        },
+        {
+          "extended": false,
+          "stageEnd": 1769013246011,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1768843263287
+        },
+        {
+          "extended": false,
+          "stageEnd": 1768843263286,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1768795701469
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Placer Mine - Middle Block Lower Indian River Placer Operation"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "b9d1ad56-661b-450d-a5be-b1d5bda05390",
+          "name": "Dawson"
+        }
+      ],
+      "decisionBodies": [
+        "DFO Referrals Pacific",
+        "Transport Canada",
+        "YG EMR Minerals Resources Branch"
+      ],
+      "indigenousGovernments": [
+        "Tr'ond\u00ebk Hw\u00ebch'in"
+      ],
+      "locations": [
+        {
+          "latitude": 64.00653,
+          "longitude": -139.05634
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [
+        "Dawson Regional Planning Commission"
+      ],
+      "projectId": "29813fc4-b805-4849-be52-7f2d1338a193",
+      "projectNumber": "2026-0007",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Wesley Greer",
+      "sectors": [
+        {
+          "name": "Mining - Placer",
+          "sectorId": "a962ed4b-1223-40f2-81ca-027046576935"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 58,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1768329260989,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1768018865719
+        },
+        {
+          "extended": false,
+          "stageEnd": 1768018865718,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1768018864044
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Placer Mine - Tinhorn Bench"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "d2ebaae3-6422-4598-92e1-f0b6d61df474",
+          "name": "Mayo"
+        }
+      ],
+      "decisionBodies": [
+        "DFO Referrals Pacific",
+        "Transport Canada",
+        "YG EMR Minerals Resources Branch"
+      ],
+      "indigenousGovernments": [
+        "First Nation of Na-Cho Ny\u00e4k Dun"
+      ],
+      "locations": [
+        {
+          "latitude": 63.70695,
+          "longitude": -136.12377
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "2f5ca067-54b1-42ba-8bf5-3ee053ae8db3",
+      "projectNumber": "2026-0052",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Norex Mining Inc",
+      "sectors": [
+        {
+          "name": "Mining - Placer",
+          "sectorId": "a962ed4b-1223-40f2-81ca-027046576935"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 50,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1772820708212,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1772608937662
+        },
+        {
+          "extended": false,
+          "stageEnd": 1772608937661,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1772561038303
+        },
+        {
+          "extended": false,
+          "stageEnd": 1772561038302,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1772531900770
+        },
+        {
+          "extended": false,
+          "stageEnd": 1772531900769,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1772434262149
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Placer Mine - Minto and Jarvis Creeks"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "ec31872e-2d70-4c4b-8097-f4006eb92fc9",
+          "name": "Haines Junction"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [
+        "Kluane First Nation",
+        "Champagne and Aishihik First Nations",
+        "White River First Nation"
+      ],
+      "locations": [
+        {
+          "latitude": 60.57618,
+          "longitude": -137.218
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "e94a2ed9-1f07-45ca-bd6e-03cea2f82ceb",
+      "projectNumber": "2026-0026",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Fresh Adventures Ltd",
+      "sectors": [
+        {
+          "name": "Recreation and Tourism",
+          "sectorId": "d109e521-1f78-409d-977c-99f2e731fccd"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 21,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1770327614587,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1770213817972
+        },
+        {
+          "extended": false,
+          "stageEnd": 1770213817971,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1770213045769
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Guided Hiking in KNPR (Fresh Adventures)"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "b9d1ad56-661b-450d-a5be-b1d5bda05390",
+          "name": "Dawson"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [
+        "First Nation of Na-Cho Ny\u00e4k Dun"
+      ],
+      "locations": [
+        {
+          "latitude": 63.92376,
+          "longitude": -136.91508
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "a3afc2df-6221-4060-aba4-c4ec1022a903",
+      "projectNumber": "2026-0038",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Tim Coles Enterprises Ltd.",
+      "sectors": [
+        {
+          "name": "Mining - Placer",
+          "sectorId": "a962ed4b-1223-40f2-81ca-027046576935"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 35,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1771525495668,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1771357381431
+        },
+        {
+          "extended": false,
+          "stageEnd": 1771357381430,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1771276319060
+        },
+        {
+          "extended": false,
+          "stageEnd": 1771276319059,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1771010868624
+        },
+        {
+          "extended": false,
+          "stageEnd": 1771010868623,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1768765734388
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Placer Mine - Big, Granite, Hobo Creeks and Tributaries"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "36fe3ef0-fbd2-4fb2-b75e-4ab48008e50f",
+          "name": "Whitehorse"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [
+        "Ta'an Kw\u00e4ch'\u00e4n Council",
+        "Kwanlin D\u00fcn First Nation"
+      ],
+      "locations": [
+        {
+          "latitude": 60.5986,
+          "longitude": -134.9503
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "01e77cf6-71d8-4f63-b143-0df424aa91bf",
+      "projectNumber": "2026-0017",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Department of National Defence (DND)",
+      "sectors": [
+        {
+          "name": "Other Industrial Activities",
+          "sectorId": "10674ce2-eb75-4d4b-85b0-d4824a997380"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 12,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1769525146534,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1769459681293
+        },
+        {
+          "extended": false,
+          "stageEnd": 1769459681292,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1769459679295
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Water License - Whitehorse Summer Cadet Training Centre "
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "36fe3ef0-fbd2-4fb2-b75e-4ab48008e50f",
+          "name": "Whitehorse"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [
+        "Ta'an Kw\u00e4ch'\u00e4n Council",
+        "Kwanlin D\u00fcn First Nation"
+      ],
+      "locations": [
+        {
+          "latitude": 60.57066,
+          "longitude": -134.86717
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "4c998024-c575-49c7-b734-77903a2e1463",
+      "projectNumber": "2026-0036",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Government of Yukon - Forest Management Branch",
+      "sectors": [
+        {
+          "name": "Transportation - Roads, Access Roads and Trails",
+          "sectorId": "41ffc2b0-c99e-416c-be0a-96327eb26408"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 34,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1771435180369,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1771268568123
+        },
+        {
+          "extended": false,
+          "stageEnd": 1771268568122,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1771268566381
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "South Klondike Highway Access"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "3a238322-8075-4058-8553-7f44ecb01bd2",
+          "name": "Watson Lake"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [
+        "Teslin Tlingit Council",
+        "Liard First Nation",
+        "Ross River Dena Council"
+      ],
+      "locations": [
+        {
+          "latitude": 61.53111,
+          "longitude": -132.26667
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "57f6044c-51ba-4761-87e6-5d481f4bd5b9",
+      "projectNumber": "2026-0011",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Government of Yukon - Assessment and Abandoned Mines",
+      "sectors": [],
+      "stage": {
+        "daysRemaining": 5,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1768923020274,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1768603734892
+        },
+        {
+          "extended": false,
+          "stageEnd": 1768603734891,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1768603733971
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Ketza River Mine Fuel Tank Removal"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "d2ebaae3-6422-4598-92e1-f0b6d61df474",
+          "name": "Mayo"
+        }
+      ],
+      "decisionBodies": [
+        "DFO Referrals Pacific",
+        "Transport Canada",
+        "YG EMR Minerals Resources Branch"
+      ],
+      "indigenousGovernments": [
+        "Selkirk First Nation",
+        "Tr'ond\u00ebk Hw\u00ebch'in",
+        "Little Salmon/Carmacks First Nation",
+        "White River First Nation"
+      ],
+      "locations": [
+        {
+          "latitude": 62.53923,
+          "longitude": -137.58335
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "07976d84-8cb3-44dd-90e1-763fe5fc5579",
+      "projectNumber": "2026-0068",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Selkirk Copper Mines Ltd.",
+      "sectors": [
+        {
+          "name": "Mining - Quartz",
+          "sectorId": "bca2424f-12c5-41e9-82e9-1a31b68abbd0"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 16,
+        "extended": false,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1775173586438,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1774999636642
+        },
+        {
+          "extended": false,
+          "stageEnd": 1774999636641,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1774999635820
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Quartz Exploration - Minto Regional Exploration Program"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "ec31872e-2d70-4c4b-8097-f4006eb92fc9",
+          "name": "Haines Junction"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [
+        "Kluane First Nation",
+        "White River First Nation"
+      ],
+      "locations": [
+        {
+          "latitude": 61.39334,
+          "longitude": -139.56884
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "d4e9abdd-0edf-4c38-b6dd-9ba91719db06",
+      "projectNumber": "2026-0033",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "535785 Yukon Inc",
+      "sectors": [
+        {
+          "name": "Mining - Placer",
+          "sectorId": "a962ed4b-1223-40f2-81ca-027046576935"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 34,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1771343924181,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1771229336740
+        },
+        {
+          "extended": false,
+          "stageEnd": 1771229336739,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1771208988297
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Placer Mine - Wade Creek"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "36fe3ef0-fbd2-4fb2-b75e-4ab48008e50f",
+          "name": "Whitehorse"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [
+        "Ta'an Kw\u00e4ch'\u00e4n Council",
+        "Kwanlin D\u00fcn First Nation"
+      ],
+      "locations": [
+        {
+          "latitude": 60.68258,
+          "longitude": -135.14735
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "bc4fa87e-60e5-47f8-ae1b-400e0b130eae",
+      "projectNumber": "2026-0037",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Whitehorse Nordic Ski Society",
+      "sectors": [
+        {
+          "name": "Recreation and Tourism",
+          "sectorId": "d109e521-1f78-409d-977c-99f2e731fccd"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 35,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1771516935321,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1771368467614
+        },
+        {
+          "extended": false,
+          "stageEnd": 1771368467613,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1771363496337
+        },
+        {
+          "extended": false,
+          "stageEnd": 1771363496336,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1771286376561
+        },
+        {
+          "extended": false,
+          "stageEnd": 1771286376560,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1771112703864
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Proposed Descent Trail "
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "ec31872e-2d70-4c4b-8097-f4006eb92fc9",
+          "name": "Haines Junction"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [],
+      "locations": [
+        {
+          "latitude": 60.82305,
+          "longitude": -138.01556
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "21f46916-75ea-45f6-a140-ccf118c456e4",
+      "projectNumber": "2026-0009",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Dulac Mining",
+      "sectors": [
+        {
+          "name": "Mining - Placer",
+          "sectorId": "a962ed4b-1223-40f2-81ca-027046576935"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 58,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1768336197948,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1768335003720
+        },
+        {
+          "extended": false,
+          "stageEnd": 1768335003719,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1768335003713
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Placer Mine - Kimberley Creek"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "b9d1ad56-661b-450d-a5be-b1d5bda05390",
+          "name": "Dawson"
+        }
+      ],
+      "decisionBodies": [
+        "DFO Referrals Pacific",
+        "Transport Canada",
+        "YG EMR Minerals Resources Branch"
+      ],
+      "indigenousGovernments": [
+        "Tr'ond\u00ebk Hw\u00ebch'in",
+        "White River First Nation"
+      ],
+      "locations": [
+        {
+          "latitude": 63.08308,
+          "longitude": -139.29503
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [
+        "Dawson Regional Planning Commission"
+      ],
+      "projectId": "245cc03b-b712-4f13-bf0b-9738b6e03147",
+      "projectNumber": "2026-0055",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "536019 Yukon Inc",
+      "sectors": [
+        {
+          "name": "Mining - Placer",
+          "sectorId": "a962ed4b-1223-40f2-81ca-027046576935"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 56,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1773332288259,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1773191167060
+        },
+        {
+          "extended": false,
+          "stageEnd": 1773191167059,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1773188095491
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Placer Mine - Thistle Creek - Unnamed Right Limit Tributary (UNRLT)"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "b9d1ad56-661b-450d-a5be-b1d5bda05390",
+          "name": "Dawson"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [
+        "Tr'ond\u00ebk Hw\u00ebch'in"
+      ],
+      "locations": [
+        {
+          "latitude": 63.89079,
+          "longitude": -139.40569
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "a27ab4f2-7b80-4749-aa37-41be67753816",
+      "projectNumber": "2026-0073",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Andrew Heslip",
+      "sectors": [
+        {
+          "name": "Mining - Placer",
+          "sectorId": "a962ed4b-1223-40f2-81ca-027046576935"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 26,
+        "extended": false,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1775841180267,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1775687222658
+        },
+        {
+          "extended": false,
+          "stageEnd": 1775687222657,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1775686860001
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Placer Mine - French Gulch"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "3a238322-8075-4058-8553-7f44ecb01bd2",
+          "name": "Watson Lake"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [
+        "Liard First Nation",
+        "Ross River Dena Council"
+      ],
+      "locations": [
+        {
+          "latitude": 60.06299,
+          "longitude": -128.71915
+        },
+        {
+          "latitude": 59.99946,
+          "longitude": -129.05307
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "22edad00-ce92-4170-a83d-ebbf6ea6f407",
+      "projectNumber": "2026-0001",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "City West Cable and Telephone Corp.",
+      "sectors": [
+        {
+          "name": "Utilities - Telecommunications",
+          "sectorId": "5113d79b-dca5-4a3e-bb51-5e7c5e8bd29d"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 50,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1767633043229,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1766183786854
+        },
+        {
+          "extended": false,
+          "stageEnd": 1766183786853,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1766083685898
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Fibre Optic Line Link (Watson Lake to BC Border - Hwy 37)"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "36fe3ef0-fbd2-4fb2-b75e-4ab48008e50f",
+          "name": "Whitehorse"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [
+        "Ta'an Kw\u00e4ch'\u00e4n Council",
+        "Kwanlin D\u00fcn First Nation"
+      ],
+      "locations": [
+        {
+          "latitude": 61.35172,
+          "longitude": -134.34689
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "e8ccbd8f-4803-4d5e-bc65-fed535f2a6b2",
+      "projectNumber": "2026-0027",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Geoplacer Exploration Ltd. ",
+      "sectors": [
+        {
+          "name": "Mining - Placer",
+          "sectorId": "a962ed4b-1223-40f2-81ca-027046576935"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 22,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1770399120251,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1770224864873
+        },
+        {
+          "extended": false,
+          "stageEnd": 1770224864872,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1769824245493
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Placer Mine - Summit Creek"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "36fe3ef0-fbd2-4fb2-b75e-4ab48008e50f",
+          "name": "Whitehorse"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [
+        "Ta'an Kw\u00e4ch'\u00e4n Council",
+        "Kwanlin D\u00fcn First Nation"
+      ],
+      "locations": [
+        {
+          "latitude": 60.68476,
+          "longitude": -135.07989
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "eabb3adf-bad3-4190-b402-fac80f8ca0fb",
+      "projectNumber": "2026-0072",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Lobird Living Corp",
+      "sectors": [
+        {
+          "name": "Utilities - Water and Wastewater",
+          "sectorId": "0e9bde29-76d0-4a76-90e6-a221dc7407db"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 23,
+        "extended": false,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1775760433731,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1775662724011
+        },
+        {
+          "extended": false,
+          "stageEnd": 1775662724010,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1775662723056
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Lobird Subdivision - Water License and Wastewater Treatment Lagoon"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "ec31872e-2d70-4c4b-8097-f4006eb92fc9",
+          "name": "Haines Junction"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [
+        "Kluane First Nation",
+        "White River First Nation"
+      ],
+      "locations": [
+        {
+          "latitude": 61.40679,
+          "longitude": -138.70161
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "5dd7c8e1-6fac-4a81-a06f-1e65703ae469",
+      "projectNumber": "2026-0008",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Cordillera Quarry Services Ltd.",
+      "sectors": [
+        {
+          "name": "Mining - Placer",
+          "sectorId": "a962ed4b-1223-40f2-81ca-027046576935"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 58,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1768332878208,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1768177617701
+        },
+        {
+          "extended": false,
+          "stageEnd": 1768177617700,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1768168318629
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Placer Mine - Bliss and Al Creeks"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "b9d1ad56-661b-450d-a5be-b1d5bda05390",
+          "name": "Dawson"
+        }
+      ],
+      "decisionBodies": [
+        "DFO Referrals Pacific",
+        "Transport Canada",
+        "YG EMR Minerals Resources Branch"
+      ],
+      "indigenousGovernments": [
+        "First Nation of Na-Cho Ny\u00e4k Dun",
+        "Tr'ond\u00ebk Hw\u00ebch'in"
+      ],
+      "locations": [
+        {
+          "latitude": 63.77556,
+          "longitude": -138.55028
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "06209050-b038-4359-b4ee-332a1ab5dce4",
+      "projectNumber": "2026-0069",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Metallic Minerals Corp.",
+      "sectors": [
+        {
+          "name": "Mining - Placer",
+          "sectorId": "a962ed4b-1223-40f2-81ca-027046576935"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 22,
+        "extended": false,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1775666350401,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1775136976086
+        },
+        {
+          "extended": false,
+          "stageEnd": 1775136976085,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1775069335965
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Placer Mine - Dominion Left Limit Bench"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "d2ebaae3-6422-4598-92e1-f0b6d61df474",
+          "name": "Mayo"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [
+        "First Nation of Na-Cho Ny\u00e4k Dun"
+      ],
+      "locations": [
+        {
+          "latitude": 63.60794,
+          "longitude": -135.9612
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "73d4ee89-5969-46f7-bbb3-94865cd44123",
+      "projectNumber": "2026-0078",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Too Tall Construction and Consulting Inc.",
+      "sectors": [
+        {
+          "name": "Mining - Other (Coal, Aggregate etc.)",
+          "sectorId": "fac9a8f1-62ab-475b-a76f-eb6314667dfd"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 28,
+        "extended": false,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1776191170477,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1775860643060
+        },
+        {
+          "extended": false,
+          "stageEnd": 1775860643059,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1775846177133
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Quarry - Silver Trail km 46"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "d2ebaae3-6422-4598-92e1-f0b6d61df474",
+          "name": "Mayo"
+        }
+      ],
+      "decisionBodies": [
+        "DFO Referrals Pacific",
+        "Transport Canada",
+        "YG EMR Minerals Resources Branch"
+      ],
+      "indigenousGovernments": [
+        "First Nation of Na-Cho Ny\u00e4k Dun"
+      ],
+      "locations": [
+        {
+          "latitude": 63.72673,
+          "longitude": -136.08449
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "7a4cfb2f-a975-4c38-8568-75bacfd2879b",
+      "projectNumber": "2026-0047",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "George Hnatyshyn\u00a0",
+      "sectors": [
+        {
+          "name": "Mining - Placer",
+          "sectorId": "a962ed4b-1223-40f2-81ca-027046576935"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 43,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1772221650287,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1772052237487
+        },
+        {
+          "extended": false,
+          "stageEnd": 1772052237486,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1772052237479
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Placer Mine - Highet Creek"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "d2ebaae3-6422-4598-92e1-f0b6d61df474",
+          "name": "Mayo"
+        }
+      ],
+      "decisionBodies": [
+        "DFO Referrals Pacific",
+        "Transport Canada",
+        "YG EMR Minerals Resources Branch"
+      ],
+      "indigenousGovernments": [
+        "First Nation of Na-Cho Ny\u00e4k Dun"
+      ],
+      "locations": [
+        {
+          "latitude": 63.70501,
+          "longitude": -136.14408
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "e5a6d3d5-0aaa-4b09-a7d9-1308b57a6d20",
+      "projectNumber": "2026-0048",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "535785 Yukon Inc",
+      "sectors": [
+        {
+          "name": "Mining - Placer",
+          "sectorId": "a962ed4b-1223-40f2-81ca-027046576935"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 43,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1772225280767,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1771222558887
+        },
+        {
+          "extended": false,
+          "stageEnd": 1771222558886,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1771214441948
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Placer Mine - Jarvis Creek"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "b9d1ad56-661b-450d-a5be-b1d5bda05390",
+          "name": "Dawson"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [
+        "Inuvialuit Game Council"
+      ],
+      "locations": [
+        {
+          "latitude": 69.2175,
+          "longitude": -138.4625
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "c4585ecb-5ffe-4ff6-a236-f3a7dfa8149e",
+      "projectNumber": "2026-0079",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Margaret Campbell",
+      "sectors": [
+        {
+          "name": "Scientific Research/Wildlife Management",
+          "sectorId": "411164f6-8122-4579-85e2-7cc73254b4e3"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 28,
+        "extended": false,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1776200742832,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1775850862957
+        },
+        {
+          "extended": false,
+          "stageEnd": 1775850862956,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1775688545895
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Breeding Waterfowl Surveys - Tuktoyaktuk Peninsula and Yukon North Slope"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "b9d1ad56-661b-450d-a5be-b1d5bda05390",
+          "name": "Dawson"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [
+        "Tr'ond\u00ebk Hw\u00ebch'in"
+      ],
+      "locations": [
+        {
+          "latitude": 64.0571,
+          "longitude": -139.4357
+        }
+      ],
+      "outcomes": {
+        "outcomeName": "Withdrawn"
+      },
+      "planningCommissions": [
+        "Dawson Regional Planning Commission"
+      ],
+      "projectId": "46191727-4c76-4dcd-9b00-f1fd834b76d4",
+      "projectNumber": "2026-0019",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Dawson Society for Children and Families ",
+      "sectors": [
+        {
+          "name": "Residential, Commercial, and Industrial Land Development",
+          "sectorId": "45a93ca0-2007-466d-81fb-d8c4fbe48215"
+        }
+      ],
+      "stage": {
+        "extended": false,
+        "name": "Assessment Discontinued",
+        "stageId": "a9d1c60d-9ebf-4d8c-86f6-bd9736a3d1cf"
+      },
+      "stageHistory": [
+        {
+          "extended": true,
+          "stageEnd": 1774376498489,
+          "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+          "stageName": "Adequacy Review",
+          "stageStart": 1769784804841
+        },
+        {
+          "extended": false,
+          "stageEnd": 1769784804840,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1769636444384
+        },
+        {
+          "extended": false,
+          "stageEnd": 1769636444383,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1769563222854
+        }
+      ],
+      "stageId": "a9d1c60d-9ebf-4d8c-86f6-bd9736a3d1cf",
+      "title": "Geotechnical Drilling \u2013 Parcel K"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "d2ebaae3-6422-4598-92e1-f0b6d61df474",
+          "name": "Mayo"
+        }
+      ],
+      "decisionBodies": [
+        "DFO Referrals Pacific",
+        "Transport Canada",
+        "YG EMR Minerals Resources Branch"
+      ],
+      "indigenousGovernments": [
+        "Selkirk First Nation",
+        "Tr'ond\u00ebk Hw\u00ebch'in",
+        "White River Asserted Territory"
+      ],
+      "locations": [
+        {
+          "latitude": 62.98433,
+          "longitude": -138.44777
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [
+        "Dawson Regional Planning Commission"
+      ],
+      "projectId": "e170bb78-58e5-46aa-824d-61cfee124ae2",
+      "projectNumber": "2026-0060",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Zdenek Bidrman",
+      "sectors": [
+        {
+          "name": "Mining - Placer",
+          "sectorId": "a962ed4b-1223-40f2-81ca-027046576935"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 7,
+        "extended": false,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1774376119892,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1774219486049
+        },
+        {
+          "extended": false,
+          "stageEnd": 1774219486048,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1774219148702
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Placer Mine - Scroggie Creek Amendment "
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "b9d1ad56-661b-450d-a5be-b1d5bda05390",
+          "name": "Dawson"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [
+        "Tr'ond\u00ebk Hw\u00ebch'in",
+        "White River First Nation"
+      ],
+      "locations": [
+        {
+          "latitude": 62.99165,
+          "longitude": -139.17434
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "a293ad2d-c596-4ca6-868b-056098904c12",
+      "projectNumber": "2026-0071",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Arcus Development Corp.",
+      "sectors": [
+        {
+          "name": "Mining - Quartz",
+          "sectorId": "bca2424f-12c5-41e9-82e9-1a31b68abbd0"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 23,
+        "extended": false,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1775754621817,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1775581083391
+        },
+        {
+          "extended": false,
+          "stageEnd": 1775581083390,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1775581082644
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Quartz Exploration - Touleary Project"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "b9d1ad56-661b-450d-a5be-b1d5bda05390",
+          "name": "Dawson"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [
+        "Tr'ond\u00ebk Hw\u00ebch'in"
+      ],
+      "locations": [
+        {
+          "latitude": 64.0326,
+          "longitude": -139.19436
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "b273279e-522f-48bd-bcf1-0cf9d278ff8b",
+      "projectNumber": "2026-0075",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Government of Yukon, Department of Highways and Public Works, Transportation Engineering Branch",
+      "sectors": [
+        {
+          "name": "Transportation - Roads, Access Roads and Trails",
+          "sectorId": "41ffc2b0-c99e-416c-be0a-96327eb26408"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 26,
+        "extended": false,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1775841733581,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1775672604383
+        },
+        {
+          "extended": false,
+          "stageEnd": 1775672604382,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1775672602813
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "N. Klondike Hwy (km 700.2-702.8) Reconstruction and Hunker Creek Bridge Construction"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "d2ebaae3-6422-4598-92e1-f0b6d61df474",
+          "name": "Mayo"
+        }
+      ],
+      "decisionBodies": [
+        "DFO Referrals Pacific",
+        "Transport Canada",
+        "YG EMR Minerals Resources Branch"
+      ],
+      "indigenousGovernments": [
+        "First Nation of Na-Cho Ny\u00e4k Dun",
+        "Tr'ond\u00ebk Hw\u00ebch'in"
+      ],
+      "locations": [
+        {
+          "latitude": 63.56569,
+          "longitude": -137.38981
+        },
+        {
+          "latitude": 63.57277,
+          "longitude": -137.38162
+        }
+      ],
+      "outcomes": {
+        "outcomeName": "Withdrawn"
+      },
+      "planningCommissions": [],
+      "projectId": "a87743cc-f1c7-460c-8daf-789d86a3eed1",
+      "projectNumber": "2026-0004",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "835599 Yukon Inc.",
+      "sectors": [
+        {
+          "name": "Mining - Placer",
+          "sectorId": "a962ed4b-1223-40f2-81ca-027046576935"
+        }
+      ],
+      "stage": {
+        "extended": false,
+        "name": "Assessment Discontinued",
+        "stageId": "a9d1c60d-9ebf-4d8c-86f6-bd9736a3d1cf"
+      },
+      "stageHistory": [
+        {
+          "extended": true,
+          "stageEnd": 1775672536563,
+          "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+          "stageName": "Adequacy Review",
+          "stageStart": 1768233153452
+        },
+        {
+          "extended": false,
+          "stageEnd": 1768233153451,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1767892004684
+        },
+        {
+          "extended": false,
+          "stageEnd": 1767892004683,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1767886293079
+        }
+      ],
+      "stageId": "a9d1c60d-9ebf-4d8c-86f6-bd9736a3d1cf",
+      "title": "Placer Mine - McQuesten West Raven"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "36fe3ef0-fbd2-4fb2-b75e-4ab48008e50f",
+          "name": "Whitehorse"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [
+        "Kwanlin D\u00fcn First Nation"
+      ],
+      "locations": [
+        {
+          "latitude": 60.50551,
+          "longitude": -134.84745
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "a909d2f3-d0fd-43fe-aa70-d4b58ba75de4",
+      "projectNumber": "2026-0028",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Nathan Dumont",
+      "sectors": [
+        {
+          "name": "Energy Transmission (Gas, Electricity)",
+          "sectorId": "c7d4d0d5-5c80-47b3-ae4b-8698aabf6cc2"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 26,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1770740387504,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1770493834515
+        },
+        {
+          "extended": false,
+          "stageEnd": 1770493834514,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1770493832954
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Powerline to Service Lot 1214, Mt Lorne"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "36fe3ef0-fbd2-4fb2-b75e-4ab48008e50f",
+          "name": "Whitehorse"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [
+        "Ta'an Kw\u00e4ch'\u00e4n Council",
+        "Kwanlin D\u00fcn First Nation"
+      ],
+      "locations": [
+        {
+          "latitude": 60.69153,
+          "longitude": -135.05298
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "655713a6-a2ea-4e46-9692-e322893193d2",
+      "projectNumber": "2026-0070",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "City of Whitehorse",
+      "sectors": [
+        {
+          "name": "Other Industrial Activities",
+          "sectorId": "10674ce2-eb75-4d4b-85b0-d4824a997380"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 23,
+        "extended": false,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1775745710211,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1775583789824
+        },
+        {
+          "extended": false,
+          "stageEnd": 1775583789823,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1775583246537
+        },
+        {
+          "extended": false,
+          "stageEnd": 1775583246536,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1775153654204
+        },
+        {
+          "extended": false,
+          "stageEnd": 1775153654203,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1775153653362
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Snow Storage Site Expansion - Robert Service Way "
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "d2ebaae3-6422-4598-92e1-f0b6d61df474",
+          "name": "Mayo"
+        }
+      ],
+      "decisionBodies": [
+        "DFO Referrals Pacific",
+        "Transport Canada",
+        "YG EMR Minerals Resources Branch"
+      ],
+      "indigenousGovernments": [
+        "Selkirk First Nation",
+        "Tr'ond\u00ebk Hw\u00ebch'in",
+        "White River Asserted Territory"
+      ],
+      "locations": [
+        {
+          "latitude": 62.99492,
+          "longitude": -138.30134
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [
+        "Dawson Regional Planning Commission"
+      ],
+      "projectId": "86744208-5b01-4fe5-b1ed-ffd93edebdc9",
+      "projectNumber": "2026-0061",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "536281 Yukon Inc.",
+      "sectors": [
+        {
+          "name": "Mining - Placer",
+          "sectorId": "a962ed4b-1223-40f2-81ca-027046576935"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 7,
+        "extended": false,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1774376156697,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1774205378377
+        },
+        {
+          "extended": false,
+          "stageEnd": 1774205378376,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1774204971511
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Placer Mine - Alberta Creek"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "d2ebaae3-6422-4598-92e1-f0b6d61df474",
+          "name": "Mayo"
+        }
+      ],
+      "decisionBodies": [
+        "DFO Referrals Pacific",
+        "Transport Canada",
+        "YG EMR Minerals Resources Branch"
+      ],
+      "indigenousGovernments": [
+        "Selkirk First Nation",
+        "First Nation of Na-Cho Ny\u00e4k Dun",
+        "Tr'ond\u00ebk Hw\u00ebch'in",
+        "White River First Nation"
+      ],
+      "locations": [
+        {
+          "latitude": 63.12556,
+          "longitude": -138.63889
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "d9f386e4-a11a-4b97-99a3-b04a4ab00e87",
+      "projectNumber": "2026-0066",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Zdenek Bidrman",
+      "sectors": [
+        {
+          "name": "Mining - Placer",
+          "sectorId": "a962ed4b-1223-40f2-81ca-027046576935"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 14,
+        "extended": false,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1774973980052,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1774826209651
+        },
+        {
+          "extended": false,
+          "stageEnd": 1774826209650,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1774803043963
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Placer Mine - Scroggie Creek"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "ec31872e-2d70-4c4b-8097-f4006eb92fc9",
+          "name": "Haines Junction"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [
+        "Champagne and Aishihik First Nations"
+      ],
+      "locations": [
+        {
+          "latitude": 60.71755,
+          "longitude": -137.42505
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "beb5f5de-6f58-415a-9a8f-de06d5b1c5ca",
+      "projectNumber": "2026-0013",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Champagne Pack Trains Ltd",
+      "sectors": [
+        {
+          "name": "Recreation and Tourism",
+          "sectorId": "d109e521-1f78-409d-977c-99f2e731fccd"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 6,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1769033939564,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1768851436086
+        },
+        {
+          "extended": false,
+          "stageEnd": 1768851436085,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1767995962311
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Guided Horseback Day Trips in KNPR"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "ec31872e-2d70-4c4b-8097-f4006eb92fc9",
+          "name": "Haines Junction"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [
+        "Champagne and Aishihik First Nations"
+      ],
+      "locations": [
+        {
+          "latitude": 60.7431,
+          "longitude": -137.50123
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "5423c86e-5402-4573-9ab7-5b1a11f118d8",
+      "projectNumber": "2026-0003",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Parks Canada Agency",
+      "sectors": [
+        {
+          "name": "Forestry",
+          "sectorId": "392deb7c-b6d1-4675-87fa-b0a73633ece7"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 54,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1767818294756,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1767636161010
+        },
+        {
+          "extended": false,
+          "stageEnd": 1767636161009,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1763056251042
+        },
+        {
+          "extended": false,
+          "stageEnd": 1763056251041,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1757522429591
+        },
+        {
+          "extended": false,
+          "stageEnd": 1757522429590,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1756835864491
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Haines Road Wildfire Risk Reduction "
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "b9d1ad56-661b-450d-a5be-b1d5bda05390",
+          "name": "Dawson"
+        }
+      ],
+      "decisionBodies": [
+        "DFO Referrals Pacific",
+        "Transport Canada",
+        "YG EMR Minerals Resources Branch"
+      ],
+      "indigenousGovernments": [
+        "Vuntut Gwitchin First Nation"
+      ],
+      "locations": [
+        {
+          "latitude": 66.50109,
+          "longitude": -140.36931
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [
+        "North Yukon Regional Planning Commission"
+      ],
+      "projectId": "9077dbc6-06f0-4c5c-b473-1237c8b039d3",
+      "projectNumber": "2026-0049",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Blackcomb Silver Corp.",
+      "sectors": [
+        {
+          "name": "Mining - Quartz",
+          "sectorId": "bca2424f-12c5-41e9-82e9-1a31b68abbd0"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 47,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1772476116100,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1772156988403
+        },
+        {
+          "extended": false,
+          "stageEnd": 1772156988402,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1772156986476
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Quartz Exploration - Rusty Springs "
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "d2ebaae3-6422-4598-92e1-f0b6d61df474",
+          "name": "Mayo"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [
+        "Selkirk First Nation",
+        "First Nation of Na-Cho Ny\u00e4k Dun",
+        "White River Asserted Territory"
+      ],
+      "locations": [
+        {
+          "latitude": 62.82562,
+          "longitude": -136.5797
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "9a982891-6b12-4ca3-8750-62807ac3f52a",
+      "projectNumber": "2026-0016",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Government of Yukon, Department of Highways and Public Works, Transportation Engineering Branch",
+      "sectors": [
+        {
+          "name": "Transportation - Roads, Access Roads and Trails",
+          "sectorId": "41ffc2b0-c99e-416c-be0a-96327eb26408"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 12,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1769443644169,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1769102884153
+        },
+        {
+          "extended": false,
+          "stageEnd": 1769102884152,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1769102882891
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": " Pelly Crossing Pedestrian Infrastructure Improvements"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "36fe3ef0-fbd2-4fb2-b75e-4ab48008e50f",
+          "name": "Whitehorse"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [
+        "Ta'an Kw\u00e4ch'\u00e4n Council",
+        "Champagne and Aishihik First Nations",
+        "Kwanlin D\u00fcn First Nation"
+      ],
+      "locations": [
+        {
+          "latitude": 60.86451,
+          "longitude": -135.63527
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "df3d27a1-6354-4328-952f-ab2eb3454b4c",
+      "projectNumber": "2026-0041",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Dionne Laybourne and Mario Ley",
+      "sectors": [
+        {
+          "name": "Utilities - Water and Wastewater",
+          "sectorId": "0e9bde29-76d0-4a76-90e6-a221dc7407db"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 35,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1771528397340,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1771435950035
+        },
+        {
+          "extended": false,
+          "stageEnd": 1771435950034,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1771435950027
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Waterline to Lot 1 Murray Agricultural Subdivision"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "36fe3ef0-fbd2-4fb2-b75e-4ab48008e50f",
+          "name": "Whitehorse"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [
+        "Ta'an Kw\u00e4ch'\u00e4n Council",
+        "Kwanlin D\u00fcn First Nation"
+      ],
+      "locations": [
+        {
+          "latitude": 60.6564,
+          "longitude": -135.0887
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "a1e6ac5b-518a-4542-9a4d-4abd4ebea84f",
+      "projectNumber": "2026-0014",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "836409 Yukon Inc",
+      "sectors": [
+        {
+          "name": "Other Industrial Activities",
+          "sectorId": "10674ce2-eb75-4d4b-85b0-d4824a997380"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 8,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1769178185625,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1769032081714
+        },
+        {
+          "extended": false,
+          "stageEnd": 1769032081713,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1769032081108
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Geotechnical Investigation - Mclean Lake"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "d2ebaae3-6422-4598-92e1-f0b6d61df474",
+          "name": "Mayo"
+        }
+      ],
+      "decisionBodies": [
+        "DFO Referrals Pacific",
+        "Transport Canada",
+        "YG EMR Land Use Branch"
+      ],
+      "indigenousGovernments": [
+        "Selkirk First Nation",
+        "White River Asserted Territory",
+        "Little Salmon/Carmacks First Nation"
+      ],
+      "locations": [
+        {
+          "latitude": 62.27621,
+          "longitude": -136.97353
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "2c07ad71-9181-4ba5-8dbb-730728fab0d7",
+      "projectNumber": "2026-0062",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Triumph Gold Corp.",
+      "sectors": [
+        {
+          "name": "Mining - Quartz",
+          "sectorId": "bca2424f-12c5-41e9-82e9-1a31b68abbd0"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 8,
+        "extended": false,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1774458782657,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1774318528882
+        },
+        {
+          "extended": false,
+          "stageEnd": 1774318528881,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1773876663809
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Quartz Exploration - Tinta Hill"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "36fe3ef0-fbd2-4fb2-b75e-4ab48008e50f",
+          "name": "Whitehorse"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [
+        "Kwanlin D\u00fcn First Nation"
+      ],
+      "locations": [
+        {
+          "latitude": 60.68989,
+          "longitude": -135.31366
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "470a1acf-db5f-47ee-a894-a81ee960ef62",
+      "projectNumber": "2026-0076",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Sid McKeown",
+      "sectors": [
+        {
+          "name": "Mining - Other (Coal, Aggregate etc.)",
+          "sectorId": "fac9a8f1-62ab-475b-a76f-eb6314667dfd"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 26,
+        "extended": false,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1775860136806,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1775169792872
+        },
+        {
+          "extended": false,
+          "stageEnd": 1775169792871,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1775169791865
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Red Chief Quarry - Franklin Lake"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "b9d1ad56-661b-450d-a5be-b1d5bda05390",
+          "name": "Dawson"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [
+        "First Nation of Na-Cho Ny\u00e4k Dun",
+        "Tr'ond\u00ebk Hw\u00ebch'in"
+      ],
+      "locations": [
+        {
+          "latitude": 63.77981,
+          "longitude": -138.61526
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "0c06db54-0a99-47fd-a855-35f9e8223d79",
+      "projectNumber": "2026-0074",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "James Ewert",
+      "sectors": [
+        {
+          "name": "Mining - Placer",
+          "sectorId": "a962ed4b-1223-40f2-81ca-027046576935"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 26,
+        "extended": false,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1775841347019,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1775661875572
+        },
+        {
+          "extended": false,
+          "stageEnd": 1775661875571,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1775660814289
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Placer Mine - Hunter Creek"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "b9d1ad56-661b-450d-a5be-b1d5bda05390",
+          "name": "Dawson"
+        }
+      ],
+      "decisionBodies": [
+        "DFO Referrals Pacific",
+        "Transport Canada",
+        "YG EMR Minerals Resources Branch"
+      ],
+      "indigenousGovernments": [
+        "Tr'ond\u00ebk Hw\u00ebch'in"
+      ],
+      "locations": [
+        {
+          "latitude": 63.90816,
+          "longitude": -139.15026
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [
+        "Dawson Regional Planning Commission"
+      ],
+      "projectId": "0f1d67db-0ed1-48b7-9acf-45c0c7659407",
+      "projectNumber": "2026-0054",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Chesla McGee",
+      "sectors": [
+        {
+          "name": "Mining - Placer",
+          "sectorId": "a962ed4b-1223-40f2-81ca-027046576935"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 54,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1773181249509,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1772836537042
+        },
+        {
+          "extended": false,
+          "stageEnd": 1772836537041,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1772836537034
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Placer Mine - Big Sandy 1"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "d2ebaae3-6422-4598-92e1-f0b6d61df474",
+          "name": "Mayo"
+        }
+      ],
+      "decisionBodies": [
+        "DFO Referrals Pacific",
+        "Transport Canada",
+        "YG EMR Minerals Resources Branch"
+      ],
+      "indigenousGovernments": [
+        "First Nation of Na-Cho Ny\u00e4k Dun"
+      ],
+      "locations": [
+        {
+          "latitude": 63.52534,
+          "longitude": -137.23977
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "ce52f6da-4129-40a7-b804-073d798d4281",
+      "projectNumber": "2026-0043",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Thomas Werner Gossmann",
+      "sectors": [
+        {
+          "name": "Mining - Placer",
+          "sectorId": "a962ed4b-1223-40f2-81ca-027046576935"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 35,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1771536983418,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1771354860981
+        },
+        {
+          "extended": false,
+          "stageEnd": 1771354860980,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1770327192498
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Placer Mine - West New Crossing"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "3a238322-8075-4058-8553-7f44ecb01bd2",
+          "name": "Watson Lake"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [
+        "Liard First Nation",
+        "Ross River Dena Council"
+      ],
+      "locations": [
+        {
+          "latitude": 60.09065,
+          "longitude": -128.74699
+        },
+        {
+          "latitude": 60.08476,
+          "longitude": -128.7474
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "e927c188-7cc6-4335-8161-52750f990d8b",
+      "projectNumber": "2026-0005",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Liard First Nation",
+      "sectors": [
+        {
+          "name": "Utilities - Water and Wastewater",
+          "sectorId": "0e9bde29-76d0-4a76-90e6-a221dc7407db"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 58,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1768317691027,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1768001218552
+        },
+        {
+          "extended": false,
+          "stageEnd": 1768001218551,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1764349707369
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Liard First Nation Water Treatment Plant Capacity Upgrade Project "
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "3a238322-8075-4058-8553-7f44ecb01bd2",
+          "name": "Watson Lake"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [
+        "Liard First Nation",
+        "Ross River Dena Council"
+      ],
+      "locations": [
+        {
+          "latitude": 62.23,
+          "longitude": -133.356
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "7930f94c-7fce-418f-91a6-be132ba25dba",
+      "projectNumber": "2026-0029",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Government of Yukon \u2013 Highways and Public Works, Property Management Division ",
+      "sectors": [],
+      "stage": {
+        "daysRemaining": 26,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1770743077492,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1770418336049
+        },
+        {
+          "extended": false,
+          "stageEnd": 1770418336048,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1770413554756
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Former Chateau Jomini - Structural Demolition, Lot 158, Faro"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "b9d1ad56-661b-450d-a5be-b1d5bda05390",
+          "name": "Dawson"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [
+        "Tr'ond\u00ebk Hw\u00ebch'in"
+      ],
+      "locations": [
+        {
+          "latitude": 63.55046,
+          "longitude": -139.98829
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "025bb6ed-ed2c-4eeb-b4b5-40f12a5925fb",
+      "projectNumber": "2026-0067",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Cameron Johnson",
+      "sectors": [
+        {
+          "name": "Mining - Placer",
+          "sectorId": "a962ed4b-1223-40f2-81ca-027046576935"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 15,
+        "extended": false,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1775056238048,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1774884864140
+        },
+        {
+          "extended": false,
+          "stageEnd": 1774884864139,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1774843977451
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Placer Mine - Thirteen Mile Creek and Tributaries "
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "d2ebaae3-6422-4598-92e1-f0b6d61df474",
+          "name": "Mayo"
+        }
+      ],
+      "decisionBodies": [
+        "DFO Referrals Pacific",
+        "Transport Canada",
+        "YG EMR Minerals Resources Branch"
+      ],
+      "indigenousGovernments": [
+        "White River Asserted Territory",
+        "Little Salmon/Carmacks First Nation"
+      ],
+      "locations": [
+        {
+          "latitude": 62.05724,
+          "longitude": -137.22196
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "91ba69ea-d375-452d-9984-e0dcac6bdf10",
+      "projectNumber": "2026-0025",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Mutoa Holdings Ltd.",
+      "sectors": [
+        {
+          "name": "Mining - Placer",
+          "sectorId": "a962ed4b-1223-40f2-81ca-027046576935"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 21,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1770324539952,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1770172805371
+        },
+        {
+          "extended": false,
+          "stageEnd": 1770172805370,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1770170627800
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Placer Mine - Nansen Creek"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "36fe3ef0-fbd2-4fb2-b75e-4ab48008e50f",
+          "name": "Whitehorse"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [
+        "Ta'an Kw\u00e4ch'\u00e4n Council",
+        "Kwanlin D\u00fcn First Nation"
+      ],
+      "locations": [
+        {
+          "latitude": 60.7523,
+          "longitude": -135.1504
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "e9f11b68-1565-45ed-8500-25dc94243f05",
+      "projectNumber": "2026-0021",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "City of Whitehorse",
+      "sectors": [
+        {
+          "name": "Other Industrial Activities",
+          "sectorId": "10674ce2-eb75-4d4b-85b0-d4824a997380"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 19,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1770045136139,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1769665859730
+        },
+        {
+          "extended": false,
+          "stageEnd": 1769665859729,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1769301085386
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Groundwater Monitoring Wells Installation - Waste Management Facility"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "b9d1ad56-661b-450d-a5be-b1d5bda05390",
+          "name": "Dawson"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [
+        "Tr'ond\u00ebk Hw\u00ebch'in"
+      ],
+      "locations": [
+        {
+          "latitude": 63.91587,
+          "longitude": -139.31512
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "f1951b0a-bf5c-4353-a323-a53813c594cb",
+      "projectNumber": "2026-0035",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Dulac Mining",
+      "sectors": [
+        {
+          "name": "Mining - Placer",
+          "sectorId": "a962ed4b-1223-40f2-81ca-027046576935"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 34,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1771354088046,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1771021552564
+        },
+        {
+          "extended": false,
+          "stageEnd": 1771021552563,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1771021552558
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Placer Mine - Eldorado Creek"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "36fe3ef0-fbd2-4fb2-b75e-4ab48008e50f",
+          "name": "Whitehorse"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [
+        "Ta'an Kw\u00e4ch'\u00e4n Council",
+        "Kwanlin D\u00fcn First Nation"
+      ],
+      "locations": [
+        {
+          "latitude": 60.7141,
+          "longitude": -135.0418
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "9d4bc006-da5d-4d07-a30a-38a36d9f32d3",
+      "projectNumber": "2026-0045",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Yukon Government \u2013 Highways and Public Works - Property Management",
+      "sectors": [
+        {
+          "name": "Residential, Commercial, and Industrial Land Development",
+          "sectorId": "45a93ca0-2007-466d-81fb-d8c4fbe48215"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 42,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1772121744673,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1771963535086
+        },
+        {
+          "extended": false,
+          "stageEnd": 1771963535085,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1771962899764
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Former Child Development Center Demolition"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "ec31872e-2d70-4c4b-8097-f4006eb92fc9",
+          "name": "Haines Junction"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [
+        "White River First Nation"
+      ],
+      "locations": [
+        {
+          "latitude": 61.90821,
+          "longitude": -138.18065
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "e94bb2b9-8d7f-49ab-90c3-08b5e0944948",
+      "projectNumber": "2026-0010",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Lapie Mining Inc.",
+      "sectors": [
+        {
+          "name": "Mining - Quartz",
+          "sectorId": "bca2424f-12c5-41e9-82e9-1a31b68abbd0"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 61,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1768598751919,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1768402540422
+        },
+        {
+          "extended": false,
+          "stageEnd": 1768402540421,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1768402539383
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Quartz Exploration - Birch Project"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "ec31872e-2d70-4c4b-8097-f4006eb92fc9",
+          "name": "Haines Junction"
+        }
+      ],
+      "decisionBodies": [
+        "Parks Canada Yukon"
+      ],
+      "indigenousGovernments": [
+        "Champagne and Aishihik First Nations"
+      ],
+      "locations": [
+        {
+          "latitude": 60.57631,
+          "longitude": -137.22258
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "8e09759e-3f24-4bf9-9722-bf62b5cad80f",
+      "projectNumber": "2026-0065",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "North Country Outdoor Adventures",
+      "sectors": [
+        {
+          "name": "Recreation and Tourism",
+          "sectorId": "d109e521-1f78-409d-977c-99f2e731fccd"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 12,
+        "extended": false,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1774646004884,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1774567000222
+        },
+        {
+          "extended": false,
+          "stageEnd": 1774567000221,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1774566998461
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Kluane NPR Business License/Expansion (North Country Outdoor Adventures)"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "d2ebaae3-6422-4598-92e1-f0b6d61df474",
+          "name": "Mayo"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [
+        "Liard First Nation",
+        "Ross River Dena Council",
+        "Little Salmon/Carmacks First Nation"
+      ],
+      "locations": [
+        {
+          "latitude": 62.1985,
+          "longitude": -134.5557
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "56e58d27-8921-4f12-a9c6-86fbd3942f74",
+      "projectNumber": "2026-0077",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Government of Yukon, Department of Highways and Public Works, Transportation Engineering Branch",
+      "sectors": [
+        {
+          "name": "Transportation - Roads, Access Roads and Trails",
+          "sectorId": "41ffc2b0-c99e-416c-be0a-96327eb26408"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 27,
+        "extended": false,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1776104673023,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1775754160640
+        },
+        {
+          "extended": false,
+          "stageEnd": 1775754160639,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1775754159888
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Safety Rest Area km 477 Robert Campbell Highway"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "b9d1ad56-661b-450d-a5be-b1d5bda05390",
+          "name": "Dawson"
+        }
+      ],
+      "decisionBodies": [
+        "DFO Referrals Pacific",
+        "Transport Canada",
+        "YG EMR Minerals Resources Branch"
+      ],
+      "indigenousGovernments": [
+        "Tr'ond\u00ebk Hw\u00ebch'in"
+      ],
+      "locations": [
+        {
+          "latitude": 63.77727,
+          "longitude": -139.68589
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [
+        "Dawson Regional Planning Commission"
+      ],
+      "projectId": "84a146ac-1b30-4ada-99a4-a6e3caa8f71a",
+      "projectNumber": "2026-0057",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Slate River Mining Ltd.",
+      "sectors": [
+        {
+          "name": "Mining - Placer",
+          "sectorId": "a962ed4b-1223-40f2-81ca-027046576935"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 61,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1773764940651,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1773630032177
+        },
+        {
+          "extended": false,
+          "stageEnd": 1773630032176,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1772914544188
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Placer Mine- Indian River and  Tributaries "
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "d2ebaae3-6422-4598-92e1-f0b6d61df474",
+          "name": "Mayo"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [
+        "White River Asserted Territory",
+        "Little Salmon/Carmacks First Nation"
+      ],
+      "locations": [
+        {
+          "latitude": 62.02807,
+          "longitude": -137.20412
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "fe6780e5-8055-407a-9d60-d001c1b0447c",
+      "projectNumber": "2026-0032",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Ren Huawei",
+      "sectors": [
+        {
+          "name": "Mining - Placer",
+          "sectorId": "a962ed4b-1223-40f2-81ca-027046576935"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 29,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1770995595394,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1770831023820
+        },
+        {
+          "extended": false,
+          "stageEnd": 1770831023819,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1767127269899
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Placer Exploration - Nansen Creek (Claim P 529258)"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "36fe3ef0-fbd2-4fb2-b75e-4ab48008e50f",
+          "name": "Whitehorse"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [
+        "Ta'an Kw\u00e4ch'\u00e4n Council",
+        "Kwanlin D\u00fcn First Nation"
+      ],
+      "locations": [
+        {
+          "latitude": 60.69173,
+          "longitude": -135.06892
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "bb519eed-9329-4a7a-924f-4237a3976ddb",
+      "projectNumber": "2026-0012",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Government of Yukon, Community Services, Land Development Branch ",
+      "sectors": [
+        {
+          "name": "Residential, Commercial, and Industrial Land Development",
+          "sectorId": "45a93ca0-2007-466d-81fb-d8c4fbe48215"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 5,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1768934618629,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1768849393448
+        },
+        {
+          "extended": false,
+          "stageEnd": 1768849393447,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1767896436113
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Industrial Subdivision - Ice Lake Road South "
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "3a238322-8075-4058-8553-7f44ecb01bd2",
+          "name": "Watson Lake"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [
+        "Liard First Nation",
+        "Ross River Dena Council"
+      ],
+      "locations": [
+        {
+          "latitude": 60.4469,
+          "longitude": -129.1343
+        },
+        {
+          "latitude": 60.4448,
+          "longitude": -129.0777
+        },
+        {
+          "latitude": 60.3989,
+          "longitude": -129.0801
+        },
+        {
+          "latitude": 60.4015,
+          "longitude": -129.1373
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "c2a4fd72-299d-4820-836e-1e75e5eaed7e",
+      "projectNumber": "2026-0022",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Government of Yukon - Forest Management Branch",
+      "sectors": [
+        {
+          "name": "Forestry",
+          "sectorId": "392deb7c-b6d1-4675-87fa-b0a73633ece7"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 19,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1770131935984,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1769819059253
+        },
+        {
+          "extended": false,
+          "stageEnd": 1769819059252,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1769819059099
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Salvage Timber Harvesting - Cabin Creek"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "d2ebaae3-6422-4598-92e1-f0b6d61df474",
+          "name": "Mayo"
+        }
+      ],
+      "decisionBodies": [
+        "DFO Referrals Pacific",
+        "Transport Canada",
+        "YG EMR Minerals Resources Branch"
+      ],
+      "indigenousGovernments": [
+        "Selkirk First Nation",
+        "White River Asserted Territory",
+        "Little Salmon/Carmacks First Nation"
+      ],
+      "locations": [
+        {
+          "latitude": 62.1848,
+          "longitude": -137.40764
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "a589d7e9-4103-42e1-a825-5b4c4aeaa3ef",
+      "projectNumber": "2026-0024",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "ZSG Depot Ltd.",
+      "sectors": [
+        {
+          "name": "Mining - Placer",
+          "sectorId": "a962ed4b-1223-40f2-81ca-027046576935"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 20,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1770224229917,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1770037339187
+        },
+        {
+          "extended": false,
+          "stageEnd": 1770037339186,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1770001185235
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Placer Mine - Unnamed Tributary of Klaza River "
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "d2ebaae3-6422-4598-92e1-f0b6d61df474",
+          "name": "Mayo"
+        }
+      ],
+      "decisionBodies": [
+        "DFO Referrals Pacific",
+        "Transport Canada",
+        "YG EMR Minerals Resources Branch"
+      ],
+      "indigenousGovernments": [
+        "First Nation of Na-Cho Ny\u00e4k Dun"
+      ],
+      "locations": [
+        {
+          "latitude": 63.7682,
+          "longitude": -136.09344
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "49bb006c-968c-4c06-a56b-dd24d6afcca7",
+      "projectNumber": "2026-0023",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Sovereign Strikers Ltd.",
+      "sectors": [
+        {
+          "name": "Mining - Placer",
+          "sectorId": "a962ed4b-1223-40f2-81ca-027046576935"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 19,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1770138334367,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1769818113870
+        },
+        {
+          "extended": false,
+          "stageEnd": 1769818113869,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1768974199410
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Placer Mine - Bennet Blitz"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "d2ebaae3-6422-4598-92e1-f0b6d61df474",
+          "name": "Mayo"
+        }
+      ],
+      "decisionBodies": [
+        "DFO Referrals Pacific",
+        "Transport Canada",
+        "YG EMR Minerals Resources Branch"
+      ],
+      "indigenousGovernments": [
+        "Selkirk First Nation",
+        "White River Asserted Territory",
+        "Little Salmon/Carmacks First Nation"
+      ],
+      "locations": [
+        {
+          "latitude": 62.21127,
+          "longitude": -137.64541
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "7c59e9c6-d4e5-428c-95a6-1f296d355519",
+      "projectNumber": "2026-0053",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Zimin Wang",
+      "sectors": [
+        {
+          "name": "Mining - Placer",
+          "sectorId": "a962ed4b-1223-40f2-81ca-027046576935"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 54,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1773089120354,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1772769871225
+        },
+        {
+          "extended": false,
+          "stageEnd": 1772769871224,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1772769869574
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Placer Mine - Klaza River"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "36fe3ef0-fbd2-4fb2-b75e-4ab48008e50f",
+          "name": "Whitehorse"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [
+        "Ta'an Kw\u00e4ch'\u00e4n Council",
+        "Kwanlin D\u00fcn First Nation"
+      ],
+      "locations": [
+        {
+          "latitude": 60.75738,
+          "longitude": -135.04347
+        },
+        {
+          "latitude": 60.67603,
+          "longitude": -135.0771
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "72894aef-04d5-4fc1-91d7-5063a1ce966e",
+      "projectNumber": "2026-0059",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Yukon Government (YG) \u2013 Lands Development Branch, Kw\u00e4nlin D\u00fcn First Nation and Ta\u2019an Kw\u00e4ch\u2019\u00e4n Council",
+      "sectors": [
+        {
+          "name": "Residential, Commercial, and Industrial Land Development",
+          "sectorId": "45a93ca0-2007-466d-81fb-d8c4fbe48215"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 5,
+        "extended": false,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1774036935775,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1773935965983
+        },
+        {
+          "extended": false,
+          "stageEnd": 1773935965982,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1773935965974
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Geotechnical Drilling Investigation \u2013 Whitehorse North and South Growth Areas"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "d2ebaae3-6422-4598-92e1-f0b6d61df474",
+          "name": "Mayo"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [
+        "First Nation of Na-Cho Ny\u00e4k Dun"
+      ],
+      "locations": [
+        {
+          "latitude": 63.6563,
+          "longitude": -135.91921
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "668806b0-cb95-4130-b049-4f704b10aeb1",
+      "projectNumber": "2026-0063",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Yukon Energy Corporation",
+      "sectors": [
+        {
+          "name": "Energy - Power Generation",
+          "sectorId": "e15998a0-284b-4506-a68d-900ee2161cb0"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 12,
+        "extended": false,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1774625873533,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1774503153149
+        },
+        {
+          "extended": false,
+          "stageEnd": 1774503153148,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1774462442337
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Wareham Dam Spillway Replacement Project"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "d2ebaae3-6422-4598-92e1-f0b6d61df474",
+          "name": "Mayo"
+        }
+      ],
+      "decisionBodies": [
+        "DFO Referrals Pacific",
+        "Transport Canada",
+        "YG EMR Minerals Resources Branch"
+      ],
+      "indigenousGovernments": [
+        "White River Asserted Territory",
+        "Little Salmon/Carmacks First Nation"
+      ],
+      "locations": [
+        {
+          "latitude": 62.03406,
+          "longitude": -137.10856
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "c17217ea-7b03-4fb8-ab72-aeaedafbea54",
+      "projectNumber": "2026-0002",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Mutoa Holdings Ltd.",
+      "sectors": [
+        {
+          "name": "Mining - Placer",
+          "sectorId": "a962ed4b-1223-40f2-81ca-027046576935"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 51,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1767712370664,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1767463428881
+        },
+        {
+          "extended": false,
+          "stageEnd": 1767463428880,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1767375320843
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Placer Mine - Trophy Creek"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "757a5115-beee-40f7-af71-b3faf0bd356f",
+          "name": "Teslin"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [
+        "Teslin Tlingit Council"
+      ],
+      "locations": [
+        {
+          "latitude": 60.4889,
+          "longitude": -133.2931
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "417c56f2-51e2-480d-9338-fdf948732b7a",
+      "projectNumber": "2026-0015",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Teslin Tlingit Council ",
+      "sectors": [
+        {
+          "name": "Waste Management - Contaminated Sites",
+          "sectorId": "49493439-af44-457f-8398-6fc1c556b688"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 8,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1769198985004,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1769184793662
+        },
+        {
+          "extended": false,
+          "stageEnd": 1769184793661,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1769184149231
+        },
+        {
+          "extended": false,
+          "stageEnd": 1769184149230,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1769182418219
+        },
+        {
+          "extended": false,
+          "stageEnd": 1769182418218,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1768862325558
+        },
+        {
+          "extended": false,
+          "stageEnd": 1768862325557,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1768585643300
+        },
+        {
+          "extended": false,
+          "stageEnd": 1768585643299,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1764627623378
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Johnsons Crossing Remedial Excavation "
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "b9d1ad56-661b-450d-a5be-b1d5bda05390",
+          "name": "Dawson"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [
+        "Tr'ond\u00ebk Hw\u00ebch'in",
+        "White River Asserted Territory"
+      ],
+      "locations": [
+        {
+          "latitude": 62.95629,
+          "longitude": -139.15387
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [
+        "Dawson Regional Planning Commission"
+      ],
+      "projectId": "1b43a827-e80c-4bce-b4fa-e4ef505f437e",
+      "projectNumber": "2026-0040",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "46381 Yukon Ltd.",
+      "sectors": [
+        {
+          "name": "Mining - Placer",
+          "sectorId": "a962ed4b-1223-40f2-81ca-027046576935"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 35,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1771527187731,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1771447319578
+        },
+        {
+          "extended": false,
+          "stageEnd": 1771447319577,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1771446236754
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Placer Mine - Sparkling Creek"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "d2ebaae3-6422-4598-92e1-f0b6d61df474",
+          "name": "Mayo"
+        }
+      ],
+      "decisionBodies": [
+        "DFO Referrals Pacific",
+        "Transport Canada",
+        "YG EMR Minerals Resources Branch"
+      ],
+      "indigenousGovernments": [
+        "First Nation of Na-Cho Ny\u00e4k Dun"
+      ],
+      "locations": [
+        {
+          "latitude": 63.88445,
+          "longitude": -135.31263
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "fa8357e7-3482-4a2b-996b-80c5d7443733",
+      "projectNumber": "2026-0056",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Frank Taylor",
+      "sectors": [
+        {
+          "name": "Mining - Placer",
+          "sectorId": "a962ed4b-1223-40f2-81ca-027046576935"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 56,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1773348112327,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1773147851902
+        },
+        {
+          "extended": false,
+          "stageEnd": 1773147851901,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1773069174960
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Placer Mine - Upper Duncan Creek (Amendment)"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "ec31872e-2d70-4c4b-8097-f4006eb92fc9",
+          "name": "Haines Junction"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [
+        "Champagne and Aishihik First Nations"
+      ],
+      "locations": [
+        {
+          "latitude": 61.58277,
+          "longitude": -137.30508
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "6a163cfa-cffb-4e15-bb22-cf984837602a",
+      "projectNumber": "2026-0042",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Gary McRobb",
+      "sectors": [
+        {
+          "name": "Transportation - Roads, Access Roads and Trails",
+          "sectorId": "41ffc2b0-c99e-416c-be0a-96327eb26408"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 35,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1771533146505,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1771449586054
+        },
+        {
+          "extended": false,
+          "stageEnd": 1771449586053,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1771449584496
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Utility Portage & Reclamation - Aishihik"
+    },
+    {
+      "assessmentDistricts": [
+        {
+          "assessmentDistrictId": "ec31872e-2d70-4c4b-8097-f4006eb92fc9",
+          "name": "Haines Junction"
+        }
+      ],
+      "decisionBodies": [],
+      "indigenousGovernments": [
+        "Kluane First Nation",
+        "Champagne and Aishihik First Nations",
+        "White River First Nation"
+      ],
+      "locations": [
+        {
+          "latitude": 60.57579,
+          "longitude": -137.22091
+        }
+      ],
+      "outcomes": {},
+      "planningCommissions": [],
+      "projectId": "0b9c0615-e7e2-4c3a-b4e8-a9c73111aae8",
+      "projectNumber": "2026-0044",
+      "projectScope": {
+        "activities": "",
+        "summary": ""
+      },
+      "projectTypeId": "d0ab87c1-4f41-4151-9889-a3ae6f2e45af",
+      "projectTypeName": "Evaluation",
+      "proponentName": "Yukon Alpine Adventures",
+      "sectors": [
+        {
+          "name": "Recreation and Tourism",
+          "sectorId": "d109e521-1f78-409d-977c-99f2e731fccd"
+        }
+      ],
+      "stage": {
+        "daysRemaining": 40,
+        "extended": true,
+        "name": "Adequacy Review",
+        "stageId": "ee3e0889-5278-4405-964c-322d5068834b"
+      },
+      "stageHistory": [
+        {
+          "extended": false,
+          "stageEnd": 1771835404508,
+          "stageId": "923b940b-5d9a-42fc-a05a-449539d313f2",
+          "stageName": "Proposal Check",
+          "stageStart": 1771564444319
+        },
+        {
+          "extended": false,
+          "stageEnd": 1771564444318,
+          "stageId": "e308c74f-0681-49d3-859a-be8425441f64",
+          "stageName": "Draft",
+          "stageStart": 1769050806852
+        }
+      ],
+      "stageId": "ee3e0889-5278-4405-964c-322d5068834b",
+      "title": "Guided Hikes in KNPR (Yukon Alpine Adventures)"
+    }
+  ],
+  "startYear": 2026
+}
