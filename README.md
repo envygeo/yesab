@@ -6,12 +6,6 @@ This repo contains scripts for:
 - caching the YESAB registry API in year buckets
 - building static map outputs from the zipped shapefiles in `data/`
 
-Development guidelines:
-
-- Use red-green TDD
-- add docstrings
-
-
 ## Scripts
 
 - `dnld-yesab-project-map-file.py`
@@ -41,6 +35,12 @@ python .\build_static_map.py .\some-output-dir
 python .\build_static_map_split.py
 python .\build_static_map_split.py .\some-output-dir
 ```
+
+Typical workflow:
+
+1. Refresh the shapefile archive when needed.
+2. Refresh the API cache.
+3. Rebuild one or both map outputs.
 
 ## Output
 
@@ -78,3 +78,8 @@ Older cache buckets stay on disk until you explicitly refresh them with `--force
 This keeps the sync logic simple while still updating the projects most likely to change.
 
 Refresh API cache buckets sequentially. The script uses a shared `data/api/state.json` file and is not designed for concurrent writers.
+
+## Notes
+
+- If `data/api/projects_merged.json` exists, both map builders will enrich matching features with YESAB registry metadata.
+- QA reports are generated with both builders so you can inspect map/API coverage and unmatched records.
