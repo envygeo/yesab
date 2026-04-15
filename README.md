@@ -6,6 +6,12 @@ This repo contains scripts for:
 - caching the YESAB registry API in year buckets
 - building static map outputs from the zipped shapefiles in `data/`
 
+Development guidelines:
+
+- Use red-green TDD
+- add docstrings
+
+
 ## Scripts
 
 - `dnld-yesab-project-map-file.py`
@@ -19,7 +25,7 @@ This repo contains scripts for:
 
 ## Usage
 
-Both scripts accept an optional output directory argument. If you omit it, they write to `./out`.
+The builders accept an optional output path. If you omit it, they write safely into `./out` without clobbering each other.
 
 ```powershell
 python .\dnld-yesab-project-map-file.py
@@ -47,14 +53,19 @@ Default output locations:
   - `data/api/buckets/projects_<start>-<end>.json`
   - `data/api/projects_merged.json`
   - `data/api/state.json`
-- `build_static_map.py` writes `out/yesab_map.html`
+- `build_static_map.py` writes:
+  - `out/yesab-map-in-one.html`
+  - `out/yesab-map-in-one.qa.html`
+  - `out/yesab-map-in-one.qa.json`
 - `build_static_map_split.py` writes:
-  - `out/index.html`
-  - `out/app.css`
-  - `out/app.js`
-  - `out/data/`
+  - `out/yesab-map/index.html`
+  - `out/yesab-map/app.css`
+  - `out/yesab-map/app.js`
+  - `out/yesab-map/data/`
+  - `out/yesab-map/qa_report.html`
+  - `out/yesab-map/qa_report.json`
 
-The split builder removes and recreates its target output directory before writing files.
+The split builder removes and recreates only its own target directory before writing files.
 
 ## API Cache Behavior
 
@@ -65,3 +76,5 @@ The split builder removes and recreates its target output directory before writi
 
 Older cache buckets stay on disk until you explicitly refresh them with `--force`.
 This keeps the sync logic simple while still updating the projects most likely to change.
+
+Refresh API cache buckets sequentially. The script uses a shared `data/api/state.json` file and is not designed for concurrent writers.

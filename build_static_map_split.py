@@ -21,7 +21,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 DATA_DIR = ROOT / "data"
 API_CACHE_FILE = DATA_DIR / "api" / "projects_merged.json"
-DEFAULT_OUTPUT_DIR = Path("./out")
+DEFAULT_OUTPUT_DIR = Path("./out/yesab-map")
 
 
 LAYER_COLORS = {
@@ -90,6 +90,126 @@ def load_api_projects() -> dict[str, dict[str, object]]:
         if project_number:
             lookup[project_number] = project
     return lookup
+
+
+def qa_project_summary(project: dict[str, object]) -> dict[str, object]:
+    """Return a compact QA summary for one cached API project."""
+    return {
+        "projectNumber": project.get("projectNumber", ""),
+        "projectId": project.get("projectId", ""),
+        "title": project.get("title", ""),
+        "projectTypeName": project.get("projectTypeName", ""),
+        "proponentName": project.get("proponentName", ""),
+        "stageName": project.get("stage", {}).get("name", ""),
+        "districts": [item.get("name", "") for item in project.get("assessmentDistricts", [])],
+        "sectors": [item.get("name", "") for item in project.get("sectors", [])],
+        "locationCount": len(project.get("locations", [])),
+    }
+
+
+def build_qa_html(qa_payload: dict[str, object], title: str) -> str:
+    """Render a lightweight HTML QA report for API-to-map matching."""
+    matched = qa_payload["matchedProjects"]
+    unmatched = qa_payload["unmatchedApiProjects"]
+    matched_rows = "".join(
+        f"<tr><td>{item['projectNumber']}</td><td>{item['featureCount']}</td><td>{item['layerNames']}</td></tr>"
+        for item in matched[:80]
+    )
+    unmatched_rows = "".join(
+        f"<tr><td>{item['projectNumber']}</td><td>{item['stageName']}</td><td>{item['title']}</td><td>{', '.join(item['districts'])}</td></tr>"
+        for item in unmatched[:160]
+    )
+    return f"""<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>{title}</title>
+  <style>
+    body {{
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      color: #1f2937;
+      background: linear-gradient(135deg, #efe8d8, #f7f4ec 45%, #ebe4d5);
+    }}
+    main {{
+      width: min(1200px, calc(100vw - 32px));
+      margin: 20px auto 40px;
+      display: grid;
+      gap: 18px;
+    }}
+    section {{
+      background: rgba(255,252,246,0.92);
+      border: 1px solid rgba(31,41,55,0.12);
+      border-radius: 20px;
+      padding: 20px 22px;
+    }}
+    h1, h2 {{ margin: 0 0 12px; }}
+    .stats {{
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }}
+    .stat {{
+      border: 1px solid rgba(31,41,55,0.08);
+      border-radius: 16px;
+      background: rgba(255,255,255,0.6);
+      padding: 12px 14px;
+    }}
+    .stat strong {{ display:block; font-size: 1.4rem; }}
+    table {{
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+    }}
+    th, td {{
+      text-align: left;
+      vertical-align: top;
+      padding: 9px 10px;
+      border-top: 1px solid rgba(31,41,55,0.1);
+    }}
+    th {{
+      color: #6b7280;
+      font-weight: 700;
+      border-top: 0;
+    }}
+    code {{ background: rgba(17,24,39,0.06); padding: 0.1em 0.35em; border-radius: 6px; }}
+    @media (max-width: 900px) {{
+      .stats {{ grid-template-columns: 1fr 1fr; }}
+    }}
+  </style>
+</head>
+<body>
+  <main>
+    <section>
+      <h1>{title}</h1>
+      <p>QA summary for cached YESAB API matching against shapefile-derived geometries.</p>
+      <div class="stats">
+        <div class="stat"><strong>{qa_payload['summary']['cachedApiProjectCount']}</strong><span>cached API projects</span></div>
+        <div class="stat"><strong>{qa_payload['summary']['matchedApiProjectCount']}</strong><span>API projects matched to geometry</span></div>
+        <div class="stat"><strong>{qa_payload['summary']['unmatchedApiProjectCount']}</strong><span>cached API projects with no geometry match</span></div>
+        <div class="stat"><strong>{qa_payload['summary']['matchedFeatureCount']}</strong><span>geometry features linked to cached API records</span></div>
+      </div>
+      <p>Coverage: <code>{qa_payload['summary']['matchedApiProjectCount']}/{qa_payload['summary']['cachedApiProjectCount']}</code> cached API projects matched.</p>
+    </section>
+    <section>
+      <h2>Matched Projects</h2>
+      <table>
+        <thead><tr><th>Project Number</th><th>Feature Count</th><th>Layers</th></tr></thead>
+        <tbody>{matched_rows}</tbody>
+      </table>
+    </section>
+    <section>
+      <h2>Unmatched Cached API Projects</h2>
+      <table>
+        <thead><tr><th>Project Number</th><th>Stage</th><th>Title</th><th>Districts</th></tr></thead>
+        <tbody>{unmatched_rows}</tbody>
+      </table>
+    </section>
+  </main>
+</body>
+</html>
+"""
 
 
 def read_dbf(data: bytes) -> list[dict[str, str]]:
@@ -173,6 +293,9 @@ def load_payload() -> dict[str, object]:
     bounds: list[float] | None = None
     api_projects = load_api_projects()
     matched_project_numbers: set[str] = set()
+    matched_project_features: dict[str, int] = {}
+    matched_project_layers: dict[str, set[str]] = {}
+    matched_feature_count = 0
 
     for zip_path in sorted(DATA_DIR.glob("*.zip")):
         archives.append(zip_path.name)
@@ -214,6 +337,12 @@ def load_payload() -> dict[str, object]:
 
                 layer_name = Path(stem).name
                 geom_type = features[0]["geometry"]["type"] if features else "Unknown"
+                for feature in features:
+                    api_project_number = feature["apiProjectNumber"]
+                    if api_project_number:
+                        matched_feature_count += 1
+                        matched_project_features[api_project_number] = matched_project_features.get(api_project_number, 0) + 1
+                        matched_project_layers.setdefault(api_project_number, set()).add(layer_name)
                 layers.append(
                     {
                         "name": layer_name,
@@ -225,6 +354,27 @@ def load_payload() -> dict[str, object]:
                     }
                 )
 
+    unmatched_project_numbers = sorted(set(api_projects) - matched_project_numbers)
+    qa_payload = {
+        "summary": {
+            "cachedApiProjectCount": len(api_projects),
+            "matchedApiProjectCount": len(matched_project_numbers),
+            "unmatchedApiProjectCount": len(unmatched_project_numbers),
+            "matchedFeatureCount": matched_feature_count,
+        },
+        "matchedProjects": [
+            {
+                "projectNumber": project_number,
+                "featureCount": matched_project_features.get(project_number, 0),
+                "layerNames": ", ".join(sorted(matched_project_layers.get(project_number, set()))),
+            }
+            for project_number in sorted(matched_project_numbers)
+        ],
+        "unmatchedApiProjects": [
+            qa_project_summary(api_projects[project_number])
+            for project_number in unmatched_project_numbers
+        ],
+    }
     return {
         "archives": archives,
         "bounds": bounds or [0.0, 0.0, 1.0, 1.0],
@@ -234,7 +384,9 @@ def load_payload() -> dict[str, object]:
             "available": bool(api_projects),
             "projectCount": len(api_projects),
             "matchedProjectCount": len(matched_project_numbers),
+            "matchedFeatureCount": matched_feature_count,
         },
+        "qa": qa_payload,
     }
 
 
@@ -565,11 +717,22 @@ def site_js() -> str:
   function drawFeature(feature, color, selected) {
     const geom = feature.geometry;
     const isHover = state.hovered === feature;
+    const hasApi = Boolean(feature.apiProjectNumber);
     const alpha = selected ? 0.85 : isHover ? 0.72 : 0.48;
     const stroke = selected ? 2.2 : isHover ? 1.7 : 1.1;
     ctx.beginPath();
     if (geom.type === "Point") {
       const [sx, sy] = worldToScreen(geom.coordinates);
+      if (hasApi) {
+        ctx.beginPath();
+        ctx.arc(sx, sy, selected ? 8.2 : 6.4, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(180, 134, 47, 0.32)";
+        ctx.fill();
+        ctx.lineWidth = selected ? 2.3 : 1.7;
+        ctx.strokeStyle = "rgba(31,41,55,0.78)";
+        ctx.stroke();
+        ctx.beginPath();
+      }
       ctx.arc(sx, sy, selected ? 5 : 3.2, 0, Math.PI * 2);
       ctx.fillStyle = color;
       ctx.globalAlpha = 0.95;
@@ -598,6 +761,14 @@ def site_js() -> str:
       ctx.globalAlpha = alpha * 0.45;
       ctx.fill("evenodd");
       ctx.globalAlpha = 1;
+    }
+    if (hasApi) {
+      ctx.save();
+      ctx.lineWidth = stroke + 2.4;
+      ctx.strokeStyle = "rgba(180, 134, 47, 0.7)";
+      ctx.globalAlpha = selected ? 0.9 : 0.58;
+      ctx.stroke();
+      ctx.restore();
     }
     ctx.lineWidth = stroke;
     ctx.strokeStyle = color;
@@ -754,7 +925,7 @@ def site_js() -> str:
     tooltip.style.display = "block";
     tooltip.style.left = `${clientX}px`;
     tooltip.style.top = `${clientY}px`;
-    tooltip.innerHTML = `<strong>${esc(pick.feature.label)}</strong><br>${esc(pick.layer.name)}`;
+    tooltip.innerHTML = `<strong>${esc(pick.feature.label)}</strong><br>${esc(pick.layer.name)}${pick.feature.apiProjectNumber ? "<br>Registry-linked" : ""}`;
   }
 
   function renderLayerList() {
@@ -782,7 +953,7 @@ def site_js() -> str:
   function renderMeta() {
     const total = DATA.layers.reduce((sum, layer) => sum + layer.count, 0);
     const apiLine = DATA.apiSummary && DATA.apiSummary.available
-      ? `<span>${DATA.apiSummary.matchedProjectCount.toLocaleString()} map projects matched to ${DATA.apiSummary.projectCount.toLocaleString()} cached API projects</span><br>`
+      ? `<span>${DATA.apiSummary.matchedProjectCount.toLocaleString()} map projects matched to ${DATA.apiSummary.projectCount.toLocaleString()} cached API projects</span><br><span>${DATA.apiSummary.matchedFeatureCount.toLocaleString()} geometry features are registry-linked and highlighted in gold</span><br>`
       : '<span>No cached API data loaded</span><br>';
     metaEl.innerHTML = `
       <strong>${total.toLocaleString()} features</strong><br>
@@ -936,9 +1107,18 @@ def build_site(output_dir: Path) -> None:
     )
     (output_dir / "app.css").write_text(site_css(), encoding="utf-8")
     (output_dir / "app.js").write_text(site_js(), encoding="utf-8")
+    (output_dir / "qa_report.json").write_text(
+        json.dumps(payload["qa"], indent=2, sort_keys=True),
+        encoding="utf-8",
+    )
+    (output_dir / "qa_report.html").write_text(
+        build_qa_html(payload["qa"], "YESAB API Match QA"),
+        encoding="utf-8",
+    )
 
     total = sum(layer["count"] for layer in payload["layers"])
     print(f"Wrote {output_dir} with {len(payload['layers'])} layers and {total} features.")
+    print("Wrote QA artifacts: qa_report.html, qa_report.json")
 
 
 if __name__ == "__main__":
