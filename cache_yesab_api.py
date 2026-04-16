@@ -2,9 +2,9 @@
 Cache YESAB API responses in year buckets and emit a merged local dataset.
 
 The cache is intentionally simple:
-- refresh only recent "hot" year buckets by default
+- refresh only the current year bucket by default
 - keep older bucket snapshots on disk
-- normalize all cached buckets into one merged JSON file
+- normalize all cached buckets into one merged compressed dataset
 
 This avoids re-fetching the full registry every run while keeping recent
 projects reasonably fresh for map enrichment.
@@ -13,11 +13,12 @@ projects reasonably fresh for map enrichment.
 """
 
 # /// script
-# requires-python = ">=3.10"
+# requires-python = ">=3.14"
 # ///
 from __future__ import annotations
 
 import argparse
+import compression.zstd as zstd
 import hashlib
 import json
 import sys
@@ -32,9 +33,9 @@ BASE_DIR = Path(__file__).resolve().parent
 DATA_DIR = BASE_DIR / "data" / "api"
 BUCKET_DIR = DATA_DIR / "buckets"
 STATE_FILE = DATA_DIR / "state.json"
-MERGED_FILE = DATA_DIR / "projects_merged.json"
+MERGED_FILE = DATA_DIR / "projects_merged.json.zst"
 TIMEOUT = 60
-HOT_BUCKET_SIZE = 2
+ZSTD_LEVEL = 10
 
 
 def utc_now_iso() -> str:
@@ -62,7 +63,7 @@ def bucket_key(start_year: int, end_year: int) -> str:
 
 def bucket_path(start_year: int, end_year: int) -> Path:
     """Return the file path for a cached year bucket."""
-    return BUCKET_DIR / f"projects_{bucket_key(start_year, end_year)}.json"
+    return BUCKET_DIR / f"projects_{bucket_key(start_year, end_year)}.json.zst"
 
 
 def build_url(start_year: int, end_year: int) -> str:
@@ -73,6 +74,21 @@ def build_url(start_year: int, end_year: int) -> str:
 def sha256_text(text: str) -> str:
     """Return the SHA-256 hash for a UTF-8 text payload."""
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+def write_zstd_json(path: Path, payload: object) -> None:
+    """Write one JSON payload compressed with Zstandard."""
+    with zstd.open(path, "wt", encoding="utf-8", level=ZSTD_LEVEL) as handle:
+        json.dump(payload, handle, indent=2, sort_keys=True)
+
+
+def read_zstd_json(path: Path) -> dict:
+    """Read one Zstandard-compressed JSON payload."""
+    with zstd.open(path, "rt", encoding="utf-8") as handle:
+        loaded = json.load(handle)
+    if not isinstance(loaded, dict):
+        raise ValueError(f"Expected object payload from {path}")
+    return loaded
 
 
 def normalize_record(record: dict) -> dict:
@@ -135,12 +151,12 @@ def write_bucket(start_year: int, end_year: int, records: list[dict]) -> None:
         "cachedAt": utc_now_iso(),
         "records": records,
     }
-    path.write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
+    write_zstd_json(path, payload)
 
 
 def read_bucket(path: Path) -> tuple[dict, list[dict]]:
     """Read one cached bucket file."""
-    payload = json.loads(path.read_text(encoding="utf-8"))
+    payload = read_zstd_json(path)
     records = payload.get("records", [])
     return payload, records
 
@@ -148,6 +164,8 @@ def read_bucket(path: Path) -> tuple[dict, list[dict]]:
 def years_from_bucket_path(path: Path) -> tuple[int, int] | None:
     """Parse the canonical year span from a bucket filename."""
     stem = path.stem
+    if path.suffix == ".zst":
+        stem = Path(stem).stem
     prefix = "projects_"
     if not stem.startswith(prefix):
         return None
@@ -167,7 +185,7 @@ def normalize_bucket_payload_years(path: Path, payload: dict, start_year: int, e
         "startYear": start_year,
         "endYear": end_year,
     }
-    path.write_text(json.dumps(normalized, indent=2, sort_keys=True), encoding="utf-8")
+    write_zstd_json(path, normalized)
     return normalized
 
 
@@ -184,7 +202,7 @@ def metadata_from_bucket_file(path: Path, payload: dict, records: list[dict], pr
         "record_count": len(records),
         "sha256": sha256_text(json.dumps(records, separators=(",", ":"), sort_keys=True)),
         "content_length": str(path.stat().st_size),
-        "content_type": "application/json",
+        "content_type": "application/zstd",
     }
 
 
@@ -193,7 +211,7 @@ def sync_state_to_bucket_files(state: dict) -> dict:
     prior_buckets = state.get("buckets", {})
     synced_buckets: dict[str, dict] = {}
 
-    for path in sorted(BUCKET_DIR.glob("projects_*.json")):
+    for path in sorted(BUCKET_DIR.glob("projects_*.json.zst")):
         years = years_from_bucket_path(path)
         if years is None:
             continue
@@ -273,12 +291,12 @@ def merge_cached_buckets(state: dict) -> dict:
         "buckets": source_buckets,
     }
     merged = {"summary": summary, "projects": projects}
-    MERGED_FILE.write_text(json.dumps(merged, indent=2, sort_keys=True), encoding="utf-8")
+    write_zstd_json(MERGED_FILE, merged)
     return summary
 
 
 def hot_buckets(now_year: int) -> list[tuple[int, int]]:
-    """Return the default bucket to refresh when no years are provided."""
+    """Return the default bucket spec to refresh when no years are provided."""
     return [(now_year, now_year)]
 
 

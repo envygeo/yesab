@@ -2,10 +2,12 @@
 
 The generated output embeds both the application code and all parsed layer data
 into one HTML document so it can be opened directly from disk without a server.
+
+(c)2026 Matt Wilkie, Yukon Government. MIT License.
 """
 
 # /// script
-# requires-python = ">=3.10"
+# requires-python = ">=3.14"
 # ///
 from __future__ import annotations
 
@@ -16,9 +18,11 @@ import zipfile
 from datetime import UTC, datetime, timedelta, timezone
 from pathlib import Path
 
+import compression.zstd as zstd
+
 ROOT = Path(__file__).resolve().parent
 DATA_DIR = ROOT / "data"
-API_CACHE_FILE = DATA_DIR / "api" / "projects_merged.json"
+API_CACHE_FILE = DATA_DIR / "api" / "projects_merged.json.zst"
 API_STATE_FILE = DATA_DIR / "api" / "state.json"
 ZIP_STATE_FILE = DATA_DIR / "yesab_all_zip.state.json"
 DEFAULT_OUTPUT_PATH = Path("./out/yesab-map-in-one.html")
@@ -124,6 +128,15 @@ def read_json_file(path: Path) -> dict[str, object]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def read_zstd_json_file(path: Path) -> dict[str, object]:
+    """Return compressed JSON content from ``path`` when present, otherwise an empty mapping."""
+    if not path.exists():
+        return {}
+    with zstd.open(path, "rt", encoding="utf-8") as handle:
+        loaded = json.load(handle)
+    return loaded if isinstance(loaded, dict) else {}
+
+
 def load_source_info() -> dict[str, object]:
     """Return source links and currency dates embedded into the built page."""
     zip_state = read_json_file(ZIP_STATE_FILE)
@@ -163,7 +176,7 @@ def load_api_projects() -> dict[str, dict[str, object]]:
     """Load merged YESAB API records keyed by project number, if available."""
     if not API_CACHE_FILE.exists():
         return {}
-    payload = json.loads(API_CACHE_FILE.read_text(encoding="utf-8"))
+    payload = read_zstd_json_file(API_CACHE_FILE)
     projects = payload.get("projects", [])
     lookup: dict[str, dict[str, object]] = {}
     for project in projects:

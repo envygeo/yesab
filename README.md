@@ -11,7 +11,7 @@ YESAB is the Yukon Environmental and Socio-economic Assessment Board, which trac
 - `dnld-yesab-project-map-file.py`
   Downloads `all.zip` only when the remote file changed.
 - `cache_yesab_api.py`
-  Caches YESAB API project records into local year-bucket JSON files and writes a merged dataset.
+  Caches YESAB API project records into local year-bucket Zstandard-compressed JSON files and writes a merged dataset.
 - `build_static_map.py`
   Builds a single self-contained HTML file.
 - `build_static_map_split.py`
@@ -20,6 +20,8 @@ YESAB is the Yukon Environmental and Socio-economic Assessment Board, which trac
 ## Usage
 
 The builders accept an optional output path. If you omit it, they write safely into `./out` without clobbering each other.
+
+Use Python `3.14+`, or run the scripts through `uv` with a `3.14` interpreter.
 
 ```powershell
 python .\dnld-yesab-project-map-file.py
@@ -50,8 +52,8 @@ Default output locations:
   - `data/yesab_all.zip`
   - `data/yesab_all_zip.state.json`
 - `cache_yesab_api.py` writes:
-  - `data/api/buckets/projects_<start>-<end>.json`
-  - `data/api/projects_merged.json`
+  - `data/api/buckets/projects_<start>-<end>.json.zst`
+  - `data/api/projects_merged.json.zst`
   - `data/api/state.json`
 - `build_static_map.py` writes:
   - `out/yesab-map-in-one.html`
@@ -69,10 +71,7 @@ The split builder removes and recreates only its own target directory before wri
 
 ## API Cache Behavior
 
-`cache_yesab_api.py` defaults to refreshing only recent "hot" buckets:
-
-- previous two years as one bucket
-- current year as one bucket
+`cache_yesab_api.py` defaults to refreshing the current year bucket only.
 
 Older cache buckets stay on disk until you explicitly refresh them with `--force`.
 This keeps the sync logic simple while still updating the projects most likely to change.
@@ -81,5 +80,6 @@ Refresh API cache buckets sequentially. The script uses a shared `data/api/state
 
 ## Notes
 
-- If `data/api/projects_merged.json` exists, both map builders will enrich matching features with YESAB registry metadata.
+- Python `3.14+` is required for stdlib `compression.zstd` support.
+- If `data/api/projects_merged.json.zst` exists, both map builders will enrich matching features with YESAB registry metadata.
 - QA reports are generated with both builders so you can inspect map/API coverage and unmatched records.
