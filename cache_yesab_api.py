@@ -18,7 +18,6 @@ projects reasonably fresh for map enrichment.
 from __future__ import annotations
 
 import argparse
-import compression.zstd as zstd
 import hashlib
 import json
 import sys
@@ -27,6 +26,7 @@ import urllib.request
 from datetime import UTC, datetime
 from pathlib import Path
 
+import compression.zstd as zstd
 
 API_BASE = "https://yesabregistry.ca/api/integration/projects"
 BASE_DIR = Path(__file__).resolve().parent
@@ -134,7 +134,9 @@ def fetch_bucket(start_year: int, end_year: int) -> tuple[list[dict], dict]:
         "url": url,
         "fetched_at": utc_now_iso(),
         "record_count": len(records),
-        "sha256": sha256_text(json.dumps(records, separators=(",", ":"), sort_keys=True)),
+        "sha256": sha256_text(
+            json.dumps(records, separators=(",", ":"), sort_keys=True)
+        ),
         "content_length": headers.get("Content-Length", ""),
         "content_type": headers.get("Content-Type", ""),
     }
@@ -176,7 +178,9 @@ def years_from_bucket_path(path: Path) -> tuple[int, int] | None:
         return None
 
 
-def normalize_bucket_payload_years(path: Path, payload: dict, start_year: int, end_year: int) -> dict:
+def normalize_bucket_payload_years(
+    path: Path, payload: dict, start_year: int, end_year: int
+) -> dict:
     """Rewrite a bucket file when its embedded years disagree with its filename."""
     if payload.get("startYear") == start_year and payload.get("endYear") == end_year:
         return payload
@@ -189,7 +193,9 @@ def normalize_bucket_payload_years(path: Path, payload: dict, start_year: int, e
     return normalized
 
 
-def metadata_from_bucket_file(path: Path, payload: dict, records: list[dict], prior: dict | None = None) -> dict:
+def metadata_from_bucket_file(
+    path: Path, payload: dict, records: list[dict], prior: dict | None = None
+) -> dict:
     """Build state metadata for one on-disk bucket file."""
     start_year = payload["startYear"]
     end_year = payload["endYear"]
@@ -200,7 +206,9 @@ def metadata_from_bucket_file(path: Path, payload: dict, records: list[dict], pr
         "url": build_url(start_year, end_year),
         "fetched_at": (prior or {}).get("fetched_at") or payload.get("cachedAt", ""),
         "record_count": len(records),
-        "sha256": sha256_text(json.dumps(records, separators=(",", ":"), sort_keys=True)),
+        "sha256": sha256_text(
+            json.dumps(records, separators=(",", ":"), sort_keys=True)
+        ),
         "content_length": str(path.stat().st_size),
         "content_type": "application/zstd",
     }
@@ -219,7 +227,9 @@ def sync_state_to_bucket_files(state: dict) -> dict:
         payload, records = read_bucket(path)
         payload = normalize_bucket_payload_years(path, payload, start_year, end_year)
         key = bucket_key(start_year, end_year)
-        synced_buckets[key] = metadata_from_bucket_file(path, payload, records, prior=prior_buckets.get(key))
+        synced_buckets[key] = metadata_from_bucket_file(
+            path, payload, records, prior=prior_buckets.get(key)
+        )
 
     state["buckets"] = synced_buckets
     return state
@@ -268,7 +278,11 @@ def merge_cached_buckets(state: dict) -> dict:
                     "bucketCachedAt": bucket_cached_at,
                 },
             }
-            if existing is None or wrapped["_cache"]["bucketCachedAt"] > existing["_cache"]["bucketCachedAt"]:
+            if (
+                existing is None
+                or wrapped["_cache"]["bucketCachedAt"]
+                > existing["_cache"]["bucketCachedAt"]
+            ):
                 merged_by_key[merge_key] = wrapped
             if record.get("projectNumber"):
                 project_numbers.add(record["projectNumber"])
@@ -332,7 +346,7 @@ def refresh_bucket(state: dict, start_year: int, end_year: int, force: bool) -> 
                 "path": str(path),
             }
         )
-        print(f"Keeping cached bucket {key}")
+        print(f"Reusing cached {key}: {path}")
         return
 
     print(f"Fetching bucket {key}...")
@@ -350,7 +364,7 @@ def refresh_bucket(state: dict, start_year: int, end_year: int, force: bool) -> 
         "path": str(path),
         **metadata,
     }
-    print(f"Stored bucket {key} with {metadata['record_count']} records")
+    print(f"Stored bucket {key} with {metadata['record_count']} records: {path}")
 
 
 def parse_args(argv: list[str]) -> argparse.Namespace:
@@ -400,14 +414,18 @@ def main(argv: list[str] | None = None) -> int:
         **summary,
     }
     save_state(state)
+    print(f"State file    : {STATE_FILE}")
 
     print(
-        "Merged cache:",
+        "Merged cache  :",
         f"{summary['projectCount']} projects",
         f"from {summary['bucketCount']} bucket(s)",
     )
+    print(f"Merged dataset: {MERGED_FILE}")
+
     for key in summary["buckets"]:
-        print(f"  - {key}")
+        info = state["buckets"].get(key, {})
+        print(f"  - {key} : {resolve_bucket_file(info, key)}")
     return 0
 
 
