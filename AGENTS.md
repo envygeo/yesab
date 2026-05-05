@@ -15,6 +15,44 @@ Preference order for accessing or getting supporting tools:
 - Keep the low-complexity API bucket cache model unless there is a clear reason to add a more complex sync design.
 - You are not the only one working in this directory.
 - Use red-green TDD.
+- Prefer `uv run` for project commands.
+
+## Measurement Rules
+
+- Work under a task id when possible. Use an issue id, bead id, or short label.
+- Use `scripts/run_timed.py -- <command>` for tests, builds, downloads, cache refreshes, packaging, and other material commands.
+- Before final response for material work, append one row to `metrics/agent_sessions.jsonl` with `scripts/log_agent_session.py`.
+- If the agent UI exposes token counters, record input, cached input, output, and reasoning output tokens.
+- If token counters are not available, record `null` by omitting those fields and note that the row is incomplete.
+- Record failed tool calls and workaround chains in the session row.
+- Record abandoned approaches and durable technical decisions in `metrics/decisions.jsonl`.
+- Agent-authored commits should include these trailers:
+  - `Task: <id or short label>`
+  - `Agent-Session: <session id if available>`
+  - `Model: <model>`
+  - `Reasoning: <low|medium|high|xhigh>`
+  - `Tests: <command/result>`
+
+## Model And Reasoning Guidance
+
+- Start with `gpt-5.5` at `medium` for cross-file implementation, data modeling, architecture, and risky behavior changes.
+- Use lower reasoning for mechanical edits, commit-message help, docs-only updates, formatting, and narrow script cleanup.
+- Escalate reasoning when failures involve hidden coupling, data correctness, security, concurrency, or cross-module behavior.
+- Downgrade once the path is known and remaining work is repetitive.
+- Record suspected overkill or underpowered model choices with `--model-fit` and `--model-fit-notes` so future estimates get better.
+
+## Metrics Files
+
+- `metrics/agent_sessions.jsonl`: one row per material agent session or turn.
+- `metrics/command_runs.jsonl`: one row per timed command.
+- `metrics/decisions.jsonl`: one row per durable decision, abandoned approach, or notable tradeoff.
+
+## End-Of-Task Checklist
+
+- Tests or checks run through `scripts/run_timed.py`, when practical.
+- Relevant decisions or abandoned approaches logged.
+- Session metrics logged or explicitly noted as unavailable.
+- Commit trailers filled when committing.
 
 ## API Cache Constraints
 

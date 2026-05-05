@@ -106,3 +106,18 @@ Refresh API cache buckets sequentially. The script uses a shared `data/api/state
 - Python `3.14+` is required for stdlib `compression.zstd` support.
 - If `data/api/projects_merged.json.zst` exists, both map builders will enrich matching features with YESAB registry metadata.
 - QA reports are generated with both builders so you can inspect map/API coverage and unmatched records.
+
+## Follow-up Items
+
+- Investigate whether the GeoPackage build should consume a shared data-preparation layer directly instead of depending on `scripts/build_static_map.py`. The current dependency works and keeps behavior aligned, but the pipeline order is surprising: static-map assembly now acts as the input path for the GIS artifact.
+
+## Metrics Workflow
+
+This repo uses lightweight agent-session, command-run, and decision metrics under `metrics/`.
+
+```powershell
+uv run .\scripts\run_timed.py --task-id tests -- uv run --python 3.14 python -m unittest discover -s tests
+uv run .\scripts\summarize_metrics.py
+```
+
+The reusable starter template now lives in `maphew/agent-templates`.
