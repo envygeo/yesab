@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>YESAB Map Progress Report - May 5, 2026</title>
+  <style>
+    :root {
+      --bg: #f5f1ea;
+      --paper: rgba(255, 252, 247, 0.94);
+      --ink: #1f2933;
+      --muted: #5f6874;
+      --line: rgba(31, 41, 51, 0.12);
+      --accent: #8f3f24;
+      --green: #23675f;
+      --gold: #ae842e;
+      --blue: #315f89;
+      --shadow: 0 16px 42px rgba(45, 39, 33, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      font-family: Georgia, "Times New Roman", serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.86), transparent 32%),
+        linear-gradient(135deg, #e7decf 0%, #f9f6f0 52%, #e9e1d4 100%);
+    }
+
+    .page {
+      width: min(1180px, calc(100vw - 32px));
+      margin: 24px auto 42px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .hero,
+    .panel,
+    .card {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      padding: 30px;
+      background:
+        radial-gradient(circle at top right, rgba(49, 95, 137, 0.12), transparent 26%),
+        radial-gradient(circle at bottom left, rgba(35, 103, 95, 0.12), transparent 24%),
+        var(--paper);
+    }
+
+    .eyebrow {
+      margin: 0 0 10px;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    h1, h2, h3 { margin: 0; line-height: 1.06; }
+    h1 { font-size: clamp(2rem, 4vw, 3.5rem); max-width: 14ch; }
+    h2 { font-size: 1.42rem; margin-bottom: 12px; }
+    h3 { font-size: 1.13rem; margin-bottom: 8px; }
+
+    p, li {
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .hero p {
+      max-width: 82ch;
+      margin: 14px 0 0;
+      font-size: 1.03rem;
+    }
+
+    .grid-4,
+    .grid-3,
+    .grid-2 {
+      display: grid;
+      gap: 18px;
+    }
+
+    .grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+    .panel { padding: 22px; }
+    .card { padding: 18px; }
+
+    .stat {
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.66);
+      border: 1px solid rgba(31, 41, 51, 0.08);
+    }
+
+    .stat strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--ink);
+      font-size: 1.48rem;
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid rgba(31, 41, 51, 0.1);
+      border-radius: 999px;
+      padding: 7px 11px;
+      background: rgba(255, 255, 255, 0.7);
+      font-size: 0.9rem;
+      color: var(--ink);
+    }
+
+    ul {
+      margin: 10px 0 0;
+      padding-left: 18px;
+    }
+
+    li + li { margin-top: 8px; }
+
+    .decision {
+      margin-top: 14px;
+      padding-left: 14px;
+      border-left: 4px solid var(--gold);
+      color: var(--ink);
+    }
+
+    code {
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 0.95em;
+      background: rgba(31, 41, 51, 0.07);
+      padding: 0.05em 0.3em;
+      border-radius: 0.35em;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 0.96rem;
+    }
+
+    th, td {
+      text-align: left;
+      vertical-align: top;
+      padding: 10px;
+      border-top: 1px solid rgba(31, 41, 51, 0.09);
+    }
+
+    th {
+      color: var(--ink);
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .mono {
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 0.94rem;
+    }
+
+    @media (max-width: 960px) {
+      .grid-4,
+      .grid-3,
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <section class="hero">
+      <p class="eyebrow">YESAB Map Follow-Up - 2026-05-05</p>
+      <h1>What Changed Since The April Journal Entry</h1>
+      <p>
+        The April 15 report captured the first working map/API hybrid. Since then, the project has
+        moved from enrichment-only map output to a broader reproducible artifact set: the API cache is
+        compressed and refreshed, API-only projects can be shown as approximate points, the same joined
+        payload can be exported as a GeoPackage, and the map-building code now shares core behavior
+        through a tested package.
+      </p>
+      <div class="badge-row">
+        <span class="badge">API cache compressed with zstd</span>
+        <span class="badge">API-only fallback points added</span>
+        <span class="badge">GeoPackage export added</span>
+        <span class="badge">Shared core package created</span>
+        <span class="badge">Share landing page added</span>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Current Snapshot</h2>
+      <div class="grid-4">
+        <div class="stat">
+          <strong>4,617</strong>
+          <span>Cached API projects in <code>data/api/projects_merged.json.zst</code>.</span>
+        </div>
+        <div class="stat">
+          <strong>3,234</strong>
+          <span>API projects matched to shapefile-derived geometry.</span>
+        </div>
+        <div class="stat">
+          <strong>1,263</strong>
+          <span>API-only projects now shown through approximate fallback points.</span>
+        </div>
+        <div class="stat">
+          <strong>120</strong>
+          <span>Cached API projects still unmapped because no usable geometry or coordinate was available.</span>
+        </div>
+      </div>
+      <p class="decision">
+        The practical shift is that most cached registry records now appear somewhere in the output:
+        4,497 of 4,617 cached API projects are mapped either through shapefile geometry or API-derived
+        approximate points.
+      </p>
+    </section>
+
+    <section class="grid-3">
+      <article class="card">
+        <h3>1. Cache Format And Refreshes</h3>
+        <p>
+          The API cache moved from raw JSON files to Zstandard-compressed JSON. Bucket metadata in
+          <code>data/api/state.json</code> now records compressed content type, content length, hashes,
+          fetch times, and record counts.
+        </p>
+        <ul>
+          <li>The merged API dataset is now <code>projects_merged.json.zst</code>.</li>
+          <li>Seven buckets are tracked, including focused 2025 and 2026 refresh buckets.</li>
+          <li>The current merged cache was regenerated at <code>2026-05-05T19:08:51Z</code>.</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <h3>2. API-Only Fallback Points</h3>
+        <p>
+          Projects that do not match shapefile geometry can now be mapped from API location coordinates
+          when a usable coordinate is available. These are kept distinct from shapefile-backed features.
+        </p>
+        <ul>
+          <li>A new <code>API_Approximate_Points</code> layer is emitted by both map builders.</li>
+          <li>Details panels label these records as approximate API locations.</li>
+          <li>QA reports now split projects into matched, fallback, and unmapped groups.</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <h3>3. Coordinate Classification</h3>
+        <p>
+          Fallback coordinates are classified so downstream users can distinguish plausible API
+          coordinates from generic or suspicious values.
+        </p>
+        <ul>
+          <li>Coordinate classes and flags are included in fallback feature properties and QA summaries.</li>
+          <li><code>data/api/location_overrides.csv</code> supports explicit coordinate replacement for known cases.</li>
+          <li>One current override corrects project <code>2024-0009</code>.</li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="grid-2">
+      <article class="panel">
+        <h2>New Export Path</h2>
+        <p>
+          The joined map payload can now be written as an enriched GeoPackage through
+          <code>scripts/build_geopackage.py</code>. This gives the project a GIS-friendly output in
+          addition to the browser map artifacts.
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>Output</th>
+              <th>Location</th>
+              <th>What It Carries</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>GeoPackage</td>
+              <td class="mono">out/yesab-projects.gpkg</td>
+              <td>Enriched feature tables, API join status, approximate API point source labels, and non-spatial QA/source tables.</td>
+            </tr>
+            <tr>
+              <td>Single-file map</td>
+              <td class="mono">out/yesab-map-in-one.html</td>
+              <td>Self-contained browser output with shapefile features, matched API metadata, and API fallback points.</td>
+            </tr>
+            <tr>
+              <td>Split map</td>
+              <td class="mono">out/yesab-map/</td>
+              <td>Multi-file static site with separate layer data files, including <code>API_Approximate_Points.js</code>.</td>
+            </tr>
+          </tbody>
+        </table>
+      </article>
+
+      <article class="panel">
+        <h2>Shared Code And Tests</h2>
+        <p>
+          The duplicated builder logic was pulled into <code>yesab_map/core.py</code>, with both map
+          builders and the GeoPackage exporter using the same helper path for joins, labels, cache
+          loading, fallback point creation, coordinate overrides, and QA summaries.
+        </p>
+        <ul>
+          <li>Scripts now live under <code>scripts/</code>.</li>
+          <li>Shared behavior lives under <code>yesab_map/</code>.</li>
+          <li>Regression tests live in <code>tests/test_yesab_map_core.py</code>.</li>
+          <li>Repo instructions now explicitly call for red-green TDD and shared-helper coverage for join, QA, fallback, and details-panel behavior.</li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="panel">
+      <h2>Share Package</h2>
+      <p>
+        A share landing page was added at <code>out/index.html</code>. It gives people a simpler entry
+        point for the browser artifacts instead of requiring them to know the exact output filenames.
+      </p>
+      <ul>
+        <li>Static previews were added for both single-file and split map builds.</li>
+        <li>Active-state previews show the map with project details open.</li>
+        <li>A short browser demo video was added under <code>out/previews/</code>.</li>
+        <li>Launch-link spacing was adjusted after the initial page landed.</li>
+      </ul>
+    </section>
+
+    <section class="panel">
+      <h2>Implementation Timeline Since The Last Entry</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Commit</th>
+            <th>Change</th>
+            <th>Why It Mattered</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="mono">8cadcc5 - 009e07f</td>
+            <td>Add share landing page, previews, active-state previews, spacing fix, and browser demo video.</td>
+            <td>Made the generated browser outputs easier to inspect and share.</td>
+          </tr>
+          <tr>
+            <td class="mono">04a90fb - 25a3421</td>
+            <td>Add cached API data and refresh later API buckets.</td>
+            <td>Moved the repo from code-only cache support to committed local cache artifacts.</td>
+          </tr>
+          <tr>
+            <td class="mono">1174449 - 81e79d4</td>
+            <td>Improve bucket state sync and switch cache artifacts to <code>.json.zst</code>.</td>
+            <td>Reduced cache size while preserving the low-complexity bucket model.</td>
+          </tr>
+          <tr>
+            <td class="mono">8a3c1db - 2799fa6</td>
+            <td>Add API fallback map points and classify fallback coordinates.</td>
+            <td>Raised mapped API coverage from matched shapefile records only to nearly all cache records with usable coordinates.</td>
+          </tr>
+          <tr>
+            <td class="mono">350779e</td>
+            <td>Add enriched GeoPackage export.</td>
+            <td>Made the joined dataset usable in GIS tools, not only in the browser map.</td>
+          </tr>
+          <tr>
+            <td class="mono">eb22bea - bcc93eb</td>
+            <td>Reorganize scripts, create <code>yesab_map</code>, and clarify builder usage docs.</td>
+            <td>Reduced duplicated behavior and made the default build outputs safer and clearer.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="grid-2">
+      <article class="panel">
+        <h2>Current Build Artifacts</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Artifact</th>
+              <th>Current Location</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Single-file map</td>
+              <td class="mono">out/yesab-map-in-one.html</td>
+            </tr>
+            <tr>
+              <td>Split map app</td>
+              <td class="mono">out/yesab-map/index.html</td>
+            </tr>
+            <tr>
+              <td>Split API fallback layer</td>
+              <td class="mono">out/yesab-map/data/API_Approximate_Points.js</td>
+            </tr>
+            <tr>
+              <td>QA reports</td>
+              <td class="mono">out/yesab-map-in-one.qa.*<br>out/yesab-map/qa_report.*</td>
+            </tr>
+            <tr>
+              <td>GeoPackage</td>
+              <td class="mono">out/yesab-projects.gpkg</td>
+            </tr>
+          </tbody>
+        </table>
+      </article>
+
+      <article class="panel">
+        <h2>Remaining Gaps / Next Moves</h2>
+        <ul>
+          <li>Review the 120 still-unmapped API records and decide whether more coordinate overrides are warranted.</li>
+          <li>Decide how strongly the UI should warn users about generic or approximate fallback coordinates.</li>
+          <li>Keep adding tests around shared helpers before changing join, fallback, QA, or details-panel behavior.</li>
+          <li>Consider documenting the GeoPackage schema if it becomes a stable handoff artifact.</li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="panel">
+      <h2>Snapshot Used For This Report</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Previous journal entry</td>
+            <td class="mono">journal/2026-04-15_yesab_progress_report.html</td>
+          </tr>
+          <tr>
+            <td>Current journal entry</td>
+            <td class="mono">journal/2026-05-05_yesab_progress_report.html</td>
+          </tr>
+          <tr>
+            <td>Latest commit at report time</td>
+            <td class="mono">bcc93eb Clarify builder usage docs</td>
+          </tr>
+          <tr>
+            <td>Current QA source</td>
+            <td class="mono">out/yesab-map-in-one.qa.json</td>
+          </tr>
+          <tr>
+            <td>Latest map rebuild timestamp</td>
+            <td>Single-file and split map outputs rebuilt 2026-05-05 12:09 YST; GeoPackage rebuilt 2026-05-05 12:12 YST.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </div>
+</body>
+</html>
