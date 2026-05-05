@@ -57,7 +57,7 @@ Preference order for accessing or getting supporting tools:
 ## API Cache Constraints
 
 - Cache state is shared in `data/api/state.json`.
-- `scripts/cache_yesab_api.py` is safe for one writer at a time only. Do not run concurrent refreshes.
+- `scripts/refresh_api_cache.py` is safe for one writer at a time only. Do not run concurrent refreshes.
 - Refresh cache before rebuilding map outputs when working on API-enriched behavior.
 
 ## Join Assumptions

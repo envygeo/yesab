@@ -11,8 +11,10 @@ so that subsequent runs will only download if the file has changed.
 # /// script
 # requires-python = ">=3.10"
 # ///
+import argparse
 import json
 import pathlib
+import sys
 import urllib.error
 import urllib.request
 
@@ -70,8 +72,15 @@ def conditional_download(headers):
     return True, response_headers
 
 
-def main():
+def parse_args(argv: list[str]) -> argparse.Namespace:
+    """Parse command-line arguments."""
+    parser = argparse.ArgumentParser(description=__doc__)
+    return parser.parse_args(argv)
+
+
+def main(argv: list[str] | None = None) -> int:
     """Check the YESAB download endpoint and refresh the local zip when needed."""
+    parse_args(sys.argv[1:] if argv is None else argv)
     state = load_state()
     request_headers = build_headers(state)
 
@@ -83,7 +92,7 @@ def main():
         changed, response_headers = conditional_download(request_headers)
 
         if not changed:
-            return
+            return 0
 
         print("Download complete")
 
@@ -102,6 +111,8 @@ def main():
     except urllib.error.URLError as e:
         raise SystemExit(f"Request failed: {e}") from e
 
+    return 0
+
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

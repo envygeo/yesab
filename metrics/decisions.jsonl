@@ -1,1 +1,1 @@
-
+{"task_id":"rename-scripts","decision":"Rename operational scripts to make their data freshness and artifact scope explicit.","details":"Use download_project_map_archive.py, refresh_api_cache.py, build_static_map_single.py, build_static_map_split.py, build_geopackage.py, and refresh_and_build_geopackage.py. No compatibility shims were kept because the repository only has one active user.","timestamp":"2026-05-05T23:30:00Z"}

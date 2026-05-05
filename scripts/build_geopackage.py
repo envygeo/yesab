@@ -25,7 +25,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from scripts.build_static_map import load_layers
+from scripts.build_static_map_single import load_layers
 
 
 DEFAULT_OUTPUT_PATH = Path("./out/yesab-projects.gpkg")

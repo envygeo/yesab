@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import unittest
 
-from scripts import build_static_map
+from scripts import build_static_map_single
 from scripts import build_static_map_split
 from yesab_map import core
 
@@ -186,7 +186,7 @@ class BuilderSharedHelperTests(unittest.TestCase):
 
         for name in helper_names:
             with self.subTest(name=name):
-                self.assertIs(getattr(build_static_map, name), getattr(core, name))
+                self.assertIs(getattr(build_static_map_single, name), getattr(core, name))
                 self.assertIs(getattr(build_static_map_split, name), getattr(core, name))
 
 
