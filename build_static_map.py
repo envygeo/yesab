@@ -12,6 +12,7 @@ into one HTML document so it can be opened directly from disk without a server.
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 import math
 import struct
@@ -25,6 +26,7 @@ ROOT = Path(__file__).resolve().parent
 DATA_DIR = ROOT / "data"
 API_CACHE_FILE = DATA_DIR / "api" / "projects_merged.json.zst"
 API_STATE_FILE = DATA_DIR / "api" / "state.json"
+API_LOCATION_OVERRIDES_FILE = DATA_DIR / "api" / "location_overrides.csv"
 ZIP_STATE_FILE = DATA_DIR / "yesab_all_zip.state.json"
 DEFAULT_OUTPUT_PATH = Path("./out/yesab-map-in-one.html")
 PROJECT_MAP_PAGE_URL = "https://yesab.ca/project-map"
@@ -45,6 +47,11 @@ LAYER_COLORS = {
 }
 API_FALLBACK_LAYER_NAME = "API_Approximate_Points"
 API_FALLBACK_LAYER_COLOR = "#0f766e"
+BAD_COORDINATE_DISPLAY_LATITUDE = 65.0
+BAD_COORDINATE_DISPLAY_LONGITUDE = -127.0
+YUKON_LATITUDE_RANGE = (59.0, 70.5)
+YUKON_LONGITUDE_RANGE = (-142.5, -123.0)
+GENERIC_LONGITUDES = (-141.00001, -140.00001, -124.00001)
 GRS80_A = 6378137.0
 GRS80_INV_F = 298.257222101
 YUKON_ALBERS_FALSE_EASTING = 500000.0
@@ -111,6 +118,79 @@ def project_lonlat_to_yukon_albers(longitude: float, latitude: float) -> list[fl
     x = YUKON_ALBERS_FALSE_EASTING + rho * math.sin(theta)
     y = YUKON_ALBERS_FALSE_NORTHING + rho0 - rho * math.cos(theta)
     return [round_coord(x), round_coord(y)]
+
+
+def decimal_places(value: float) -> int:
+    """Return the number of decimal places needed to represent a coordinate."""
+    text = f"{value:.10f}".rstrip("0").rstrip(".")
+    if "." not in text:
+        return 0
+    return len(text.split(".", maxsplit=1)[1])
+
+
+def is_world_coordinate(latitude: float, longitude: float) -> bool:
+    """Return true when the coordinate is valid lon/lat anywhere on earth."""
+    return -90.0 <= latitude <= 90.0 and -180.0 <= longitude <= 180.0
+
+
+def is_yukon_coordinate(latitude: float, longitude: float) -> bool:
+    """Return true when the coordinate is inside a broad Yukon map range."""
+    return (
+        YUKON_LATITUDE_RANGE[0] <= latitude <= YUKON_LATITUDE_RANGE[1]
+        and YUKON_LONGITUDE_RANGE[0] <= longitude <= YUKON_LONGITUDE_RANGE[1]
+    )
+
+
+def classify_api_coordinate(
+    latitude: float, longitude: float, coordinate_count: int
+) -> tuple[str, list[str]]:
+    """Classify an API fallback coordinate for QA and post-processing."""
+    if not is_world_coordinate(latitude, longitude):
+        return "bad_coordinates", ["outside_world_range"]
+    if not is_yukon_coordinate(latitude, longitude):
+        return "bad_coordinates", ["outside_yukon_range"]
+
+    flags: list[str] = []
+    if coordinate_count >= 5:
+        flags.append("repeated_coordinate_5plus")
+    if any(abs(longitude - item) < 0.000001 for item in GENERIC_LONGITUDES):
+        flags.append("sentinel_like_longitude")
+    if (
+        abs(latitude - round(latitude)) < 0.00011
+        and abs(longitude - round(longitude)) < 0.00011
+    ):
+        flags.append("near_integer_coordinate")
+    if flags:
+        return "generic_coordinates", flags
+
+    if decimal_places(latitude) <= 2 or decimal_places(longitude) <= 2:
+        return "low_precision_coordinates", ["low_precision_2dp"]
+    return "plausible_api_coordinates", []
+
+
+def load_api_location_overrides() -> dict[tuple[str, str], tuple[float, float]]:
+    """Load API coordinate overrides keyed by project number and project ID."""
+    if not API_LOCATION_OVERRIDES_FILE.exists():
+        return {}
+    overrides: dict[tuple[str, str], tuple[float, float]] = {}
+    with API_LOCATION_OVERRIDES_FILE.open(newline="", encoding="utf-8-sig") as handle:
+        rows = (
+            line
+            for line in handle
+            if line.strip() and not line.lstrip().startswith(("#", ";"))
+        )
+        for row in csv.DictReader(rows):
+            project_number = (row.get("ProjectNumber") or "").strip()
+            project_id = (row.get("ProjectID") or "").strip()
+            if not project_number or not project_id:
+                continue
+            try:
+                latitude = float((row.get("Replace_Lat") or "").strip())
+                longitude = float((row.get("Replace_Long") or "").strip())
+            except ValueError:
+                continue
+            overrides[(project_number, project_id)] = (latitude, longitude)
+    return overrides
 
 
 def clean_props(record: dict[str, str]) -> dict[str, str]:
@@ -250,9 +330,15 @@ def qa_project_summary(project: dict[str, object]) -> dict[str, object]:
     }
 
 
-def api_fallback_feature(project: dict[str, object], feature_id: int) -> dict[str, object] | None:
+def api_fallback_feature(
+    project: dict[str, object],
+    feature_id: int,
+    coordinate_counts: dict[tuple[float, float], int],
+    location_overrides: dict[tuple[str, str], tuple[float, float]],
+) -> dict[str, object] | None:
     """Build one approximate map point from an API project location."""
     project_number = str(project.get("projectNumber", "")).strip()
+    project_id = str(project.get("projectId", "")).strip()
     if not project_number:
         return None
     for location in project.get("locations", []):
@@ -263,20 +349,47 @@ def api_fallback_feature(project: dict[str, object], feature_id: int) -> dict[st
         if latitude is None or longitude is None:
             continue
         try:
-            point = project_lonlat_to_yukon_albers(float(longitude), float(latitude))
+            source_latitude = float(latitude)
+            source_longitude = float(longitude)
+        except (TypeError, ValueError):
+            continue
+        coordinate_key = (round(source_latitude, 5), round(source_longitude, 5))
+        coordinate_class, coordinate_flags = classify_api_coordinate(
+            source_latitude,
+            source_longitude,
+            coordinate_counts.get(coordinate_key, 1),
+        )
+        map_latitude = source_latitude
+        map_longitude = source_longitude
+        override = location_overrides.get((project_number, project_id))
+        coordinate_override = ""
+        if override is not None:
+            map_latitude, map_longitude = override
+            coordinate_override = "location_overrides.csv"
+        elif coordinate_class == "bad_coordinates":
+            map_latitude = BAD_COORDINATE_DISPLAY_LATITUDE
+            map_longitude = BAD_COORDINATE_DISPLAY_LONGITUDE
+            coordinate_override = "bad_coordinate_display_fallback"
+        try:
+            point = project_lonlat_to_yukon_albers(map_longitude, map_latitude)
         except (TypeError, ValueError):
             continue
         properties = {
             "projectNumber": project_number,
-            "projectId": str(project.get("projectId", "")).strip(),
+            "projectId": project_id,
             "title": str(project.get("title", "")).strip(),
             "projectTypeName": str(project.get("projectTypeName", "")).strip(),
             "proponentName": str(project.get("proponentName", "")).strip(),
             "stage": str(project.get("stage", {}).get("name", "")).strip(),
             "locationSource": "YESAB API location",
             "locationApproximate": "Yes",
-            "latitude": str(latitude),
-            "longitude": str(longitude),
+            "locationCoordinateClass": coordinate_class,
+            "locationCoordinateFlags": ", ".join(coordinate_flags),
+            "locationCoordinateOverride": coordinate_override,
+            "latitude": str(map_latitude),
+            "longitude": str(map_longitude),
+            "sourceLatitude": str(source_latitude),
+            "sourceLongitude": str(source_longitude),
         }
         return {
             "id": feature_id,
@@ -300,7 +413,7 @@ def build_qa_html(qa_payload: dict[str, object], title: str) -> str:
         for item in matched[:80]
     )
     fallback_rows = "".join(
-        f"<tr><td>{item['projectNumber']}</td><td>{item['stageName']}</td><td>{item['title']}</td><td>{', '.join(item['districts'])}</td></tr>"
+        f"<tr><td>{item['projectNumber']}</td><td>{item.get('locationCoordinateClass', '')}</td><td>{item['stageName']}</td><td>{item['title']}</td><td>{', '.join(item['districts'])}</td></tr>"
         for item in fallback[:160]
     )
     unmapped_rows = "".join(
@@ -391,7 +504,7 @@ def build_qa_html(qa_payload: dict[str, object], title: str) -> str:
     <section>
       <h2>API Fallback Points</h2>
       <table>
-        <thead><tr><th>Project Number</th><th>Stage</th><th>Title</th><th>Districts</th></tr></thead>
+        <thead><tr><th>Project Number</th><th>Coordinate Class</th><th>Stage</th><th>Title</th><th>Districts</th></tr></thead>
         <tbody>{fallback_rows}</tbody>
       </table>
     </section>
@@ -574,18 +687,60 @@ def load_layers() -> dict[str, object]:
         bounds = [0.0, 0.0, 1.0, 1.0]
 
     unmatched_project_numbers = sorted(set(api_projects) - matched_project_numbers)
+    location_overrides = load_api_location_overrides()
+    coordinate_counts: dict[tuple[float, float], int] = {}
+    for project_number in unmatched_project_numbers:
+        for location in api_projects[project_number].get("locations", []):
+            if not isinstance(location, dict):
+                continue
+            latitude = location.get("latitude")
+            longitude = location.get("longitude")
+            if latitude is None or longitude is None:
+                continue
+            try:
+                coordinate_key = (round(float(latitude), 5), round(float(longitude), 5))
+            except (TypeError, ValueError):
+                continue
+            coordinate_counts[coordinate_key] = (
+                coordinate_counts.get(coordinate_key, 0) + 1
+            )
+            break
     fallback_features: list[dict[str, object]] = []
     fallback_project_numbers: list[str] = []
+    fallback_project_summaries: list[dict[str, object]] = []
     unmapped_project_numbers: list[str] = []
     for project_number in unmatched_project_numbers:
         feature = api_fallback_feature(
-            api_projects[project_number], len(fallback_features) + 1
+            api_projects[project_number],
+            len(fallback_features) + 1,
+            coordinate_counts,
+            location_overrides,
         )
         if feature is None:
             unmapped_project_numbers.append(project_number)
             continue
         fallback_features.append(feature)
         fallback_project_numbers.append(project_number)
+        summary = qa_project_summary(api_projects[project_number])
+        properties = feature["properties"]
+        summary.update(
+            {
+                "locationCoordinateClass": properties.get(
+                    "locationCoordinateClass", ""
+                ),
+                "locationCoordinateFlags": properties.get(
+                    "locationCoordinateFlags", ""
+                ),
+                "locationCoordinateOverride": properties.get(
+                    "locationCoordinateOverride", ""
+                ),
+                "latitude": properties.get("latitude", ""),
+                "longitude": properties.get("longitude", ""),
+                "sourceLatitude": properties.get("sourceLatitude", ""),
+                "sourceLongitude": properties.get("sourceLongitude", ""),
+            }
+        )
+        fallback_project_summaries.append(summary)
         bbox = feature["bbox"]
         bounds[0] = min(bounds[0], bbox[0])
         bounds[1] = min(bounds[1], bbox[1])
@@ -622,10 +777,7 @@ def load_layers() -> dict[str, object]:
             }
             for project_number in sorted(matched_project_numbers)
         ],
-        "fallbackApiProjects": [
-            qa_project_summary(api_projects[project_number])
-            for project_number in fallback_project_numbers
-        ],
+        "fallbackApiProjects": fallback_project_summaries,
         "unmappedApiProjects": [
             qa_project_summary(api_projects[project_number])
             for project_number in unmapped_project_numbers

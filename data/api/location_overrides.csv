@@ -1,0 +1,5 @@
+;
+; For matching ProjectNumber & ProjectID, replace coordinates to override location
+;
+ProjectNumber,ProjectID,Replace_Lat,Replace_Long,Title
+2024-0009,5fc23b92-f32c-41db-9b09-ce7866e4ed50,60.7366,-135.09604,EMR Compound Stormwater Drainage Improvements (Takhini Subdivision)
