@@ -277,11 +277,7 @@ def write_manifest(
         "tests_run": tests_run,
         "copied_file_count": len(files),
         "copied_paths": [repo_relative(path) for path in files],
-        "etl_command": (
-            'uv run "$(FME_MF_DIR)/yesab_map-toy-maker/scripts/'
-            'refresh_and_build_geopackage.py" '
-            '"$(FME_MF_DIR)/yesab_map-toy-output/yesab-projects.gpkg"'
-        ),
+        "etl_command": etl_command(),
     }
     dest.mkdir(parents=True, exist_ok=True)
     (dest / MANIFEST_NAME).write_text(
@@ -326,7 +322,9 @@ def smoke_check(dest: Path) -> int:
         [
             "uv",
             "run",
-            str(dest / "scripts" / "refresh_and_build_geopackage.py"),
+            "--directory",
+            str(dest),
+            str(Path("scripts") / "refresh_and_build_geopackage.py"),
             "--help",
         ],
         check=False,
@@ -339,6 +337,15 @@ def smoke_check(dest: Path) -> int:
         if result.stderr:
             print(result.stderr, end="", file=sys.stderr)
     return result.returncode
+
+
+def etl_command() -> str:
+    """Return the FME command for running the deployed GeoPackage refresh."""
+    return (
+        'uv run --directory "$(FME_MF_DIR)/yesab_map-toy-maker" '
+        '"scripts/refresh_and_build_geopackage.py" '
+        '"$(FME_MF_DIR)/yesab_map-toy-output/yesab-projects.gpkg"'
+    )
 
 
 def parse_args(argv: list[str]) -> argparse.Namespace:
@@ -455,11 +462,7 @@ def main(argv: list[str] | None = None) -> int:
     write_manifest(dest, files, source_commit, copy_engine, False, tests_run)
     print(f"Wrote {dest / MANIFEST_NAME}")
 
-    print(
-        'ETL command: uv run "$(FME_MF_DIR)/yesab_map-toy-maker/scripts/'
-        'refresh_and_build_geopackage.py" '
-        '"$(FME_MF_DIR)/yesab_map-toy-output/yesab-projects.gpkg"'
-    )
+    print(f"ETL command: {etl_command()}")
     return 0
 
 

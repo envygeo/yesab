@@ -78,7 +78,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parse_args(sys.argv[1:] if argv is None else argv)
 
     print("Step 1/3: refresh YESAB project map archive")
-    download_project_map_archive.main()
+    download_project_map_archive.main([])
 
     print("Step 2/3: refresh YESAB API cache")
     cache_exit = refresh_api_cache.main(cache_args_from(args))

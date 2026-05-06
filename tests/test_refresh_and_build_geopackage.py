@@ -7,6 +7,7 @@ from pathlib import Path
 from unittest import mock
 
 from scripts import download_project_map_archive
+from scripts import refresh_api_cache
 from scripts import refresh_and_build_geopackage
 
 
@@ -33,7 +34,7 @@ class RefreshAndBuildGeoPackageTests(unittest.TestCase):
             mock.patch.object(
                 refresh_and_build_geopackage.download_project_map_archive,
                 "main",
-                side_effect=lambda: calls.append(("download", None)),
+                side_effect=lambda argv: calls.append(("download", argv)),
             ),
             mock.patch.object(
                 refresh_and_build_geopackage.refresh_api_cache,
@@ -53,7 +54,7 @@ class RefreshAndBuildGeoPackageTests(unittest.TestCase):
         self.assertEqual(
             calls,
             [
-                ("download", None),
+                ("download", []),
                 ("cache", []),
                 ("geopackage", refresh_and_build_geopackage.ROOT / "out/custom.gpkg"),
             ],
@@ -115,6 +116,28 @@ class RefreshAndBuildGeoPackageTests(unittest.TestCase):
 
         self.assertEqual(exit_code, 0)
         cache_main.assert_called_once_with(["--years", "2024", "2025", "--force"])
+
+    def test_refresh_api_cache_empty_argv_does_not_read_process_argv(self) -> None:
+        with (
+            contextlib.redirect_stdout(io.StringIO()),
+            mock.patch("sys.argv", ["refresh_and_build_geopackage.py", "out.gpkg"]),
+            mock.patch.object(refresh_api_cache, "bucket_specs_from_args", return_value=[]),
+            mock.patch.object(refresh_api_cache, "load_state", return_value={}),
+            mock.patch.object(refresh_api_cache, "sync_state_to_bucket_files"),
+            mock.patch.object(
+                refresh_api_cache,
+                "merge_cached_buckets",
+                return_value={
+                    "projectCount": 0,
+                    "bucketCount": 0,
+                    "buckets": [],
+                },
+            ),
+            mock.patch.object(refresh_api_cache, "save_state"),
+        ):
+            exit_code = refresh_api_cache.main([])
+
+        self.assertEqual(exit_code, 0)
 
 
 if __name__ == "__main__":

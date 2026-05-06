@@ -124,6 +124,7 @@ class DeployToProductionTests(unittest.TestCase):
             )
             self.assertEqual(manifest["source_commit"], "abc123")
             self.assertIn("scripts/deploy_to_production.py", manifest["copied_paths"])
+            self.assertIn(" --directory ", manifest["etl_command"])
 
     def test_manifest_is_not_written_when_smoke_check_fails(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -168,6 +169,8 @@ class DeployToProductionTests(unittest.TestCase):
 
             self.assertEqual(exit_code, 0)
             run.assert_called_once()
+            self.assertIn("--directory", run.call_args.args[0])
+            self.assertIn(str(dest), run.call_args.args[0])
             self.assertTrue(run.call_args.kwargs["capture_output"])
             self.assertTrue(run.call_args.kwargs["text"])
 
