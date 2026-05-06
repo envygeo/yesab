@@ -65,21 +65,21 @@ The production ETL code workspace is `\\envgeoserver\dev\YESAB\yesab_map-toy-mak
 Preview the deploy plan without copying files:
 
 ```powershell
-uv run .\scripts\deploy_to_production.py --dry-run
+uv run .\scripts\deploy_to_production.py
 ```
 
 Deploy the current clean checkout:
 
 ```powershell
-uv run .\scripts\deploy_to_production.py
+uv run .\scripts\deploy_to_production.py --go
 ```
 
-The deploy tool runs tests, stages an allowlisted source subset, mirrors that subset into the dedicated production code directory, writes `deploy_manifest.json`, and runs a `--help` smoke check from the deployed copy. It intentionally excludes generated outputs, metrics, git metadata, and API cache state.
+The deploy tool defaults to dry-run mode. With `--go`, it runs tests, stages an allowlisted source subset, mirrors that subset into the dedicated production code directory, writes `deploy_manifest.json`, and runs a `--help` smoke check from the deployed copy. Mirror mode removes destination-only files under `yesab_map-toy-maker`. It intentionally excludes generated outputs, metrics, git metadata, and API cache state.
 
 For in-progress handoff from a dirty checkout, use:
 
 ```powershell
-uv run .\scripts\deploy_to_production.py --allow-dirty
+uv run .\scripts\deploy_to_production.py --go --allow-dirty
 ```
 
 ## Testing

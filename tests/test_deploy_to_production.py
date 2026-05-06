@@ -15,16 +15,19 @@ class DeployToProductionTests(unittest.TestCase):
     def test_dry_run_reports_plan_without_creating_destination(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             dest = Path(tmp) / "yesab_map-toy-maker"
+            output = io.StringIO()
 
             with mock.patch.object(
                 deploy_to_production,
                 "git_status",
                 return_value="",
-            ), contextlib.redirect_stdout(io.StringIO()):
-                exit_code = deploy_to_production.main(["--dest", str(dest), "--dry-run"])
+            ), contextlib.redirect_stdout(output):
+                exit_code = deploy_to_production.main(["--dest", str(dest)])
 
             self.assertEqual(exit_code, 0)
             self.assertFalse(dest.exists())
+            self.assertIn("Dry run: no files copied.", output.getvalue())
+            self.assertIn("Mirror behavior:", output.getvalue())
 
     def test_refuses_dirty_tree_without_allow_dirty(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -35,7 +38,7 @@ class DeployToProductionTests(unittest.TestCase):
                 "git_status",
                 return_value=" M scripts/example.py\n",
             ), contextlib.redirect_stderr(io.StringIO()):
-                exit_code = deploy_to_production.main(["--dest", str(dest), "--dry-run"])
+                exit_code = deploy_to_production.main(["--dest", str(dest)])
 
             self.assertEqual(exit_code, 2)
 
@@ -69,6 +72,7 @@ class DeployToProductionTests(unittest.TestCase):
                     [
                         "--dest",
                         str(dest),
+                        "--go",
                         "--copy-engine",
                         "python",
                     ]

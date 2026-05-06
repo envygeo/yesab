@@ -264,6 +264,19 @@ def write_manifest(
     )
 
 
+def print_plan(files: list[Path], go: bool) -> None:
+    """Print the deploy plan, including mirror deletion behavior."""
+    print(f"Mode: {'go' if go else 'dry-run'}")
+    print(
+        "Mirror behavior: destination-only files under the target directory "
+        "will be removed when --go is used."
+    )
+    if not go:
+        print("Dry run: no files copied.")
+    for path in files:
+        print(f"  {repo_relative(path)}")
+
+
 def smoke_check(dest: Path) -> int:
     """Run a lightweight import-free help check from the destination copy."""
     result = subprocess.run(
@@ -293,9 +306,14 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         help="Task id used for timed preflight commands.",
     )
     parser.add_argument(
+        "--go",
+        action="store_true",
+        help="Perform the deploy. Without this flag, only the dry-run plan is shown.",
+    )
+    parser.add_argument(
         "--dry-run",
         action="store_true",
-        help="Print the deployment plan without copying files.",
+        help="Deprecated no-op; dry-run is the default unless --go is used.",
     )
     parser.add_argument(
         "--allow-dirty",
@@ -348,17 +366,15 @@ def main(argv: list[str] | None = None) -> int:
 
     files = iter_deploy_files()
     source_commit = git_commit()
-    tests_run = not args.skip_tests and not args.dry_run
+    tests_run = args.go and not args.skip_tests
 
     print(f"Source: {ROOT}")
     print(f"Destination: {dest}")
     print(f"Source commit: {source_commit or '(unknown)'}")
     print(f"Files selected: {len(files)}")
 
-    if args.dry_run:
-        print("Dry run: no files copied.")
-        for path in files:
-            print(f"  {repo_relative(path)}")
+    if not args.go:
+        print_plan(files, args.go)
         return 0
 
     if tests_run:
