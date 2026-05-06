@@ -120,6 +120,13 @@ def text_value(value: Any) -> str:
     return json.dumps(value, ensure_ascii=False, separators=(",", ":"))
 
 
+def repo_output_path(output_path: Path) -> Path:
+    """Resolve relative output paths under the repository root."""
+    if output_path.is_absolute():
+        return output_path
+    return ROOT / output_path
+
+
 def names_from_items(items: Any) -> str:
     """Flatten registry name lists into comma-separated text."""
     if not isinstance(items, list):
@@ -553,6 +560,7 @@ def write_summary_tables(
 
 def write_geopackage(output_path: Path) -> dict[str, int]:
     """Build and write the enriched YESAB GeoPackage."""
+    output_path = repo_output_path(output_path)
     payload = load_layers()
     output_path.parent.mkdir(parents=True, exist_ok=True)
     if output_path.exists():
@@ -591,8 +599,9 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
-    counts = write_geopackage(args.output)
-    print(f"Wrote {args.output}")
+    output_path = repo_output_path(args.output)
+    counts = write_geopackage(output_path)
+    print(f"Wrote {output_path}")
     for layer_name, count in counts.items():
         print(f"  {layer_name}: {count} features")
 

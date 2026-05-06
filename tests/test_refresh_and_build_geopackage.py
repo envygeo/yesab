@@ -55,9 +55,35 @@ class RefreshAndBuildGeoPackageTests(unittest.TestCase):
             [
                 ("download", None),
                 ("cache", []),
-                ("geopackage", Path("out/custom.gpkg")),
+                ("geopackage", refresh_and_build_geopackage.ROOT / "out/custom.gpkg"),
             ],
         )
+
+    def test_absolute_output_path_is_preserved(self) -> None:
+        calls: list[Path] = []
+        output_path = Path("C:/temp/yesab-projects.gpkg")
+
+        with (
+            contextlib.redirect_stdout(io.StringIO()),
+            mock.patch.object(
+                refresh_and_build_geopackage.download_project_map_archive,
+                "main",
+            ),
+            mock.patch.object(
+                refresh_and_build_geopackage.refresh_api_cache,
+                "main",
+                return_value=0,
+            ),
+            mock.patch.object(
+                refresh_and_build_geopackage.build_geopackage,
+                "write_geopackage",
+                side_effect=lambda output: calls.append(output) or {},
+            ),
+        ):
+            exit_code = refresh_and_build_geopackage.main([str(output_path)])
+
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(calls, [output_path])
 
     def test_forwards_cache_refresh_arguments(self) -> None:
         with (

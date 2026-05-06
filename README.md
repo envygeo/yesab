@@ -20,6 +20,8 @@ YESAB is the Yukon Environmental and Socio-economic Assessment Board, which trac
   Builds an enriched GeoPackage with the same shapefile/API joins and approximate API-only points used by the map builders.
 - `scripts/refresh_and_build_geopackage.py`
   Downloads the latest map archive when changed, refreshes the API cache, and builds the GeoPackage in one command.
+- `scripts/deploy_to_production.py`
+  Mirrors the deployable code subset to the production ETL workspace.
 
 ## Usage
 
@@ -54,6 +56,30 @@ uv run .\scripts\refresh_and_build_geopackage.py
 uv run .\scripts\refresh_and_build_geopackage.py .\some-output.gpkg
 uv run .\scripts\refresh_and_build_geopackage.py --force
 uv run .\scripts\refresh_and_build_geopackage.py --years 2024 2025 --force .\some-output.gpkg
+```
+
+## Deployment
+
+The production ETL code workspace is `\\envgeoserver\dev\YESAB\yesab_map-toy-maker`.
+
+Preview the deploy plan without copying files:
+
+```powershell
+uv run .\scripts\deploy_to_production.py --dry-run
+```
+
+Deploy the current clean checkout:
+
+```powershell
+uv run .\scripts\deploy_to_production.py
+```
+
+The deploy tool runs tests, stages an allowlisted source subset, mirrors that subset into the dedicated production code directory, writes `deploy_manifest.json`, and runs a `--help` smoke check from the deployed copy. It intentionally excludes generated outputs, metrics, git metadata, and API cache state.
+
+For in-progress handoff from a dirty checkout, use:
+
+```powershell
+uv run .\scripts\deploy_to_production.py --allow-dirty
 ```
 
 ## Testing

@@ -86,8 +86,9 @@ def main(argv: list[str] | None = None) -> int:
         return cache_exit
 
     print("Step 3/3: build GeoPackage")
-    counts = build_geopackage.write_geopackage(args.output)
-    print(f"Wrote {args.output}")
+    output_path = build_geopackage.repo_output_path(args.output)
+    counts = build_geopackage.write_geopackage(output_path)
+    print(f"Wrote {output_path}")
     for layer_name, count in counts.items():
         print(f"  {layer_name}: {count} features")
     return 0
