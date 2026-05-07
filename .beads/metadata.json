@@ -1,0 +1,7 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "embedded",
+  "dolt_database": "yesab",
+  "project_id": "3dcf2122-877f-4e9b-9833-110f0b7f0cfc"
+}
