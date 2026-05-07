@@ -29,6 +29,9 @@ from yesab_map.core import (
     API_FALLBACK_LAYER_COLOR,
     API_FALLBACK_LAYER_NAME,
     DATA_DIR,
+    LOCAL_IMPORT_CSS,
+    LOCAL_IMPORT_HTML,
+    LOCAL_IMPORT_JS,
     api_fallback_feature,
     clean_props,
     label_for,
@@ -516,6 +519,30 @@ p {
   text-decoration-thickness: 1px;
   text-underline-offset: 2px;
 }
+.basemap-control {
+  display: grid;
+  gap: 6px;
+  margin: -4px 0 16px;
+}
+.basemap-control label {
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+.basemap-control select {
+  width: 100%;
+  border: 1px solid rgba(17, 24, 39, 0.16);
+  border-radius: 10px;
+  background: #fffdf8;
+  color: var(--accent);
+  padding: 8px 10px;
+  font: inherit;
+}
+.basemap-status {
+  min-height: 1.1em;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+{LOCAL_IMPORT_CSS}
 button {
   appearance: none;
   border: 1px solid rgba(17, 24, 39, 0.16);
@@ -651,7 +678,7 @@ dd {
   .app { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
   .sidebar { max-height: 45vh; border-right: 0; border-bottom: 1px solid var(--line); }
 }
-"""
+""".replace("{LOCAL_IMPORT_CSS}", LOCAL_IMPORT_CSS)
 
 
 def site_html(layer_scripts: list[str], include_api_projects: bool) -> str:
@@ -685,6 +712,16 @@ def site_html(layer_scripts: list[str], include_api_projects: bool) -> str:
       <div class="subtools">
         <a href="#" id="aboutLink">About this map</a>
       </div>
+      <div class="basemap-control">
+        <label for="basemapSelect">Basemap</label>
+        <select id="basemapSelect">
+          <option value="none">No basemap (self-contained)</option>
+          <option value="topo">Yukon topographic basemap</option>
+          <option value="relief">Yukon shaded relief</option>
+        </select>
+        <span class="basemap-status" id="basemapStatus"></span>
+      </div>
+{LOCAL_IMPORT_HTML}
       <div class="layers" id="layers"></div>
       <div class="details" id="details">
         <h2>Selection</h2>
@@ -738,6 +775,48 @@ def site_js() -> str:
   const metaEl = document.getElementById("meta");
   const fitBtn = document.getElementById("fitBtn");
   const toggleBtn = document.getElementById("toggleBtn");
+  const basemapSelect = document.getElementById("basemapSelect");
+  const basemapStatus = document.getElementById("basemapStatus");
+{LOCAL_IMPORT_JS}
+
+  const BASEMAPS = {
+    none: null,
+    topo: {
+      label: "Yukon topographic basemap",
+      url: "https://mapservices.gov.yk.ca/arcgis/rest/services/Yukon_Basemap_Cache/MapServer/tile",
+      tileInfo: {
+        size: 256,
+        origin: { x: -12920200, y: 17575300 },
+        lods: [
+          [0, 5291.677250021167], [1, 2645.8386250105837],
+          [2, 1322.9193125052918], [3, 661.4596562526459],
+          [4, 338.6673440013547], [5, 169.33367200067735],
+          [6, 84.66683600033868], [7, 42.33341800016934],
+          [8, 21.16670900008467], [9, 10.583354500042335],
+          [10, 5.291677250021167], [11, 2.6458386250105836],
+          [12, 1.3229193125052918], [13, 0.6614596562526459],
+          [14, 0.3386673440013547]
+        ]
+      }
+    },
+    relief: {
+      label: "Yukon shaded relief",
+      url: "https://mapservices.gov.yk.ca/arcgis/rest/services/ShadedRelief_Cache/MapServer/tile",
+      tileInfo: {
+        size: 256,
+        origin: { x: -12920200, y: 17575300 },
+        lods: [
+          [0, 5291.677250021167], [1, 2645.8386250105837],
+          [2, 1322.9193125052918], [3, 661.4596562526459],
+          [4, 338.6673440013547], [5, 169.33367200067735],
+          [6, 84.66683600033868], [7, 42.33341800016934],
+          [8, 21.16670900008467], [9, 10.583354500042335],
+          [10, 5.291677250021167], [11, 2.6458386250105836],
+          [12, 1.3229193125052918]
+        ]
+      }
+    }
+  };
 
   const state = {
     visible: new Set(DATA.layers.map((layer) => layer.name)),
@@ -748,7 +827,13 @@ def site_js() -> str:
     lastY: 0,
     scale: 1,
     tx: 0,
-    ty: 0
+    ty: 0,
+    basemap: basemapSelect.value || "none",
+    basemapTiles: [],
+    basemapLoading: false,
+    basemapError: "",
+    basemapRequest: 0,
+    basemapTimer: null
   };
 
   function esc(value) {
@@ -857,6 +942,7 @@ def site_js() -> str:
     canvas.height = Math.max(1, Math.round(rect.height * dpr));
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     render();
+    scheduleBasemapRefresh();
   }
 
   function fitBounds(bounds) {
@@ -870,6 +956,7 @@ def site_js() -> str:
     state.tx = pad + (w - dx * state.scale) / 2 - bounds[0] * state.scale;
     state.ty = pad + (h - dy * state.scale) / 2 + bounds[3] * state.scale;
     render();
+    scheduleBasemapRefresh();
   }
 
   function worldToScreen(pt) {
@@ -878,6 +965,106 @@ def site_js() -> str:
 
   function screenToWorld(x, y) {
     return [(x - state.tx) / state.scale, (state.ty - y) / state.scale];
+  }
+
+  function viewportWorldBounds() {
+    const rect = canvas.getBoundingClientRect();
+    const lowerLeft = screenToWorld(0, rect.height);
+    const upperRight = screenToWorld(rect.width, 0);
+    return [lowerLeft[0], lowerLeft[1], upperRight[0], upperRight[1]];
+  }
+
+  const tileCache = new Map();
+
+  function tileUrl(service, level, row, col) {
+    return `${service.url}/${level}/${row}/${col}`;
+  }
+
+  function bestLod(service) {
+    const resolution = 1 / state.scale;
+    return service.tileInfo.lods.reduce((best, lod) => (
+      Math.abs(Math.log(lod[1] / resolution)) < Math.abs(Math.log(best[1] / resolution)) ? lod : best
+    ));
+  }
+
+  function loadTile(service, level, row, col) {
+    const key = `${service.url}/${level}/${row}/${col}`;
+    let tile = tileCache.get(key);
+    if (tile) return tile;
+    const image = new Image();
+    tile = { image, loaded: false, error: false };
+    tileCache.set(key, tile);
+    image.onload = () => {
+      tile.loaded = true;
+      state.basemapLoading = state.basemapTiles.some((entry) => !entry.tile.loaded && !entry.tile.error);
+      updateBasemapStatus();
+      render();
+    };
+    image.onerror = () => {
+      tile.error = true;
+      state.basemapLoading = state.basemapTiles.some((entry) => !entry.tile.loaded && !entry.tile.error);
+      updateBasemapStatus();
+    };
+    image.src = tileUrl(service, level, row, col);
+    return tile;
+  }
+
+  function updateBasemapStatus() {
+    if (state.basemap === "none") {
+      basemapStatus.textContent = "";
+    } else if (state.basemapError) {
+      basemapStatus.textContent = state.basemapError;
+    } else if (state.basemapLoading) {
+      basemapStatus.textContent = "Loading online basemap...";
+    } else {
+      basemapStatus.textContent = "Online basemap enabled.";
+    }
+  }
+
+  function refreshBasemap() {
+    const service = BASEMAPS[state.basemap];
+    if (!service) {
+      state.basemapTiles = [];
+      state.basemapLoading = false;
+      state.basemapError = "";
+      updateBasemapStatus();
+      render();
+      return;
+    }
+    state.basemapRequest += 1;
+    state.basemapError = "";
+    const [level, resolution] = bestLod(service);
+    const tileSize = service.tileInfo.size;
+    const tileWorld = tileSize * resolution;
+    const origin = service.tileInfo.origin;
+    const [minX, minY, maxX, maxY] = viewportWorldBounds();
+    const minCol = Math.floor((minX - origin.x) / tileWorld);
+    const maxCol = Math.floor((maxX - origin.x) / tileWorld);
+    const minRow = Math.floor((origin.y - maxY) / tileWorld);
+    const maxRow = Math.floor((origin.y - minY) / tileWorld);
+    const tiles = [];
+    let loading = false;
+    for (let row = minRow; row <= maxRow; row += 1) {
+      for (let col = minCol; col <= maxCol; col += 1) {
+        const tile = loadTile(service, level, row, col);
+        if (!tile.loaded && !tile.error) loading = true;
+        tiles.push({ tile, level, row, col, resolution });
+      }
+    }
+    state.basemapTiles = tiles;
+    state.basemapLoading = loading;
+    if (tiles.length > 96) state.basemapError = "Zooming between cache levels.";
+    updateBasemapStatus();
+    render();
+  }
+
+  function scheduleBasemapRefresh() {
+    if (state.basemapTimer) window.clearTimeout(state.basemapTimer);
+    if (state.basemap === "none") {
+      refreshBasemap();
+      return;
+    }
+    state.basemapTimer = window.setTimeout(refreshBasemap, 180);
   }
 
   function drawFeature(feature, color, selected) {
@@ -1000,6 +1187,23 @@ def site_js() -> str:
     bg.addColorStop(1, "#eee6d5");
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, rect.width, rect.height);
+    if (state.basemapTiles.length) {
+      ctx.save();
+      ctx.globalAlpha = state.basemap === "relief" ? 0.62 : 0.86;
+      const service = BASEMAPS[state.basemap];
+      const origin = service.tileInfo.origin;
+      const tileSize = service.tileInfo.size;
+      for (const entry of state.basemapTiles) {
+        if (!entry.tile.loaded) continue;
+        const tileWorld = tileSize * entry.resolution;
+        const worldX = origin.x + entry.col * tileWorld;
+        const worldY = origin.y - entry.row * tileWorld;
+        const [sx, sy] = worldToScreen([worldX, worldY]);
+        const drawSize = tileWorld * state.scale;
+        ctx.drawImage(entry.tile.image, sx, sy, drawSize, drawSize);
+      }
+      ctx.restore();
+    }
     drawGrid();
     for (const layer of DATA.layers) {
       if (!state.visible.has(layer.name)) continue;
@@ -1169,7 +1373,9 @@ def site_js() -> str:
   });
 
   window.addEventListener("mouseup", () => {
+    const wasDragging = state.dragging;
     state.dragging = false;
+    if (wasDragging) scheduleBasemapRefresh();
   });
 
   window.addEventListener("mousemove", (event) => {
@@ -1226,9 +1432,24 @@ def site_js() -> str:
     state.tx = x - wx * state.scale;
     state.ty = y + wy * state.scale;
     render();
+    scheduleBasemapRefresh();
   }, { passive: false });
 
   fitBtn.addEventListener("click", () => fitBounds(DATA.bounds));
+
+  basemapSelect.addEventListener("change", (event) => {
+    state.basemap = event.target.value;
+    state.basemapTiles = [];
+    scheduleBasemapRefresh();
+    render();
+  });
+
+  localFileInput.addEventListener("change", (event) => {
+    importLocalFiles(event.target.files).catch((error) => {
+      localImportStatus.textContent = error.message || "Could not load local file.";
+    });
+    event.target.value = "";
+  });
 
   toggleBtn.addEventListener("click", () => {
     if (state.visible.size === DATA.layers.length) state.visible.clear();
@@ -1244,7 +1465,7 @@ def site_js() -> str:
   fitBounds(DATA.bounds);
   window.addEventListener("resize", resize);
 })();
-"""
+""".replace("{LOCAL_IMPORT_JS}", LOCAL_IMPORT_JS)
 
 
 def write_data_files(payload: dict[str, object], output_data_dir: Path) -> list[str]:

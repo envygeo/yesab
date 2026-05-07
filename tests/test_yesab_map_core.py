@@ -190,5 +190,79 @@ class BuilderSharedHelperTests(unittest.TestCase):
                 self.assertIs(getattr(build_static_map_split, name), getattr(core, name))
 
 
+class StaticMapBasemapChooserTests(unittest.TestCase):
+    def test_single_file_map_includes_opt_in_basemap_chooser(self) -> None:
+        html = build_static_map_single.build_html(
+            {
+                "archives": [],
+                "bounds": [0, 0, 1, 1],
+                "layers": [],
+                "apiProjects": {},
+                "apiSummary": {"available": False},
+                "sourceInfo": {},
+                "qa": {},
+            }
+        )
+
+        self.assertIn('id="basemapSelect"', html)
+        self.assertIn("No basemap (self-contained)", html)
+        self.assertIn("mapservices.gov.yk.ca/arcgis/rest/services/Yukon_Basemap_Cache/MapServer/tile", html)
+        self.assertIn("mapservices.gov.yk.ca/arcgis/rest/services/ShadedRelief_Cache/MapServer/tile", html)
+        self.assertIn("tileInfo", html)
+        self.assertIn('basemap: basemapSelect.value || "none"', html)
+        self.assertNotIn("World_Topo_Map/MapServer/export", html)
+
+    def test_split_map_includes_same_opt_in_basemap_chooser(self) -> None:
+        html = build_static_map_split.site_html([], include_api_projects=False)
+        css = build_static_map_split.site_css()
+        js = build_static_map_split.site_js()
+
+        self.assertIn('id="basemapSelect"', html)
+        self.assertIn(".basemap-control", css)
+        self.assertIn("No basemap (self-contained)", html)
+        self.assertIn("mapservices.gov.yk.ca/arcgis/rest/services/Yukon_Basemap_Cache/MapServer/tile", js)
+        self.assertIn("mapservices.gov.yk.ca/arcgis/rest/services/ShadedRelief_Cache/MapServer/tile", js)
+        self.assertIn("tileInfo", js)
+        self.assertIn('basemap: basemapSelect.value || "none"', js)
+        self.assertNotIn("World_Topo_Map/MapServer/export", js)
+
+
+class StaticMapLocalImportTests(unittest.TestCase):
+    def test_single_file_map_includes_local_shape_and_kml_importer(self) -> None:
+        html = build_static_map_single.build_html(
+            {
+                "archives": [],
+                "bounds": [0, 0, 1, 1],
+                "layers": [],
+                "apiProjects": {},
+                "apiSummary": {"available": False},
+                "sourceInfo": {},
+                "qa": {},
+            }
+        )
+
+        self.assertIn('id="localFileInput"', html)
+        self.assertIn('accept=".kml,.shp,.dbf"', html)
+        self.assertIn("parseKmlDocument", html)
+        self.assertIn("readShp", html)
+        self.assertIn("readDbf", html)
+        self.assertIn("DATA.layers.push(layer)", html)
+        self.assertIn('archive: "local device"', html)
+
+    def test_split_map_includes_same_local_shape_and_kml_importer(self) -> None:
+        html = build_static_map_split.site_html([], include_api_projects=False)
+        css = build_static_map_split.site_css()
+        js = build_static_map_split.site_js()
+
+        self.assertIn('id="localFileInput"', html)
+        self.assertIn('accept=".kml,.shp,.dbf"', html)
+        self.assertIn(".local-import", css)
+        self.assertIn("parseKmlDocument", js)
+        self.assertIn("readShp", js)
+        self.assertIn("readDbf", js)
+        self.assertIn("DATA.layers.push(layer)", js)
+        self.assertIn('archive: "local device"', js)
+
+
 if __name__ == "__main__":
     unittest.main()

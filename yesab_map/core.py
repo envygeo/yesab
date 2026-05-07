@@ -57,6 +57,328 @@ PROJECT_NUMBER_FIELDS = (
     "Number",
 )
 
+LOCAL_IMPORT_CSS = """
+.local-import {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 16px;
+}
+.local-import label {
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+.local-import input {
+  width: 100%;
+  color: var(--accent);
+  font: inherit;
+  font-size: 0.84rem;
+}
+.local-import-status {
+  min-height: 1.1em;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+"""
+
+LOCAL_IMPORT_HTML = """
+      <div class="local-import">
+        <label for="localFileInput">Add Local Layer</label>
+        <input id="localFileInput" type="file" accept=".kml,.shp,.dbf" multiple>
+        <span class="local-import-status" id="localImportStatus"></span>
+      </div>
+"""
+
+LOCAL_IMPORT_JS = r"""
+  const localFileInput = document.getElementById("localFileInput");
+  const localImportStatus = document.getElementById("localImportStatus");
+
+  const LOCAL_LAYER_COLOR = "#2563eb";
+
+  function readAscii(view, offset, length) {
+    let text = "";
+    for (let i = 0; i < length; i += 1) {
+      const code = view.getUint8(offset + i);
+      if (code === 0) break;
+      text += String.fromCharCode(code);
+    }
+    return text.trim();
+  }
+
+  function decodeDbfText(bytes) {
+    return Array.from(bytes, (byte) => String.fromCharCode(byte)).join("").trim();
+  }
+
+  function readDbf(buffer) {
+    const view = new DataView(buffer);
+    const recordCount = view.getUint32(4, true);
+    const headerLength = view.getUint16(8, true);
+    const recordLength = view.getUint16(10, true);
+    const fields = [];
+    let offset = 32;
+    while (offset < headerLength && view.getUint8(offset) !== 0x0d) {
+      fields.push({
+        name: readAscii(view, offset, 11),
+        type: String.fromCharCode(view.getUint8(offset + 11)),
+        length: view.getUint8(offset + 16)
+      });
+      offset += 32;
+    }
+    const records = [];
+    let pos = headerLength;
+    for (let i = 0; i < recordCount && pos + recordLength <= view.byteLength; i += 1) {
+      if (view.getUint8(pos) === 0x2a) {
+        pos += recordLength;
+        continue;
+      }
+      const row = {};
+      let cursor = pos + 1;
+      for (const field of fields) {
+        const bytes = new Uint8Array(buffer, cursor, field.length);
+        const value = decodeDbfText(bytes);
+        if (value) row[field.name] = value;
+        cursor += field.length;
+      }
+      records.push(row);
+      pos += recordLength;
+    }
+    return records;
+  }
+
+  function roundLocalCoord(value) {
+    return Math.round(value * 10) / 10;
+  }
+
+  function readShp(buffer) {
+    const view = new DataView(buffer);
+    const features = [];
+    let pos = 100;
+    while (pos + 8 <= view.byteLength) {
+      const contentLength = view.getInt32(pos + 4, false) * 2;
+      const recOffset = pos + 8;
+      pos += 8 + contentLength;
+      if (recOffset + 4 > view.byteLength) continue;
+      const shapeType = view.getInt32(recOffset, true);
+      if (shapeType === 0) continue;
+      if (shapeType === 1) {
+        const x = roundLocalCoord(view.getFloat64(recOffset + 4, true));
+        const y = roundLocalCoord(view.getFloat64(recOffset + 12, true));
+        features.push({
+          geometry: { type: "Point", coordinates: [x, y] },
+          bbox: [x, y, x, y]
+        });
+        continue;
+      }
+      if (![3, 5].includes(shapeType)) {
+        throw new Error(`Unsupported shapefile geometry type ${shapeType}`);
+      }
+      const xmin = roundLocalCoord(view.getFloat64(recOffset + 4, true));
+      const ymin = roundLocalCoord(view.getFloat64(recOffset + 12, true));
+      const xmax = roundLocalCoord(view.getFloat64(recOffset + 20, true));
+      const ymax = roundLocalCoord(view.getFloat64(recOffset + 28, true));
+      const numParts = view.getInt32(recOffset + 36, true);
+      const numPoints = view.getInt32(recOffset + 40, true);
+      const parts = [];
+      for (let i = 0; i < numParts; i += 1) {
+        parts.push(view.getInt32(recOffset + 44 + i * 4, true));
+      }
+      const pointOffset = recOffset + 44 + numParts * 4;
+      const points = [];
+      for (let i = 0; i < numPoints; i += 1) {
+        const pointPos = pointOffset + i * 16;
+        points.push([
+          roundLocalCoord(view.getFloat64(pointPos, true)),
+          roundLocalCoord(view.getFloat64(pointPos + 8, true))
+        ]);
+      }
+      const coordinates = parts.map((start, index) => {
+        const end = index + 1 < parts.length ? parts[index + 1] : points.length;
+        return points.slice(start, end);
+      }).filter((part) => part.length);
+      features.push({
+        geometry: { type: shapeType === 3 ? "LineString" : "Polygon", coordinates },
+        bbox: [xmin, ymin, xmax, ymax]
+      });
+    }
+    return features;
+  }
+
+  function projectLonLatToYukonAlbers(longitude, latitude) {
+    const grs80A = 6378137.0;
+    const flattening = 1 / 298.257222101;
+    const eccentricity = Math.sqrt(2 * flattening - flattening * flattening);
+    const centralMeridian = -132.5 * Math.PI / 180;
+    const standardParallel1 = 61.66666666666666 * Math.PI / 180;
+    const standardParallel2 = 68.0 * Math.PI / 180;
+    const latitudeOfOrigin = 59.0 * Math.PI / 180;
+    function albersQ(phi) {
+      const sinPhi = Math.sin(phi);
+      const eSinPhi = eccentricity * sinPhi;
+      return (1 - eccentricity ** 2) * (
+        sinPhi / (1 - eSinPhi * eSinPhi) -
+        (1 / (2 * eccentricity)) * Math.log((1 - eSinPhi) / (1 + eSinPhi))
+      );
+    }
+    function albersM(phi) {
+      const sinPhi = Math.sin(phi);
+      return Math.cos(phi) / Math.sqrt(1 - eccentricity ** 2 * sinPhi * sinPhi);
+    }
+    const m1 = albersM(standardParallel1);
+    const m2 = albersM(standardParallel2);
+    const q0 = albersQ(latitudeOfOrigin);
+    const q1 = albersQ(standardParallel1);
+    const q2 = albersQ(standardParallel2);
+    const q = albersQ(latitude * Math.PI / 180);
+    const n = (m1 * m1 - m2 * m2) / (q2 - q1);
+    const c = m1 * m1 + n * q1;
+    const rho0 = grs80A * Math.sqrt(c - n * q0) / n;
+    const rho = grs80A * Math.sqrt(Math.max(0, c - n * q)) / n;
+    const theta = n * (longitude * Math.PI / 180 - centralMeridian);
+    return [
+      roundLocalCoord(500000 + rho * Math.sin(theta)),
+      roundLocalCoord(500000 + rho0 - rho * Math.cos(theta))
+    ];
+  }
+
+  function boundsForGeometry(geometry) {
+    const points = [];
+    if (geometry.type === "Point") points.push(geometry.coordinates);
+    else geometry.coordinates.forEach((part) => part.forEach((point) => points.push(point)));
+    return points.reduce((bounds, point) => [
+      Math.min(bounds[0], point[0]),
+      Math.min(bounds[1], point[1]),
+      Math.max(bounds[2], point[0]),
+      Math.max(bounds[3], point[1])
+    ], [Infinity, Infinity, -Infinity, -Infinity]);
+  }
+
+  function parseKmlCoordinates(text) {
+    return text.trim().split(/\s+/).map((item) => {
+      const [longitude, latitude] = item.split(",").map(Number);
+      if (!Number.isFinite(longitude) || !Number.isFinite(latitude)) return null;
+      return projectLonLatToYukonAlbers(longitude, latitude);
+    }).filter(Boolean);
+  }
+
+  function parseKmlGeometry(node) {
+    const tag = node.localName;
+    if (tag === "Point") {
+      const coords = node.getElementsByTagName("coordinates")[0]?.textContent || "";
+      const point = parseKmlCoordinates(coords)[0];
+      return point ? { type: "Point", coordinates: point } : null;
+    }
+    if (tag === "LineString") {
+      const coords = node.getElementsByTagName("coordinates")[0]?.textContent || "";
+      const line = parseKmlCoordinates(coords);
+      return line.length ? { type: "LineString", coordinates: [line] } : null;
+    }
+    if (tag === "Polygon") {
+      const rings = Array.from(node.getElementsByTagName("LinearRing"))
+        .map((ring) => parseKmlCoordinates(ring.getElementsByTagName("coordinates")[0]?.textContent || ""))
+        .filter((ring) => ring.length);
+      return rings.length ? { type: "Polygon", coordinates: rings } : null;
+    }
+    return null;
+  }
+
+  function parseKmlDocument(text, fileName) {
+    const doc = new DOMParser().parseFromString(text, "application/xml");
+    const parserError = doc.getElementsByTagName("parsererror")[0];
+    if (parserError) throw new Error("KML could not be parsed.");
+    const features = [];
+    const placemarks = Array.from(doc.getElementsByTagName("Placemark"));
+    placemarks.forEach((placemark, index) => {
+      const name = placemark.getElementsByTagName("name")[0]?.textContent?.trim() || `${fileName} #${index + 1}`;
+      const candidates = ["Point", "LineString", "Polygon"].flatMap((tag) => Array.from(placemark.getElementsByTagName(tag)));
+      candidates.forEach((node) => {
+        const geometry = parseKmlGeometry(node);
+        if (!geometry) return;
+        features.push({
+          id: features.length + 1,
+          label: name,
+          bbox: boundsForGeometry(geometry),
+          properties: { Name: name, Source: fileName },
+          geometry,
+          apiProjectNumber: ""
+        });
+      });
+    });
+    return features;
+  }
+
+  function localLayerType(features) {
+    const types = new Set(features.map((feature) => feature.geometry.type));
+    return types.size === 1 ? Array.from(types)[0] : "Mixed";
+  }
+
+  function addLocalLayer(name, features) {
+    if (!features.length) throw new Error(`${name} did not contain supported features.`);
+    const layerBounds = features.reduce((bounds, feature) => [
+      Math.min(bounds[0], feature.bbox[0]),
+      Math.min(bounds[1], feature.bbox[1]),
+      Math.max(bounds[2], feature.bbox[2]),
+      Math.max(bounds[3], feature.bbox[3])
+    ], [Infinity, Infinity, -Infinity, -Infinity]);
+    const layer = {
+      name,
+      archive: "local device",
+      color: LOCAL_LAYER_COLOR,
+      type: localLayerType(features),
+      count: features.length,
+      features
+    };
+    DATA.layers.push(layer);
+    if (!DATA.archives.includes("local device")) DATA.archives.push("local device");
+    DATA.bounds = [
+      Math.min(DATA.bounds[0], layerBounds[0]),
+      Math.min(DATA.bounds[1], layerBounds[1]),
+      Math.max(DATA.bounds[2], layerBounds[2]),
+      Math.max(DATA.bounds[3], layerBounds[3])
+    ];
+    state.visible.add(layer.name);
+    renderLayerList();
+    renderMeta();
+    fitBounds(DATA.bounds);
+    render();
+  }
+
+  async function importLocalFiles(fileList) {
+    const files = Array.from(fileList || []);
+    if (!files.length) return;
+    localImportStatus.textContent = "Reading local files...";
+    let imported = 0;
+    const byLowerName = new Map(files.map((file) => [file.name.toLowerCase(), file]));
+    for (const file of files) {
+      const lower = file.name.toLowerCase();
+      if (lower.endsWith(".kml")) {
+        const features = parseKmlDocument(await file.text(), file.name);
+        addLocalLayer(file.name.replace(/\.kml$/i, ""), features);
+        imported += 1;
+      }
+      if (lower.endsWith(".shp")) {
+        const stem = file.name.replace(/\.shp$/i, "");
+        const dbf = byLowerName.get(`${stem.toLowerCase()}.dbf`);
+        const geoms = readShp(await file.arrayBuffer());
+        const records = dbf ? readDbf(await dbf.arrayBuffer()) : [];
+        const features = geoms.map((geom, index) => {
+          const properties = records[index] || {};
+          const label = properties.Prj_Name || properties.PROPERTY_N || properties.ProjectID || properties.Prj_ID || properties.YESAB_PROJ || properties.Number || `${stem} #${index + 1}`;
+          return {
+            id: index + 1,
+            label,
+            bbox: geom.bbox,
+            properties,
+            geometry: geom.geometry,
+            apiProjectNumber: ""
+          };
+        });
+        addLocalLayer(stem, features);
+        imported += 1;
+      }
+    }
+    localImportStatus.textContent = imported ? `Loaded ${imported} local layer(s).` : "Choose KML or SHP files.";
+  }
+"""
+
 
 def round_coord(value: float) -> float:
     """Round projected coordinates to a compact precision for browser delivery."""
