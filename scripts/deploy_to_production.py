@@ -25,6 +25,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_DEST = Path(r"\\envgeoserver\dev\YESAB\yesab_map-toy-maker")
+DEFAULT_OUTDEST = Path(r"\\envgeoserver\dev\YESAB\yesab_map-toy-output")
 MANIFEST_NAME = "deploy_manifest.json"
 
 ALLOWLIST = (
@@ -36,6 +37,7 @@ ALLOWLIST = (
     "tests",
     "yesab_map",
     "data/api/location_overrides.csv",
+    "out",
 )
 
 OPTIONAL_ALLOWLIST = (
@@ -133,6 +135,16 @@ def safe_destination(dest: Path, allow_any_dest: bool) -> None:
         return
     raise ValueError(
         f"destination must be the default production path {DEFAULT_DEST}; "
+        "pass --allow-any-dest to override"
+    )
+
+
+def safe_output_destination(outdest: Path, allow_any_dest: bool) -> None:
+    """Refuse to move outputs into a non-default destination without an override."""
+    if allow_any_dest or path_key(outdest) == path_key(DEFAULT_OUTDEST):
+        return
+    raise ValueError(
+        f"output destination must be the default production path {DEFAULT_OUTDEST}; "
         "pass --allow-any-dest to override"
     )
 
@@ -257,6 +269,29 @@ def mirror_stage(stage_dir: Path, dest: Path, copy_engine: str) -> str:
     return "python"
 
 
+def move_output(stage_dir: Path, outdest: Path) -> int:
+    """Move staged output files from ``stage_dir/out`` to the output directory."""
+    staged_output = stage_dir / "out"
+    if not staged_output.exists():
+        return 0
+
+    moved = 0
+    outdest.mkdir(parents=True, exist_ok=True)
+    for file in sorted(staged_output.rglob("*")):
+        if not file.is_file():
+            continue
+        target = outdest / file.relative_to(staged_output)
+        if target.exists() and target.is_dir():
+            shutil.rmtree(target)
+        elif target.exists():
+            target.unlink()
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.move(str(file), str(target))
+        moved += 1
+    shutil.rmtree(staged_output)
+    return moved
+
+
 def write_manifest(
     dest: Path,
     files: list[Path],
@@ -264,18 +299,22 @@ def write_manifest(
     copy_engine: str,
     dry_run: bool,
     tests_run: bool,
+    outdest: Path,
+    output_file_count: int,
 ) -> None:
     """Write deployment metadata into the destination."""
     manifest = {
         "deployed_at_utc": utc_now(),
         "source_root": str(ROOT),
         "destination": str(dest),
+        "output_destination": str(outdest),
         "source_commit": source_commit,
         "deployed_by": getpass.getuser(),
         "copy_engine": copy_engine,
         "dry_run": dry_run,
         "tests_run": tests_run,
         "copied_file_count": len(files),
+        "output_file_count": output_file_count,
         "copied_paths": [repo_relative(path) for path in files],
         "etl_command": etl_command(),
     }
@@ -358,6 +397,12 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         help=f"Destination directory (default: {DEFAULT_DEST})",
     )
     parser.add_argument(
+        "--outdest",
+        type=Path,
+        default=DEFAULT_OUTDEST,
+        help=f"Output directory for staged out/ contents (default: {DEFAULT_OUTDEST})",
+    )
+    parser.add_argument(
         "--task-id",
         default="deploy-production",
         help="Task id used for timed preflight commands.",
@@ -405,8 +450,10 @@ def main(argv: list[str] | None = None) -> int:
     """Deploy the allowlisted project subset to production."""
     args = parse_args(sys.argv[1:] if argv is None else argv)
     dest = args.dest
+    outdest = args.outdest
     try:
         safe_destination(dest, args.allow_any_dest)
+        safe_output_destination(outdest, args.allow_any_dest)
         status = git_status()
     except (RuntimeError, ValueError) as error:
         print(f"ERROR: {error}", file=sys.stderr)
@@ -427,6 +474,7 @@ def main(argv: list[str] | None = None) -> int:
 
     print(f"Source: {ROOT}")
     print(f"Destination: {dest}")
+    print(f"Output destination: {outdest}")
     print(f"Source commit: {source_commit or '(unknown)'}")
     print(f"Files selected: {len(files)}")
 
@@ -446,9 +494,11 @@ def main(argv: list[str] | None = None) -> int:
     with tempfile.TemporaryDirectory(prefix="yesab-deploy-") as tmp:
         stage_dir = Path(tmp) / "stage"
         copy_to_stage(files, stage_dir)
+        output_file_count = move_output(stage_dir, outdest)
         copy_engine = mirror_stage(stage_dir, dest, args.copy_engine)
 
     print(f"Copied {len(files)} files using {copy_engine}.")
+    print(f"Moved {output_file_count} output files to {outdest}.")
 
     if not args.skip_smoke:
         smoke_exit = smoke_check(dest)
@@ -459,7 +509,16 @@ def main(argv: list[str] | None = None) -> int:
             )
             return smoke_exit
 
-    write_manifest(dest, files, source_commit, copy_engine, False, tests_run)
+    write_manifest(
+        dest,
+        files,
+        source_commit,
+        copy_engine,
+        False,
+        tests_run,
+        outdest,
+        output_file_count,
+    )
     print(f"Wrote {dest / MANIFEST_NAME}")
 
     print(f"ETL command: {etl_command()}")

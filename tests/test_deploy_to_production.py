@@ -195,6 +195,92 @@ class DeployToProductionTests(unittest.TestCase):
 
             self.assertTrue(stale_file.exists())
 
+    def test_move_output_moves_staged_out_contents_to_output_destination(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            stage = root / "stage"
+            outdest = root / "yesab_map-toy-output"
+            single_file = stage / "out" / "yesab-map-in-one.html"
+            split_file = stage / "out" / "yesab-map" / "index.html"
+            code_file = stage / "scripts" / "tool.py"
+            single_file.parent.mkdir(parents=True)
+            single_file.write_text("single", encoding="utf-8")
+            split_file.parent.mkdir(parents=True)
+            split_file.write_text("split", encoding="utf-8")
+            code_file.parent.mkdir(parents=True)
+            code_file.write_text("code", encoding="utf-8")
+
+            moved = deploy_to_production.move_output(stage, outdest)
+
+            self.assertEqual(moved, 2)
+            self.assertEqual(
+                (outdest / "yesab-map-in-one.html").read_text(encoding="utf-8"),
+                "single",
+            )
+            self.assertEqual(
+                (outdest / "yesab-map" / "index.html").read_text(encoding="utf-8"),
+                "split",
+            )
+            self.assertFalse((stage / "out").exists())
+            self.assertTrue(code_file.exists())
+
+    def test_go_moves_output_to_outdest_instead_of_code_destination(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            dest = root / "yesab_map-toy-maker"
+            outdest = root / "yesab_map-toy-output"
+
+            def fake_copy_to_stage(files: list[Path], stage_dir: Path) -> None:
+                del files
+                code_file = stage_dir / "scripts" / "tool.py"
+                output_file = stage_dir / "out" / "yesab-map-in-one.html"
+                code_file.parent.mkdir(parents=True)
+                output_file.parent.mkdir(parents=True)
+                code_file.write_text("code", encoding="utf-8")
+                output_file.write_text("map", encoding="utf-8")
+
+            with (
+                contextlib.redirect_stdout(io.StringIO()),
+                mock.patch.object(deploy_to_production, "git_status", return_value=""),
+                mock.patch.object(
+                    deploy_to_production,
+                    "git_commit",
+                    return_value="abc123",
+                ),
+                mock.patch.object(
+                    deploy_to_production,
+                    "iter_deploy_files",
+                    return_value=[],
+                ),
+                mock.patch.object(
+                    deploy_to_production,
+                    "copy_to_stage",
+                    fake_copy_to_stage,
+                ),
+                mock.patch.object(deploy_to_production, "run_tests", return_value=0),
+                mock.patch.object(deploy_to_production, "smoke_check", return_value=0),
+            ):
+                exit_code = deploy_to_production.main(
+                    [
+                        "--dest",
+                        str(dest),
+                        "--outdest",
+                        str(outdest),
+                        "--allow-any-dest",
+                        "--go",
+                        "--copy-engine",
+                        "python",
+                    ]
+                )
+
+            self.assertEqual(exit_code, 0)
+            self.assertTrue((dest / "scripts" / "tool.py").exists())
+            self.assertFalse((dest / "out" / "yesab-map-in-one.html").exists())
+            self.assertEqual(
+                (outdest / "yesab-map-in-one.html").read_text(encoding="utf-8"),
+                "map",
+            )
+
 
 if __name__ == "__main__":
     unittest.main()
