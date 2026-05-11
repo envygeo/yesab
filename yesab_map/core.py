@@ -83,7 +83,7 @@ LOCAL_IMPORT_CSS = """
 LOCAL_IMPORT_HTML = """
       <div class="local-import">
         <label for="localFileInput">Add Local Layer</label>
-        <input id="localFileInput" type="file" accept=".kml,.shp,.dbf" multiple>
+        <input id="localFileInput" type="file" accept=".kml,.shp,.dbf,.prj" multiple>
         <span class="local-import-status" id="localImportStatus"></span>
       </div>
 """
@@ -154,11 +154,41 @@ LOCAL_IMPORT_JS = r"""
       xmin <= xmax && ymin <= ymax;
   }
 
+  function projectionModeForPrj(prjText) {
+    const normalized = (prjText || "").toUpperCase().replace(/\s+/g, " ");
+    if (!normalized) return "auto";
+    if (
+      normalized.includes("GEOGCS") ||
+      normalized.includes("GEODCRS") ||
+      normalized.includes('UNIT["DEGREE"') ||
+      normalized.includes('ANGLEUNIT["DEGREE"')
+    ) {
+      return "geographic";
+    }
+    if (
+      normalized.includes("PROJCS") ||
+      normalized.includes("PROJCRS") ||
+      normalized.includes("YUKON_ALBERS") ||
+      normalized.includes("YUKON ALBERS") ||
+      normalized.includes('AUTHORITY["EPSG","3578"') ||
+      normalized.includes('ID["EPSG",3578')
+    ) {
+      return "projected";
+    }
+    return "auto";
+  }
+
+  function shouldProjectShpBounds(projectionMode, xmin, ymin, xmax, ymax) {
+    if (projectionMode === "geographic") return true;
+    if (projectionMode === "projected") return false;
+    return isLikelyLonLatBounds(xmin, ymin, xmax, ymax);
+  }
+
   function projectShpPoint(point, shouldProject) {
     return shouldProject ? projectLonLatToYukonAlbers(point[0], point[1]) : point;
   }
 
-  function readShp(buffer) {
+  function readShp(buffer, projectionMode = "auto") {
     const view = new DataView(buffer);
     const features = [];
     let pos = 100;
@@ -172,7 +202,10 @@ LOCAL_IMPORT_JS = r"""
       if (shapeType === 1) {
         const x = roundLocalCoord(view.getFloat64(recOffset + 4, true));
         const y = roundLocalCoord(view.getFloat64(recOffset + 12, true));
-        const point = projectShpPoint([x, y], isLikelyLonLatBounds(x, y, x, y));
+        const point = projectShpPoint(
+          [x, y],
+          shouldProjectShpBounds(projectionMode, x, y, x, y)
+        );
         features.push({
           geometry: { type: "Point", coordinates: point },
           bbox: [point[0], point[1], point[0], point[1]]
@@ -201,7 +234,7 @@ LOCAL_IMPORT_JS = r"""
           roundLocalCoord(view.getFloat64(pointPos + 8, true))
         ]);
       }
-      const shouldProject = isLikelyLonLatBounds(xmin, ymin, xmax, ymax);
+      const shouldProject = shouldProjectShpBounds(projectionMode, xmin, ymin, xmax, ymax);
       const projectedPoints = points.map((point) => projectShpPoint(point, shouldProject));
       const coordinates = parts.map((start, index) => {
         const end = index + 1 < parts.length ? parts[index + 1] : projectedPoints.length;
@@ -371,7 +404,9 @@ LOCAL_IMPORT_JS = r"""
       if (lower.endsWith(".shp")) {
         const stem = file.name.replace(/\.shp$/i, "");
         const dbf = byLowerName.get(`${stem.toLowerCase()}.dbf`);
-        const geoms = readShp(await file.arrayBuffer());
+        const prj = byLowerName.get(`${stem.toLowerCase()}.prj`);
+        const projectionMode = projectionModeForPrj(prj ? await prj.text() : "");
+        const geoms = readShp(await file.arrayBuffer(), projectionMode);
         const records = dbf ? readDbf(await dbf.arrayBuffer()) : [];
         const features = geoms.map((geom, index) => {
           const properties = records[index] || {};
