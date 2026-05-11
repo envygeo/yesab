@@ -246,6 +246,8 @@ class StaticMapLocalImportTests(unittest.TestCase):
         self.assertIn("parseKmlDocument", html)
         self.assertIn("readShp", html)
         self.assertIn("readDbf", html)
+        self.assertIn("isLikelyLonLatBounds", html)
+        self.assertIn("projectLonLatToYukonAlbers(point[0], point[1])", html)
         self.assertIn("DATA.layers.push(layer)", html)
         self.assertIn('archive: "local device"', html)
 
@@ -260,6 +262,8 @@ class StaticMapLocalImportTests(unittest.TestCase):
         self.assertIn("parseKmlDocument", js)
         self.assertIn("readShp", js)
         self.assertIn("readDbf", js)
+        self.assertIn("isLikelyLonLatBounds", js)
+        self.assertIn("projectLonLatToYukonAlbers(point[0], point[1])", js)
         self.assertIn("DATA.layers.push(layer)", js)
         self.assertIn('archive: "local device"', js)
 

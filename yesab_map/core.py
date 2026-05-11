@@ -148,6 +148,16 @@ LOCAL_IMPORT_JS = r"""
     return Math.round(value * 10) / 10;
   }
 
+  function isLikelyLonLatBounds(xmin, ymin, xmax, ymax) {
+    return xmin >= -180 && xmax <= 180 &&
+      ymin >= -90 && ymax <= 90 &&
+      xmin <= xmax && ymin <= ymax;
+  }
+
+  function projectShpPoint(point, shouldProject) {
+    return shouldProject ? projectLonLatToYukonAlbers(point[0], point[1]) : point;
+  }
+
   function readShp(buffer) {
     const view = new DataView(buffer);
     const features = [];
@@ -162,9 +172,10 @@ LOCAL_IMPORT_JS = r"""
       if (shapeType === 1) {
         const x = roundLocalCoord(view.getFloat64(recOffset + 4, true));
         const y = roundLocalCoord(view.getFloat64(recOffset + 12, true));
+        const point = projectShpPoint([x, y], isLikelyLonLatBounds(x, y, x, y));
         features.push({
-          geometry: { type: "Point", coordinates: [x, y] },
-          bbox: [x, y, x, y]
+          geometry: { type: "Point", coordinates: point },
+          bbox: [point[0], point[1], point[0], point[1]]
         });
         continue;
       }
@@ -190,13 +201,16 @@ LOCAL_IMPORT_JS = r"""
           roundLocalCoord(view.getFloat64(pointPos + 8, true))
         ]);
       }
+      const shouldProject = isLikelyLonLatBounds(xmin, ymin, xmax, ymax);
+      const projectedPoints = points.map((point) => projectShpPoint(point, shouldProject));
       const coordinates = parts.map((start, index) => {
-        const end = index + 1 < parts.length ? parts[index + 1] : points.length;
-        return points.slice(start, end);
+        const end = index + 1 < parts.length ? parts[index + 1] : projectedPoints.length;
+        return projectedPoints.slice(start, end);
       }).filter((part) => part.length);
+      const geometry = { type: shapeType === 3 ? "LineString" : "Polygon", coordinates };
       features.push({
-        geometry: { type: shapeType === 3 ? "LineString" : "Polygon", coordinates },
-        bbox: [xmin, ymin, xmax, ymax]
+        geometry,
+        bbox: shouldProject ? boundsForGeometry(geometry) : [xmin, ymin, xmax, ymax]
       });
     }
     return features;
