@@ -155,5 +155,3 @@ This repo uses lightweight agent-session, command-run, and decision metrics unde
 uv run .\scripts\run_timed.py --task-id tests -- uv run --python 3.14 python -m unittest discover -s tests
 uv run .\scripts\summarize_metrics.py
 ```
-
-The reusable starter template now lives in `maphew/agent-templates`.

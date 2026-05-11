@@ -237,3 +237,4 @@ task_id":"yesab-zmw"}
 {"command":["git","pull","--rebase"],"cwd":"A:\\dev\\yesab","elapsed_seconds":0.757,"ended_at":"2026-05-11T17:48:40Z","exit_code":0,"label":"git-pull-rebase","started_at":"2026-05-11T17:48:39Z","task_id":"deploy-outdest"}
 {"command":["bd","dolt","push"],"cwd":"A:\\dev\\yesab","elapsed_seconds":0.785,"ended_at":"2026-05-11T17:48:47Z","exit_code":0,"label":"bd-dolt-push","started_at":"2026-05-11T17:48:47Z","task_id":"deploy-outdest"}
 {"command":["git","push"],"cwd":"A:\\dev\\yesab","elapsed_seconds":2.549,"ended_at":"2026-05-11T17:48:59Z","exit_code":0,"label":"git-push","started_at":"2026-05-11T17:48:57Z","task_id":"deploy-outdest"}
+{"command":["uv","run","python","-m","unittest","discover","-s","tests"],"cwd":"A:\\dev\\yesab","elapsed_seconds":8.639,"ended_at":"2026-05-11T17:50:15Z","exit_code":0,"label":"deploy-preflight-tests","started_at":"2026-05-11T17:50:07Z","task_id":"deploy-production"}
