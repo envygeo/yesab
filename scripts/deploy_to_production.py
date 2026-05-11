@@ -32,6 +32,7 @@ ALLOWLIST = (
     "AGENTS.md",
     "LICENSE",
     "README.md",
+    "README.html",
     "YESAB_API.md",
     "scripts",
     "tests",
