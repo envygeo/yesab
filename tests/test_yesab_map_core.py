@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import unittest
+from pathlib import Path
+from tempfile import TemporaryDirectory
 
 from scripts import build_static_map_single
 from scripts import build_static_map_split
@@ -175,19 +177,91 @@ class BuilderSharedHelperTests(unittest.TestCase):
         helper_names = (
             "api_fallback_feature",
             "clean_props",
+            "format_file_size",
             "label_for",
+            "latest_api_record_info",
+            "latest_api_record_summary",
             "load_api_location_overrides",
             "load_api_projects",
             "load_source_info",
             "project_number_for",
             "qa_project_summary",
             "round_coord",
+            "source_date_summary",
+            "total_path_size",
         )
 
         for name in helper_names:
             with self.subTest(name=name):
                 self.assertIs(getattr(build_static_map_single, name), getattr(core, name))
                 self.assertIs(getattr(build_static_map_split, name), getattr(core, name))
+
+
+class BuildStatsTests(unittest.TestCase):
+    def test_format_file_size_uses_compact_binary_units(self) -> None:
+        self.assertEqual(core.format_file_size(512), "512 bytes")
+        self.assertEqual(core.format_file_size(1536), "1.5 KB")
+        self.assertEqual(core.format_file_size(2 * 1024 * 1024), "2.0 MB")
+
+    def test_total_path_size_counts_files_recursively(self) -> None:
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "index.html").write_text("12345", encoding="utf-8")
+            (root / "data").mkdir()
+            (root / "data" / "layer.js").write_text("1234567", encoding="utf-8")
+
+            self.assertEqual(core.total_path_size(root), 12)
+
+    def test_source_date_summary_reports_existing_map_file_date_only(self) -> None:
+        self.assertEqual(
+            core.source_date_summary(
+                {"shapefile": {"sourceDate": "2026-05-11 12:26 YST"}}
+            ),
+            "YESAB shapefile date: 2026-05-11 12:26 YST",
+        )
+        self.assertEqual(core.source_date_summary({}), "")
+
+    def test_latest_api_record_summary_uses_latest_stage_history_timestamp(self) -> None:
+        self.assertEqual(
+            core.latest_api_record_summary(
+                {
+                    "2026-0003": {
+                        "projectNumber": "2026-0003",
+                        "stageHistory": [{"stageStart": 1775169791865}],
+                    },
+                    "2026-0004": {
+                        "projectNumber": "2026-0004",
+                        "stageHistory": [{"stageStart": 1776783773483}],
+                    },
+                    "legacy": {"projectNumber": "legacy"},
+                }
+            ),
+            "Latest registry change: 2026-04-21 08:02 YST (2026-0004)",
+        )
+        self.assertEqual(core.latest_api_record_summary({}), "")
+
+    def test_latest_api_record_info_returns_structured_date_and_number(self) -> None:
+        self.assertEqual(
+            core.latest_api_record_info(
+                {
+                    "2026-0004": {
+                        "projectNumber": "2026-0004",
+                        "stageHistory": [
+                            {
+                                "stageName": "Draft",
+                                "stageStart": 1776783773483,
+                            }
+                        ],
+                    },
+                }
+            ),
+            {
+                "date": "2026-04-21 08:02 YST",
+                "event": "started",
+                "projectNumber": "2026-0004",
+                "stageName": "Draft",
+            },
+        )
 
 
 class StaticMapBasemapChooserTests(unittest.TestCase):
@@ -225,6 +299,27 @@ class StaticMapBasemapChooserTests(unittest.TestCase):
         self.assertIn("tileInfo", js)
         self.assertIn('basemap: basemapSelect.value || "none"', js)
         self.assertNotIn("World_Topo_Map/MapServer/export", js)
+
+
+class StaticMapAboutPanelTests(unittest.TestCase):
+    def test_about_panel_includes_latest_api_stage_date_label(self) -> None:
+        html = build_static_map_single.build_html(
+            {
+                "archives": [],
+                "bounds": [0, 0, 1, 1],
+                "layers": [],
+                "apiProjects": {},
+                "apiSummary": {"available": False},
+                "sourceInfo": {},
+                "qa": {},
+            }
+        )
+        js = build_static_map_split.site_js()
+
+        self.assertIn("Latest registry change", html)
+        self.assertIn("latestRecordProjectNumber", html)
+        self.assertIn("Latest registry change", js)
+        self.assertIn("latestRecordProjectNumber", js)
 
 
 class StaticMapLocalImportTests(unittest.TestCase):

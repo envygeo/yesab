@@ -34,13 +34,18 @@ from yesab_map.core import (
     LOCAL_IMPORT_JS,
     api_fallback_feature,
     clean_props,
+    format_file_size,
     label_for,
+    latest_api_record_info,
+    latest_api_record_summary,
     load_api_location_overrides,
     load_api_projects,
     load_source_info,
     project_number_for,
     qa_project_summary,
     round_coord,
+    source_date_summary,
+    total_path_size,
 )
 
 DEFAULT_OUTPUT_DIR = Path("./out/yesab-map")
@@ -441,6 +446,8 @@ def load_payload() -> dict[str, object]:
             for project_number in unmapped_project_numbers
         ],
     }
+    latest_api_record = latest_api_record_info(api_projects)
+
     return {
         "archives": archives,
         "bounds": bounds or [0.0, 0.0, 1.0, 1.0],
@@ -450,6 +457,10 @@ def load_payload() -> dict[str, object]:
         "apiSummary": {
             "available": bool(api_projects),
             "projectCount": len(api_projects),
+            "latestRecordDate": latest_api_record["date"],
+            "latestRecordEvent": latest_api_record["event"],
+            "latestRecordProjectNumber": latest_api_record["projectNumber"],
+            "latestRecordStageName": latest_api_record["stageName"],
             "matchedProjectCount": len(matched_project_numbers),
             "fallbackProjectCount": len(fallback_project_numbers),
             "mappedProjectCount": len(matched_project_numbers)
@@ -915,15 +926,19 @@ def site_js() -> str:
     const bucketLine = registry.bucketCount
       ? `<dt>API cache coverage</dt><dd>${esc(String(registry.bucketCount))} bucket(s), ${esc(String(registry.projectCount || 0))} projects</dd>`
       : "";
+    const latestApiLine = DATA.apiSummary && DATA.apiSummary.latestRecordDate
+      ? `<dt>Latest registry change</dt><dd>${esc(DATA.apiSummary.latestRecordDate)} (${esc(DATA.apiSummary.latestRecordProjectNumber)}${DATA.apiSummary.latestRecordStageName ? `, ${esc(DATA.apiSummary.latestRecordStageName)} ${esc(DATA.apiSummary.latestRecordEvent || "")}` : ""})</dd>`
+      : "";
     aboutContent.innerHTML = `
       <h2>About This Map</h2>
       <p>This page combines YESAB project-map shapefile geometry with cached YESAB registry metadata when a project-number match is available, and adds approximate API-only point locations when no shapefile geometry exists.</p>
       <p>This is not a finished product - it is a toy proof-of-concept that happens to have a little usefulness.</p>
       <dl>
         <dt>Page build date</dt><dd>${esc(info.pageBuiltAt || "")}</dd>
-        <dt>Map file date</dt><dd>${esc(shapefile.sourceDate || "Unknown")}</dd>
+        <dt>YESAB shapefile date</dt><dd>${esc(shapefile.sourceDate || "Unknown")}</dd>
         <dt>Registry cache date</dt><dd>${esc(registry.sourceDate || "Not loaded")}</dd>
         ${bucketLine}
+        ${latestApiLine}
       </dl>
       <p><a href="${esc(shapefile.pageUrl || "#")}" target="_blank" rel="noreferrer">YESAB Project Map File page</a></p>
       <p><a href="${esc(registry.pageUrl || "#")}" target="_blank" rel="noreferrer">YESAB Online Registry</a></p>
@@ -1558,6 +1573,13 @@ def build_site(output_dir: Path) -> None:
     print(
         f"Wrote {output_dir} with {len(payload['layers'])} layers and {total} features."
     )
+    print(f"Output size: {format_file_size(total_path_size(output_dir))}")
+    source_date_line = source_date_summary(payload["sourceInfo"])
+    if source_date_line:
+        print(source_date_line)
+    api_record_line = latest_api_record_summary(payload["apiProjects"])
+    if api_record_line:
+        print(api_record_line)
     print("Wrote QA artifacts: qa_report.html, qa_report.json")
 
 

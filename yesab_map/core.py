@@ -572,6 +572,97 @@ def project_number_for(record: dict[str, str]) -> str:
     return ""
 
 
+def format_file_size(size_bytes: int) -> str:
+    """Return a compact human-readable size using binary units."""
+    if size_bytes < 1024:
+        return f"{size_bytes} byte" if size_bytes == 1 else f"{size_bytes} bytes"
+    value = float(size_bytes)
+    for unit in ("KB", "MB", "GB"):
+        value /= 1024
+        if value < 1024 or unit == "GB":
+            return f"{value:.1f} {unit}"
+    return f"{value:.1f} GB"
+
+
+def total_path_size(path: Path) -> int:
+    """Return the size of a file or all files under a directory."""
+    if path.is_file():
+        return path.stat().st_size
+    if not path.exists():
+        return 0
+    return sum(item.stat().st_size for item in path.rglob("*") if item.is_file())
+
+
+def source_date_summary(source_info: dict[str, object]) -> str:
+    """Return the cheap map-source date summary when the download state has one."""
+    shapefile = source_info.get("shapefile", {})
+    if not isinstance(shapefile, dict):
+        return ""
+    source_date = str(shapefile.get("sourceDate", "")).strip()
+    if not source_date:
+        return ""
+    return f"YESAB shapefile date: {source_date}"
+
+
+def latest_api_record_info(api_projects: dict[str, dict[str, object]]) -> dict[str, str]:
+    """Return the latest cached registry stage-history event."""
+    latest_timestamp_ms = -1
+    latest_event = ""
+    latest_project_number = ""
+    latest_stage_name = ""
+    for fallback_project_number, project in api_projects.items():
+        project_number = str(
+            project.get("projectNumber") or fallback_project_number
+        ).strip()
+        stage_history = project.get("stageHistory", [])
+        if not isinstance(stage_history, list):
+            continue
+        for stage in stage_history:
+            if not isinstance(stage, dict):
+                continue
+            for field in ("stageStart", "stageEnd"):
+                try:
+                    timestamp_ms = int(stage.get(field, ""))
+                except (TypeError, ValueError):
+                    continue
+                if timestamp_ms > latest_timestamp_ms:
+                    latest_timestamp_ms = timestamp_ms
+                    latest_event = "started" if field == "stageStart" else "ended"
+                    latest_project_number = project_number
+                    latest_stage_name = str(stage.get("stageName", "")).strip()
+    if latest_timestamp_ms < 0:
+        return {"date": "", "event": "", "projectNumber": "", "stageName": ""}
+    latest_date = (
+        datetime.fromtimestamp(latest_timestamp_ms / 1000, UTC)
+        .astimezone(YST)
+        .strftime("%Y-%m-%d %H:%M YST")
+    )
+    return {
+        "date": latest_date,
+        "event": latest_event,
+        "projectNumber": latest_project_number,
+        "stageName": latest_stage_name,
+    }
+
+
+def latest_api_record_summary(api_projects: dict[str, dict[str, object]]) -> str:
+    """Return the latest API stage-history date when cached records include one."""
+    latest = latest_api_record_info(api_projects)
+    latest_project_number = str(latest.get("projectNumber", ""))
+    latest_date = str(latest.get("date", ""))
+    latest_event = str(latest.get("event", ""))
+    latest_stage_name = str(latest.get("stageName", ""))
+    if not latest_project_number or not latest_date:
+        return ""
+    event_detail = (
+        f", {latest_stage_name} {latest_event}".rstrip() if latest_stage_name else ""
+    )
+    return (
+        f"Latest registry change: {latest_date} "
+        f"({latest_project_number}{event_detail})"
+    )
+
+
 def utc_now_iso() -> str:
     """Return the current UTC timestamp in ISO-8601 format."""
     return datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")

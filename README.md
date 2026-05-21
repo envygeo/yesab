@@ -45,8 +45,13 @@ Example of building a single self-contained map:
 ```
 ❯ uv run scripts/build_static_map_single.py
 Wrote out/yesab-map-in-one.html with 6 layers and 5048 features.
+Output size: 19.6 MB
+YESAB shapefile date: 2026-05-11 12:26 YST
+Latest registry change: 2026-04-21 13:53 YST (2025-0172, Adequacy Review Response ended)
 Wrote QA artifacts: yesab-map-in-one.qa.html, yesab-map-in-one.qa.json
 ```
+
+[![](out/preview/yesab-map-in-one.png)](out/yesab-map-in-one.html)
 
 ## Scripts
 
@@ -190,3 +195,7 @@ This repo uses lightweight agent-session, command-run, and decision metrics unde
 uv run .\scripts\run_timed.py --task-id tests -- uv run --python 3.14 python -m unittest discover -s tests
 uv run .\scripts\summarize_metrics.py
 ```
+
+## End notes
+
+Built by Matt Wilkie at Yukon department of Environment. The code is open-source and available under the [MIT](LICENSE) and [Yukon Open Government](OPEN-GOVERNMENT-LICENCE-YUKON.txt) licenses. Provided as-is, without warranty or support.
