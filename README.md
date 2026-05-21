@@ -2,26 +2,61 @@
 
 YESAB is the Yukon Environmental and Socio-economic Assessment Board, which tracks assessment projects across Yukon. This repository exists to pull the published project map data and registry metadata into reproducible local artifacts so it is easier to inspect, rebuild, and share static map outputs without depending on the live services at runtime.
 
-- downloading the YESAB shapefile archive
-- caching the YESAB registry API in year buckets
-- building static map outputs from the zipped shapefiles in `data/`
+- downloading the [YESAB Project Map](https://yesab.ca/project-map/) - [shapefile archive](https://yesab.ca/wp-content/plugins/yesab-map-wp-plugin/geojson/all.zip)
+- fetching and caching the [YESAB registry API](https://yesabregistry.ca/api/integration/projects) in year buckets
+- joining the shapefile archive and registry API data into a single GeoPackage, filtering approximate locations into their own class
+- building static map outputs from the previous steps
+
+The workhorse or main value of the project is the combined shapefile and registry API data in a single geospatial package. It is one step of a larger internal ETL (extract, transform, load) pipeline. The maps are demos, toys made to quickly view the data and illustrate the concept of a self-contained dynamic map.
+
+Example of refreshing and building the GeoPackage from scratch:
+
+```
+❯ uv run scripts/refresh_and_build_geopackage.py
+Step 1/3: refresh YESAB project map archive
+Checking YESAB all.zip...
+Local dataset missing, forcing download: /var/home/matt/dev/yesab/data/yesab_all.zip
+Download complete
+State updated: {'last_modified': 'Mon, 11 May 2026 19:26:06 GMT', 'content_length': '2333858'}
+Step 2/3: refresh YESAB API cache
+Reusing cached 2026-2026: /var/home/matt/dev/yesab/data/api/buckets/projects_2026-2026.json.zst
+State file    : /var/home/matt/dev/yesab/data/api/state.json
+Merged cache  : 4617 projects from 7 bucket(s)
+Merged dataset: /var/home/matt/dev/yesab/data/api/projects_merged.json.zst
+  - 2005-2005 : /var/home/matt/dev/yesab/data/api/buckets/projects_2005-2005.json.zst
+  - 2006-2010 : /var/home/matt/dev/yesab/data/api/buckets/projects_2006-2010.json.zst
+  - 2011-2015 : /var/home/matt/dev/yesab/data/api/buckets/projects_2011-2015.json.zst
+  - 2016-2020 : /var/home/matt/dev/yesab/data/api/buckets/projects_2016-2020.json.zst
+  - 2021-2025 : /var/home/matt/dev/yesab/data/api/buckets/projects_2021-2025.json.zst
+  - 2025-2025 : /var/home/matt/dev/yesab/data/api/buckets/projects_2025-2025.json.zst
+  - 2026-2026 : /var/home/matt/dev/yesab/data/api/buckets/projects_2026-2026.json.zst
+Step 3/3: build GeoPackage
+Wrote /var/home/matt/dev/yesab/out/yesab-projects.gpkg
+  Projects_Linear: 310 features
+  Projects_Placer: 1133 features
+  Projects_Points: 1093 features
+  Projects_Polygons: 787 features
+  Projects_Quartz: 462 features
+  API_Approximate_Points: 1263 features
+```  
+
+Example of building a single self-contained map:
+
+```
+❯ uv run scripts/build_static_map_single.py
+Wrote out/yesab-map-in-one.html with 6 layers and 5048 features.
+Wrote QA artifacts: yesab-map-in-one.qa.html, yesab-map-in-one.qa.json
+```
 
 ## Scripts
 
-- `scripts/download_project_map_archive.py`
-  Downloads `all.zip` only when the remote file changed.
-- `scripts/refresh_api_cache.py`
-  Caches YESAB API project records into local year-bucket Zstandard-compressed JSON files and writes a merged dataset.
-- `scripts/build_static_map_single.py`
-  Builds a single self-contained HTML file.
-- `scripts/build_static_map_split.py`
-  Builds a multi-file static site with separate HTML, CSS, JS, and layer data files.
-- `scripts/build_geopackage.py`
-  Builds an enriched GeoPackage with the same shapefile/API joins and approximate API-only points used by the map builders.
-- `scripts/refresh_and_build_geopackage.py`
-  Downloads the latest map archive when changed, refreshes the API cache, and builds the GeoPackage in one command.
-- `scripts/deploy_to_production.py`
-  Mirrors the deployable code subset to the production ETL workspace.
+- `scripts/download_project_map_archive.py` - Downloads `all.zip` only when the remote file changed.
+- `scripts/refresh_api_cache.py` - Caches YESAB API project records into local year-bucket Zstandard-compressed JSON files and writes a merged dataset.
+- `scripts/build_geopackage.py` - Builds an enriched GeoPackage shapefile/API joins and approximate API-only points.
+- `scripts/refresh_and_build_geopackage.py` - wrapper for downloading the latest map archive, refreshing the API cache, and building the GeoPackage in one command.
+- `scripts/deploy_to_production.py` - Mirrors the deployable code subset to the production ETL workspace.
+- `scripts/build_static_map_single.py` - Builds a single self-contained HTML file.
+- `scripts/build_static_map_split.py` - Builds a multi-file static site with separate HTML, CSS, JS, and layer data files.
 
 ## Usage
 
@@ -60,7 +95,7 @@ uv run .\scripts\refresh_and_build_geopackage.py --years 2024 2025 --force .\som
 
 ## Deployment
 
-The production ETL code workspace is `\\envgeoserver\dev\YESAB\yesab_map-toy-maker`.
+The production ETL code workspace is `\\envgeoserver\dev\YESAB\yesab_map`.
 
 Preview the deploy plan without copying files:
 
