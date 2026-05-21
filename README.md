@@ -51,7 +51,7 @@ Latest registry change: 2026-04-21 13:53 YST (2025-0172, Adequacy Review Respons
 Wrote QA artifacts: yesab-map-in-one.qa.html, yesab-map-in-one.qa.json
 ```
 
-[![](out/preview/yesab-map-in-one.png)](out/yesab-map-in-one.html)
+[![](out/previews/yesab-map-in-one.png)](out/yesab-map-in-one.html)
 
 ## Scripts
 

@@ -7,32 +7,90 @@
 <style>
 :root{--sans-font:-apple-system,BlinkMacSystemFont,"Avenir Next",Avenir,"Nimbus Sans L",Roboto,"Noto Sans","Segoe UI",Arial,Helvetica,"Helvetica Neue",sans-serif;--mono-font:Consolas,Menlo,Monaco,"Andale Mono","Ubuntu Mono",monospace;--standard-border-radius:5px;--border-width:1px;--bg:#fff;--accent-bg:#f5f7ff;--text:#212121;--text-light:#585858;--border:#898ea4;--accent:#0d47a1;--accent-hover:#1266e2;--accent-text:var(--bg);--code:#d81b60;--preformatted:#444;--marked:#fd3;--disabled:#efefef}@media (prefers-color-scheme:dark){:root{color-scheme:dark;--bg:#212121;--accent-bg:#2b2b2b;--text:#dcdcdc;--text-light:#ababab;--accent:#ffb300;--accent-hover:#ffe099;--accent-text:var(--bg);--code:#f06292;--preformatted:#ccc;--disabled:#111}img,video{opacity:.8}}*,:before,:after{box-sizing:border-box}textarea,select,input,progress{-webkit-appearance:none;-moz-appearance:none;appearance:none}html{font-family:var(--sans-font);scroll-behavior:smooth}body{color:var(--text);background-color:var(--bg);grid-template-columns:1fr min(45rem,90%) 1fr;margin:0;font-size:1.15rem;line-height:1.5;display:grid}body>*{grid-column:2}body>header{background-color:var(--accent-bg);border-bottom:var(--border-width)solid var(--border);text-align:center;grid-column:1/-1;padding:0 .5rem 2rem}body>header>:only-child{margin-block-start:2rem}body>header h1{max-width:1200px;margin:1rem auto}body>header p{max-width:40rem;margin:1rem auto}main{padding-top:1.5rem}body>footer{color:var(--text-light);text-align:center;border-top:var(--border-width)solid var(--border);margin-top:4rem;padding:2rem 1rem 1.5rem;font-size:.9rem}h1{font-size:3rem}h2{margin-top:3rem;font-size:2.6rem}h3{margin-top:3rem;font-size:2rem}h4{font-size:1.44rem}h5{font-size:1.15rem}h6{font-size:.96rem}p{margin:1.5rem 0}p,h1,h2,h3,h4,h5,h6{overflow-wrap:break-word}h1,h2,h3{line-height:1.1}@media only screen and (width<=720px){h1{font-size:2.5rem}h2{font-size:2.1rem}h3{font-size:1.75rem}h4{font-size:1.25rem}}a,a:visited{color:var(--accent)}a:hover{text-decoration:none}button,.button,a.button,input[type=submit],input[type=reset],input[type=button]{border:var(--border-width)solid var(--accent);background-color:var(--accent);color:var(--accent-text);padding:.5rem .9rem;line-height:normal;text-decoration:none}.button[aria-disabled=true],input:disabled,textarea:disabled,select:disabled,button[disabled]{cursor:not-allowed;background-color:var(--disabled);border-color:var(--disabled);color:var(--text-light)}input[type=range]{padding:0}abbr[title]{cursor:help;text-decoration-line:underline;text-decoration-style:dotted}button:enabled:hover,.button:not([aria-disabled=true]):hover,input[type=submit]:enabled:hover,input[type=reset]:enabled:hover,input[type=button]:enabled:hover{background-color:var(--accent-hover);border-color:var(--accent-hover);cursor:pointer}.button:focus-visible,button:focus-visible:where(:enabled),input:enabled:focus-visible:where([type=submit],[type=reset],[type=button]){outline:2px solid var(--accent);outline-offset:1px}header nav{padding:1rem 0 0;font-size:1rem;line-height:2}header nav ul,header nav ol{flex-flow:wrap;place-content:space-around center;align-items:center;margin:0;padding:0;list-style-type:none;display:flex}header nav ul li,header nav ol li{display:inline-block}header nav a,header nav a:visited{border:var(--border-width)solid var(--border);border-radius:var(--standard-border-radius);color:var(--text);margin:0 .5rem 1rem;padding:.1rem 1rem;text-decoration:none;display:inline-block}header nav a:hover,header nav a.current,header nav a[aria-current=page],header nav a[aria-current=true]{border-color:var(--accent);color:var(--accent);cursor:pointer}@media only screen and (width<=720px){header nav a{border:none;padding:0;line-height:1;text-decoration:underline}}aside,details,pre,progress{background-color:var(--accent-bg);border:var(--border-width)solid var(--border);border-radius:var(--standard-border-radius);margin-bottom:1rem}aside{float:right;width:30%;margin-inline-start:15px;padding:0 15px;font-size:1rem}[dir=rtl] aside{float:left}@media only screen and (width<=720px){aside{float:none;width:100%;margin-inline-start:0}}article,fieldset,dialog{border:var(--border-width)solid var(--border);border-radius:var(--standard-border-radius);margin-bottom:1rem;padding:1rem}article h2:first-child,section h2:first-child,article h3:first-child,section h3:first-child{margin-top:1rem}section{border-top:var(--border-width)solid var(--border);border-bottom:var(--border-width)solid var(--border);margin:3rem 0;padding:2rem 1rem}section+section,section:first-child{border-top:0;padding-top:0}section+section{margin-top:0}section:last-child{border-bottom:0;padding-bottom:0}details{padding:.7rem 1rem}summary{cursor:pointer;word-break:break-all;margin:-.7rem -1rem;padding:.7rem 1rem;font-weight:700}details[open]>summary+*{margin-top:0}details[open]>summary{margin-bottom:.5rem}details[open]>:last-child{margin-bottom:0}table{border-collapse:collapse;margin:1.5rem 0}figure>table{width:max-content;margin:0}td,th{border:var(--border-width)solid var(--border);text-align:start;padding:.5rem}th{background-color:var(--accent-bg);font-weight:700}tr:nth-child(2n){background-color:var(--accent-bg)}table caption{margin-bottom:.5rem;font-weight:700}textarea,select,input,button,.button{font-size:inherit;border-radius:var(--standard-border-radius);box-shadow:none;max-width:100%;margin-bottom:.5rem;padding:.5em;font-family:inherit;display:inline-block}textarea,select,input{color:var(--text);background-color:var(--bg);border:var(--border-width)solid var(--border)}label{display:block}textarea:not([cols]){width:100%}select:not([multiple]){background-image:linear-gradient(45deg,transparent 49%,var(--text)51%),linear-gradient(135deg,var(--text)51%,transparent 49%);background-position:calc(100% - 15px),calc(100% - 10px);background-repeat:no-repeat;background-size:5px 5px,5px 5px;padding-inline-end:25px}[dir=rtl] select:not([multiple]){background-position:10px,15px}input[type=checkbox],input[type=radio]{vertical-align:middle;width:min-content;position:relative}input[type=checkbox]+label,input[type=radio]+label{display:inline-block}input[type=radio]{border-radius:100%}input[type=checkbox]:checked,input[type=radio]:checked{background-color:var(--accent)}input[type=checkbox]:checked:after{content:" ";border-right:solid var(--bg).08em;border-bottom:solid var(--bg).08em;background-color:#0000;border-radius:0;width:.2em;height:.4em;font-size:1.8em;position:absolute;top:.04em;left:.18em;transform:rotate(45deg)}input[type=radio]:checked:after{content:" ";background-color:var(--bg);border-radius:100%;width:.3em;height:.3em;font-size:1.8em;position:absolute;top:.125em;left:.125em}@media only screen and (width<=720px){textarea,select,input{width:100%}}input[type=color]{height:2.5rem;padding:.2rem}input[type=file]{border:0}hr{height:var(--border-width);background:var(--border);border:none;margin:1rem auto}mark{border-radius:var(--standard-border-radius);background-color:var(--marked);color:#000;padding:2px 5px}mark a{color:#0d47a1}img,video{border-radius:var(--standard-border-radius);max-width:100%;height:auto}figure{margin:0;display:block;overflow-x:auto}figure>img,figure>picture>img{margin-inline:auto;display:block}figcaption{text-align:center;color:var(--text-light);margin-block:1rem;font-size:.9rem;position:sticky;left:0}blockquote{border-inline-start:.35rem solid var(--accent);color:var(--text-light);margin-block:2rem;margin-inline:2rem 0;padding:.4rem .8rem;font-style:italic}cite{color:var(--text-light);font-size:.9rem;font-style:normal}dt{color:var(--text-light)}code,pre,pre span,kbd,samp{font-family:var(--mono-font);color:var(--code)}kbd{color:var(--preformatted);border:var(--border-width)solid var(--preformatted);border-bottom:3px solid var(--preformatted);border-radius:var(--standard-border-radius);padding:.1rem .4rem}pre{max-width:100%;color:var(--preformatted);padding:1rem 1.4rem;overflow:auto}pre code{color:var(--preformatted);background:0 0;margin:0;padding:0}progress{width:100%}progress:indeterminate{background-color:var(--accent-bg)}progress::-webkit-progress-bar{border-radius:var(--standard-border-radius);background-color:var(--accent-bg)}progress::-webkit-progress-value{border-radius:var(--standard-border-radius);background-color:var(--accent)}progress::-moz-progress-bar{border-radius:var(--standard-border-radius);background-color:var(--accent);transition-property:width;transition-duration:.3s}progress:indeterminate::-moz-progress-bar{background-color:var(--accent-bg)}dialog{background-color:var(--bg);max-width:40rem;margin:auto}dialog::backdrop{background-color:var(--bg);opacity:.8}@media only screen and (width<=720px){dialog{max-width:calc(100vw - 2rem)}}sup,sub{vertical-align:baseline;position:relative}sup{top:-.4em}sub{top:.3em}.notice{background:var(--accent-bg);border:var(--border-width)solid var(--border);border-radius:var(--standard-border-radius);margin:2rem 0;padding:1.5rem}@media print{@page{margin:1cm}body{display:block}body>header{background-color:unset}body>header nav,body>footer{display:none}article{border:none;padding:0}a[href^=http]:after{content:" <" attr(href)">"}abbr[title]:after{content:" (" attr(title)")"}a{text-decoration:none}p{widows:3;orphans:3}hr{border-top:var(--border-width)solid var(--border)}mark{border:var(--border-width)solid var(--border)}pre,table,figure,img,svg{break-inside:avoid}pre code{white-space:pre-wrap}}
 </style>
+<style>
+:root[data-theme="light"]{color-scheme:light;--bg:#fff;--accent-bg:#f5f7ff;--text:#212121;--text-light:#585858;--accent:#0d47a1;--accent-hover:#1266e2;--accent-text:var(--bg);--code:#d81b60;--preformatted:#444;--disabled:#efefef}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#212121;--accent-bg:#2b2b2b;--text:#dcdcdc;--text-light:#ababab;--accent:#ffb300;--accent-hover:#ffe099;--accent-text:var(--bg);--code:#f06292;--preformatted:#ccc;--disabled:#111}
+:root[data-theme="dark"] img,:root[data-theme="dark"] video{opacity:.8}
+#theme-toggle{position:fixed;top:.75rem;right:.75rem;z-index:1000;padding:.25rem .6rem;font-size:1rem;line-height:1;cursor:pointer;border-radius:var(--standard-border-radius);border:var(--border-width) solid var(--border);background:var(--accent-bg);color:var(--text)}
+</style>
+<script>
+(function(){
+  var saved=localStorage.getItem('theme');
+  var sys=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+  document.documentElement.dataset.theme=saved||sys;
+  document.addEventListener('DOMContentLoaded',function(){
+    var b=document.createElement('button');
+    b.id='theme-toggle';b.type='button';b.title='Toggle light/dark';
+    var sync=function(){b.textContent=document.documentElement.dataset.theme==='dark'?'\u2600':'\u263E';};
+    sync();
+    b.onclick=function(){
+      var next=document.documentElement.dataset.theme==='dark'?'light':'dark';
+      document.documentElement.dataset.theme=next;
+      localStorage.setItem('theme',next);
+      sync();
+    };
+    document.body.appendChild(b);
+  });
+})();
+</script>
 </head>
 <body>
 <main>
 <h1>YESAB Static Map Builders</h1>
 <p>YESAB is the Yukon Environmental and Socio-economic Assessment Board, which tracks assessment projects across Yukon. This repository exists to pull the published project map data and registry metadata into reproducible local artifacts so it is easier to inspect, rebuild, and share static map outputs without depending on the live services at runtime.</p>
 <ul>
-<li>downloading the YESAB shapefile archive</li>
-<li>caching the YESAB registry API in year buckets</li>
-<li>building static map outputs from the zipped shapefiles in <code>data/</code></li>
+<li>downloading the <a href="https://yesab.ca/project-map/">YESAB Project Map</a> - <a href="https://yesab.ca/wp-content/plugins/yesab-map-wp-plugin/geojson/all.zip">shapefile archive</a></li>
+<li>fetching and caching the <a href="https://yesabregistry.ca/api/integration/projects">YESAB registry API</a> in year buckets</li>
+<li>joining the shapefile archive and registry API data into a single GeoPackage, filtering approximate locations into their own class</li>
+<li>building static map outputs from the previous steps</li>
 </ul>
+<p>The workhorse or main value of the project is the combined shapefile and registry API data in a single geospatial package. It is one step of a larger internal ETL (extract, transform, load) pipeline. The maps are demos, toys made to quickly view the data and illustrate the concept of a self-contained dynamic map.</p>
+<p>Example of refreshing and building the GeoPackage from scratch:</p>
+<pre><code>❯ uv run scripts/refresh_and_build_geopackage.py
+Step 1/3: refresh YESAB project map archive
+Checking YESAB all.zip...
+Local dataset missing, forcing download: /var/home/matt/dev/yesab/data/yesab_all.zip
+Download complete
+State updated: {'last_modified': 'Mon, 11 May 2026 19:26:06 GMT', 'content_length': '2333858'}
+Step 2/3: refresh YESAB API cache
+Reusing cached 2026-2026: /var/home/matt/dev/yesab/data/api/buckets/projects_2026-2026.json.zst
+State file    : /var/home/matt/dev/yesab/data/api/state.json
+Merged cache  : 4617 projects from 7 bucket(s)
+Merged dataset: /var/home/matt/dev/yesab/data/api/projects_merged.json.zst
+  - 2005-2005 : /var/home/matt/dev/yesab/data/api/buckets/projects_2005-2005.json.zst
+  - 2006-2010 : /var/home/matt/dev/yesab/data/api/buckets/projects_2006-2010.json.zst
+  - 2011-2015 : /var/home/matt/dev/yesab/data/api/buckets/projects_2011-2015.json.zst
+  - 2016-2020 : /var/home/matt/dev/yesab/data/api/buckets/projects_2016-2020.json.zst
+  - 2021-2025 : /var/home/matt/dev/yesab/data/api/buckets/projects_2021-2025.json.zst
+  - 2025-2025 : /var/home/matt/dev/yesab/data/api/buckets/projects_2025-2025.json.zst
+  - 2026-2026 : /var/home/matt/dev/yesab/data/api/buckets/projects_2026-2026.json.zst
+Step 3/3: build GeoPackage
+Wrote /var/home/matt/dev/yesab/out/yesab-projects.gpkg
+  Projects_Linear: 310 features
+  Projects_Placer: 1133 features
+  Projects_Points: 1093 features
+  Projects_Polygons: 787 features
+  Projects_Quartz: 462 features
+  API_Approximate_Points: 1263 features
+</code></pre>
+<p>Example of building a single self-contained map:</p>
+<pre><code>❯ uv run scripts/build_static_map_single.py
+Wrote out/yesab-map-in-one.html with 6 layers and 5048 features.
+Output size: 19.6 MB
+YESAB shapefile date: 2026-05-11 12:26 YST
+Latest registry change: 2026-04-21 13:53 YST (2025-0172, Adequacy Review Response ended)
+Wrote QA artifacts: yesab-map-in-one.qa.html, yesab-map-in-one.qa.json
+</code></pre>
+<p><a href="out/yesab-map-in-one.html"><img src="out/previews/yesab-map-in-one.png" alt="" /></a></p>
 <h2>Scripts</h2>
 <ul>
-<li><code>scripts/download_project_map_archive.py</code>
-Downloads <code>all.zip</code> only when the remote file changed.</li>
-<li><code>scripts/refresh_api_cache.py</code>
-Caches YESAB API project records into local year-bucket Zstandard-compressed JSON files and writes a merged dataset.</li>
-<li><code>scripts/build_static_map_single.py</code>
-Builds a single self-contained HTML file.</li>
-<li><code>scripts/build_static_map_split.py</code>
-Builds a multi-file static site with separate HTML, CSS, JS, and layer data files.</li>
-<li><code>scripts/build_geopackage.py</code>
-Builds an enriched GeoPackage with the same shapefile/API joins and approximate API-only points used by the map builders.</li>
-<li><code>scripts/refresh_and_build_geopackage.py</code>
-Downloads the latest map archive when changed, refreshes the API cache, and builds the GeoPackage in one command.</li>
-<li><code>scripts/deploy_to_production.py</code>
-Mirrors the deployable code subset to the production ETL workspace.</li>
+<li><code>scripts/download_project_map_archive.py</code> - Downloads <code>all.zip</code> only when the remote file changed.</li>
+<li><code>scripts/refresh_api_cache.py</code> - Caches YESAB API project records into local year-bucket Zstandard-compressed JSON files and writes a merged dataset.</li>
+<li><code>scripts/build_geopackage.py</code> - Builds an enriched GeoPackage shapefile/API joins and approximate API-only points.</li>
+<li><code>scripts/refresh_and_build_geopackage.py</code> - wrapper for downloading the latest map archive, refreshing the API cache, and building the GeoPackage in one command.</li>
+<li><code>scripts/deploy_to_production.py</code> - Mirrors the deployable code subset to the production ETL workspace.</li>
+<li><code>scripts/build_static_map_single.py</code> - Builds a single self-contained HTML file.</li>
+<li><code>scripts/build_static_map_split.py</code> - Builds a multi-file static site with separate HTML, CSS, JS, and layer data files.</li>
 </ul>
 <h2>Usage</h2>
 <p>Run commands from the repository root. If you omit output arguments, the builders write safely into <code>./out</code> without clobbering each other.</p>
@@ -65,7 +123,7 @@ uv run .\scripts\refresh_and_build_geopackage.py --force
 uv run .\scripts\refresh_and_build_geopackage.py --years 2024 2025 --force .\some-output.gpkg
 </code></pre>
 <h2>Deployment</h2>
-<p>The production ETL code workspace is <code>\\envgeoserver\dev\YESAB\yesab_map-toy-maker</code>.</p>
+<p>The production ETL code workspace is <code>\\envgeoserver\dev\YESAB\yesab_map</code>.</p>
 <p>Preview the deploy plan without copying files:</p>
 <pre><code class="language-powershell">uv run .\scripts\deploy_to_production.py
 </code></pre>
@@ -149,6 +207,8 @@ This keeps the sync logic simple while still updating the projects most likely t
 <pre><code class="language-powershell">uv run .\scripts\run_timed.py --task-id tests -- uv run --python 3.14 python -m unittest discover -s tests
 uv run .\scripts\summarize_metrics.py
 </code></pre>
+<h2>End notes</h2>
+<p>Built by Matt Wilkie at Yukon department of Environment. The code is open-source and available under the <a href="LICENSE">MIT</a> and <a href="OPEN-GOVERNMENT-LICENCE-YUKON.txt">Yukon Open Government</a> licenses. Provided as-is, without warranty or support.</p>
 
 </main>
 </body>
