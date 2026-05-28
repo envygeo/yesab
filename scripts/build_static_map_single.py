@@ -12,6 +12,8 @@ into one HTML document so it can be opened directly from disk without a server.
 from __future__ import annotations
 
 import argparse
+import base64
+import gzip
 import json
 import math
 import struct
@@ -47,6 +49,7 @@ from yesab_map.core import (
 )
 
 DEFAULT_OUTPUT_PATH = Path("./out/yesab-map-in-one.html")
+DEFAULT_COMPRESSED_SUFFIX = ".compressed.html"
 
 LAYER_COLORS = {
     "Projects_Linear": "#f59e0b",
@@ -55,6 +58,93 @@ LAYER_COLORS = {
     "Projects_Polygons": "#3b82f6",
     "Projects_Quartz": "#8b5cf6",
 }
+
+
+def default_compressed_output_path(output_path: Path) -> Path:
+    """Return the default compressed wrapper path for a single-file artifact."""
+    return output_path.with_name(f"{output_path.stem}{DEFAULT_COMPRESSED_SUFFIX}")
+
+
+def build_compressed_html(source_html: str) -> str:
+    """Build a native-browser gzip loader that reconstructs ``source_html``."""
+    compressed = gzip.compress(source_html.encode("utf-8"), mtime=0)
+    encoded = base64.b64encode(compressed).decode("ascii")
+    encoded_js = json.dumps(encoded)
+    return f"""<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>YESAB map compressed loader</title>
+  <style>
+    body {{
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #1f2937;
+      background: #f7f4ec;
+    }}
+    main {{
+      max-width: 42rem;
+      padding: 1.5rem;
+      line-height: 1.5;
+    }}
+    code {{
+      background: rgba(31, 41, 55, 0.08);
+      border-radius: 0.25rem;
+      padding: 0.1rem 0.25rem;
+    }}
+  </style>
+</head>
+<body>
+  <main id="loaderStatus">
+    <h1>Loading YESAB map...</h1>
+    <p>This wrapper is decompressing the generated single-file map in your browser.</p>
+  </main>
+  <script type="module">
+    const COMPRESSED_APP_BASE64 = {encoded_js};
+
+    function base64ToBytes(value) {{
+      const binary = atob(value);
+      const bytes = new Uint8Array(binary.length);
+      for (let index = 0; index < binary.length; index += 1) {{
+        bytes[index] = binary.charCodeAt(index);
+      }}
+      return bytes;
+    }}
+
+    async function decompressAppHtml(compressedBytes) {{
+      if (!("DecompressionStream" in globalThis)) {{
+        throw new Error("This browser does not support DecompressionStream('gzip'). Use yesab-map-in-one.html instead.");
+      }}
+      const stream = new Blob([compressedBytes])
+        .stream()
+        .pipeThrough(new DecompressionStream("gzip"));
+      return await new Response(stream).text();
+    }}
+
+    async function boot() {{
+      const status = document.getElementById("loaderStatus");
+      try {{
+        const appHtml = await decompressAppHtml(base64ToBytes(COMPRESSED_APP_BASE64));
+        document.open();
+        document.write(appHtml);
+        document.close();
+      }} catch (error) {{
+        status.innerHTML = `<h1>Could not load compressed map</h1>
+          <p>${{error.message || error}}</p>
+          <p>Open <code>yesab-map-in-one.html</code> with a current Chromium, Firefox, or Safari browser as a fallback.</p>`;
+        throw error;
+      }}
+    }}
+
+    boot();
+  </script>
+</body>
+</html>
+"""
 
 
 def build_qa_html(qa_payload: dict[str, object], title: str) -> str:
@@ -1453,6 +1543,22 @@ def parse_args() -> argparse.Namespace:
         type=Path,
         help="HTML file path or output directory (default: ./out/yesab-map-in-one.html).",
     )
+    parser.add_argument(
+        "--compressed",
+        action="store_true",
+        help=(
+            "Also write a gzip/base64 native-browser wrapper next to the single-file "
+            "artifact (default name: yesab-map-in-one.compressed.html)."
+        ),
+    )
+    parser.add_argument(
+        "--compressed-output",
+        type=Path,
+        help=(
+            "Optional compressed HTML file path or output directory. Implies "
+            "--compressed when provided."
+        ),
+    )
     return parser.parse_args()
 
 
@@ -1466,7 +1572,21 @@ def main() -> None:
         output_path = raw_output_path / "yesab-map-in-one.html"
     output_path.parent.mkdir(parents=True, exist_ok=True)
     payload = load_layers()
-    output_path.write_text(build_html(payload), encoding="utf-8")
+    html = build_html(payload)
+    output_path.write_text(html, encoding="utf-8")
+    compressed_path = None
+    if args.compressed or args.compressed_output is not None:
+        raw_compressed_path = args.compressed_output
+        if raw_compressed_path is None:
+            compressed_path = default_compressed_output_path(output_path)
+        elif raw_compressed_path.suffix.lower() == ".html":
+            compressed_path = raw_compressed_path
+        else:
+            compressed_path = raw_compressed_path / default_compressed_output_path(
+                output_path
+            ).name
+        compressed_path.parent.mkdir(parents=True, exist_ok=True)
+        compressed_path.write_text(build_compressed_html(html), encoding="utf-8")
     qa_json_path = output_path.with_suffix(".qa.json")
     qa_html_path = output_path.with_suffix(".qa.html")
     qa_json_path.write_text(
@@ -1480,6 +1600,11 @@ def main() -> None:
         f"Wrote {output_path} with {len(payload['layers'])} layers and {total} features."
     )
     print(f"Output size: {format_file_size(total_path_size(output_path))}")
+    if compressed_path is not None:
+        print(
+            f"Wrote compressed wrapper: {compressed_path} "
+            f"({format_file_size(total_path_size(compressed_path))})"
+        )
     source_date_line = source_date_summary(payload["sourceInfo"])
     if source_date_line:
         print(source_date_line)

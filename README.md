@@ -51,6 +51,22 @@ Latest registry change: 2026-04-21 13:53 YST (2025-0172, Adequacy Review Respons
 Wrote QA artifacts: yesab-map-in-one.qa.html, yesab-map-in-one.qa.json
 ```
 
+Build the optional browser-native compressed wrapper when you need a smaller
+single-file artifact for sharing:
+
+```
+❯ uv run scripts/build_static_map_single.py --compressed
+Wrote out/yesab-map-in-one.html with 6 layers and 5048 features.
+Output size: 19.6 MB
+Wrote compressed wrapper: out/yesab-map-in-one.compressed.html (5.4 MB)
+...
+```
+
+The compressed wrapper embeds a gzip copy of the generated
+`yesab-map-in-one.html` bytes and reconstructs the original document in browsers
+that support `DecompressionStream("gzip")`. Keep `yesab-map-in-one.html` as the
+canonical compatibility artifact.
+
 [![](out/previews/yesab-map-in-one.png)](out/yesab-map-in-one.html)
 
 ## Output geopackage metadata 
@@ -67,7 +83,7 @@ Wrote QA artifacts: yesab-map-in-one.qa.html, yesab-map-in-one.qa.json
 - `scripts/build_geopackage.py` - Builds an enriched GeoPackage shapefile/API joins and approximate API-only points.
 - `scripts/refresh_and_build_geopackage.py` - wrapper for downloading the latest map archive, refreshing the API cache, and building the GeoPackage in one command.
 - `scripts/deploy_to_production.py` - Mirrors the deployable code subset to the production ETL workspace.
-- `scripts/build_static_map_single.py` - Builds a single self-contained HTML file.
+- `scripts/build_static_map_single.py` - Builds a single self-contained HTML file, with an optional compressed wrapper.
 - `scripts/build_static_map_split.py` - Builds a multi-file static site with separate HTML, CSS, JS, and layer data files.
 
 ## Usage
@@ -77,6 +93,7 @@ Run commands from the repository root. If you omit output arguments, the builder
 Output arguments differ by builder:
 
 - `scripts/build_static_map_single.py` accepts either an `.html` file path or a directory. Directory output writes `yesab-map-in-one.html` inside that directory.
+- `scripts/build_static_map_single.py --compressed` also writes `yesab-map-in-one.compressed.html` next to the single-file output. Use `--compressed-output` to choose a different compressed `.html` path or output directory.
 - `scripts/build_static_map_split.py` accepts an output directory and recreates that directory before writing.
 - `scripts/build_geopackage.py` accepts a `.gpkg` file path.
 
@@ -91,7 +108,9 @@ uv run .\scripts\refresh_api_cache.py --start-year 2024 --end-year 2025 --force
 uv run .\scripts\refresh_api_cache.py --years 2022 2023 2024 --force
 
 uv run .\scripts\build_static_map_single.py
+uv run .\scripts\build_static_map_single.py --compressed
 uv run .\scripts\build_static_map_single.py .\some-output-dir
+uv run .\scripts\build_static_map_single.py .\some-output-dir --compressed-output .\some-output-dir\shared-map.html
 
 uv run .\scripts\build_static_map_split.py
 uv run .\scripts\build_static_map_split.py .\some-output-dir
@@ -160,6 +179,7 @@ Default output locations:
   - `data/api/state.json`
 - `scripts/build_static_map_single.py` writes:
   - `out/yesab-map-in-one.html`
+  - `out/yesab-map-in-one.compressed.html` when `--compressed` or `--compressed-output` is used
   - `out/yesab-map-in-one.qa.html`
   - `out/yesab-map-in-one.qa.json`
 - `scripts/build_static_map_split.py` writes:

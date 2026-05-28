@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+import base64
+import gzip
+import json
+import re
 import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -299,6 +303,34 @@ class StaticMapBasemapChooserTests(unittest.TestCase):
         self.assertIn("tileInfo", js)
         self.assertIn('basemap: basemapSelect.value || "none"', js)
         self.assertNotIn("World_Topo_Map/MapServer/export", js)
+
+
+class StaticMapCompressedOutputTests(unittest.TestCase):
+    def test_compressed_wrapper_embeds_recoverable_app_html(self) -> None:
+        source_html = "<!doctype html><html><body><h1>YESAB</h1><script>window.ok = true;</script></body></html>"
+
+        wrapper = build_static_map_single.build_compressed_html(source_html)
+
+        self.assertIn('DecompressionStream("gzip")', wrapper)
+        self.assertIn("document.write(appHtml)", wrapper)
+        payload_match = re.search(
+            r"const COMPRESSED_APP_BASE64 = ([^;]+);", wrapper
+        )
+        self.assertIsNotNone(payload_match)
+        encoded_payload = json.loads(payload_match.group(1))
+        recovered_html = gzip.decompress(base64.b64decode(encoded_payload)).decode(
+            "utf-8"
+        )
+        self.assertEqual(recovered_html, source_html)
+        self.assertLess(len(encoded_payload), len(source_html) * 2)
+
+    def test_default_compressed_path_sits_next_to_single_file_output(self) -> None:
+        self.assertEqual(
+            build_static_map_single.default_compressed_output_path(
+                Path("out/yesab-map-in-one.html")
+            ),
+            Path("out/yesab-map-in-one.compressed.html"),
+        )
 
 
 class StaticMapAboutPanelTests(unittest.TestCase):
