@@ -353,6 +353,67 @@ class StaticMapAboutPanelTests(unittest.TestCase):
         self.assertIn("Latest registry change", js)
         self.assertIn("latestRecordProjectNumber", js)
 
+    def test_about_panel_includes_qa_coverage_summary(self) -> None:
+        payload = {
+            "archives": [],
+            "bounds": [0, 0, 1, 1],
+            "layers": [],
+            "apiProjects": {},
+            "apiSummary": {"available": True},
+            "sourceInfo": {},
+            "qa": {
+                "summary": {
+                    "cachedApiProjectCount": 10,
+                    "matchedApiProjectCount": 3,
+                    "fallbackApiProjectCount": 2,
+                    "mappedApiProjectCount": 5,
+                    "unmappedApiProjectCount": 5,
+                    "matchedFeatureCount": 7,
+                }
+            },
+        }
+
+        html = build_static_map_single.build_html(payload)
+        split_js = build_static_map_split.site_js()
+
+        self.assertIn("Data QA coverage", html)
+        self.assertIn("matched API project(s) with shapefile geometry", html)
+        self.assertIn("API-only fallback point project(s)", html)
+        self.assertIn("cached API project(s) still unmapped", html)
+        self.assertIn('"mappedApiProjectCount":5', html)
+        self.assertIn("Data QA coverage", split_js)
+        self.assertIn("matched API project(s) with shapefile geometry", split_js)
+
+    def test_split_manifest_includes_qa_summary_for_about_panel(self) -> None:
+        with TemporaryDirectory() as tmp:
+            data_dir = Path(tmp)
+            build_static_map_split.write_data_files(
+                {
+                    "archives": [],
+                    "bounds": [0, 0, 1, 1],
+                    "layers": [],
+                    "apiProjects": {},
+                    "apiSummary": {"available": False},
+                    "sourceInfo": {},
+                    "qa": {
+                        "summary": {
+                            "cachedApiProjectCount": 10,
+                            "matchedApiProjectCount": 3,
+                            "fallbackApiProjectCount": 2,
+                            "mappedApiProjectCount": 5,
+                            "unmappedApiProjectCount": 5,
+                            "matchedFeatureCount": 7,
+                        }
+                    },
+                },
+                data_dir,
+            )
+
+            manifest_js = (data_dir / "manifest.js").read_text(encoding="utf-8")
+
+        self.assertIn('"qaSummary"', manifest_js)
+        self.assertIn('"mappedApiProjectCount":5', manifest_js)
+
 
 class StaticMapLocalImportTests(unittest.TestCase):
     def test_single_file_map_includes_local_shape_and_kml_importer(self) -> None:

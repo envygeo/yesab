@@ -771,6 +771,7 @@ def site_js() -> str:
     layers: (manifest.layers || []).map((meta) => ({ ...meta, features: layerMap[meta.name] || [] })),
     apiProjects,
     apiSummary: manifest.apiSummary || { available: false, projectCount: 0, matchedProjectCount: 0, fallbackProjectCount: 0, mappedProjectCount: 0, unmappedProjectCount: 0, matchedFeatureCount: 0 },
+    qaSummary: manifest.qaSummary || null,
     sourceInfo: manifest.sourceInfo || {}
   };
 
@@ -919,6 +920,28 @@ def site_js() -> str:
     `;
   }
 
+  function renderQaSummary() {
+    const summary = DATA.qaSummary || null;
+    if (!summary) return "";
+    const cached = Number(summary.cachedApiProjectCount || 0);
+    const mapped = Number(summary.mappedApiProjectCount || 0);
+    const matched = Number(summary.matchedApiProjectCount || 0);
+    const fallback = Number(summary.fallbackApiProjectCount || 0);
+    const unmapped = Number(summary.unmappedApiProjectCount || 0);
+    const linkedFeatures = Number(summary.matchedFeatureCount || 0);
+    return `
+      <h2>Data QA coverage</h2>
+      <p>${mapped.toLocaleString()}/${cached.toLocaleString()} cached API project(s) shown on the map.</p>
+      <dl>
+        <dt>Matched</dt><dd>${matched.toLocaleString()} matched API project(s) with shapefile geometry</dd>
+        <dt>API-only</dt><dd>${fallback.toLocaleString()} API-only fallback point project(s)</dd>
+        <dt>Unmapped</dt><dd>${unmapped.toLocaleString()} cached API project(s) still unmapped</dd>
+        <dt>Linked features</dt><dd>${linkedFeatures.toLocaleString()} geometry feature(s) linked to cached API records</dd>
+      </dl>
+      <p><a href="qa_report.html" target="_blank" rel="noreferrer">Open the detailed QA report</a>.</p>
+    `;
+  }
+
   function renderAbout() {
     const info = DATA.sourceInfo || {};
     const shapefile = info.shapefile || {};
@@ -940,6 +963,7 @@ def site_js() -> str:
         ${bucketLine}
         ${latestApiLine}
       </dl>
+      ${renderQaSummary()}
       <p><a href="${esc(shapefile.pageUrl || "#")}" target="_blank" rel="noreferrer">YESAB Project Map File page</a></p>
       <p><a href="${esc(registry.pageUrl || "#")}" target="_blank" rel="noreferrer">YESAB Online Registry</a></p>
     `;
@@ -1489,6 +1513,7 @@ def write_data_files(payload: dict[str, object], output_data_dir: Path) -> list[
         "archives": payload["archives"],
         "bounds": payload["bounds"],
         "apiSummary": payload["apiSummary"],
+        "qaSummary": payload["qa"]["summary"],
         "sourceInfo": payload["sourceInfo"],
         "layers": [
             {

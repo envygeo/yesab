@@ -208,7 +208,7 @@ Refresh API cache buckets sequentially. The script uses a shared `data/api/state
 
 - Python `3.14+` is required for stdlib `compression.zstd` support.
 - If `data/api/projects_merged.json.zst` exists, both map builders will enrich matching features with YESAB registry metadata.
-- QA reports are generated with both builders so you can inspect map/API coverage and unmatched records.
+- QA reports are generated with both builders so you can inspect map/API coverage and unmatched records. The map About panel includes the compact QA coverage summary; the separate QA HTML/JSON artifacts contain the detailed project lists.
 
 ## Follow-up Items
 

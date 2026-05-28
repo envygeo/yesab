@@ -966,6 +966,28 @@ def build_html(payload: dict[str, object]) -> str:
       `;
     }}
 
+    function renderQaSummary() {{
+      const summary = DATA.qa?.summary || DATA.qaSummary || null;
+      if (!summary) return "";
+      const cached = Number(summary.cachedApiProjectCount || 0);
+      const mapped = Number(summary.mappedApiProjectCount || 0);
+      const matched = Number(summary.matchedApiProjectCount || 0);
+      const fallback = Number(summary.fallbackApiProjectCount || 0);
+      const unmapped = Number(summary.unmappedApiProjectCount || 0);
+      const linkedFeatures = Number(summary.matchedFeatureCount || 0);
+      return `
+        <h2>Data QA coverage</h2>
+        <p>${{mapped.toLocaleString()}}/${{cached.toLocaleString()}} cached API project(s) shown on the map.</p>
+        <dl>
+          <dt>Matched</dt><dd>${{matched.toLocaleString()}} matched API project(s) with shapefile geometry</dd>
+          <dt>API-only</dt><dd>${{fallback.toLocaleString()}} API-only fallback point project(s)</dd>
+          <dt>Unmapped</dt><dd>${{unmapped.toLocaleString()}} cached API project(s) still unmapped</dd>
+          <dt>Linked features</dt><dd>${{linkedFeatures.toLocaleString()}} geometry feature(s) linked to cached API records</dd>
+        </dl>
+        <p>Detailed QA artifacts are written next to the generated map as HTML and JSON reports.</p>
+      `;
+    }}
+
     function renderAbout() {{
       const info = DATA.sourceInfo || {{}};
       const shapefile = info.shapefile || {{}};
@@ -987,6 +1009,7 @@ def build_html(payload: dict[str, object]) -> str:
           ${{bucketLine}}
           ${{latestApiLine}}
         </dl>
+        ${{renderQaSummary()}}
         <p><a href="${{esc(shapefile.pageUrl || "#")}}" target="_blank" rel="noreferrer">YESAB Project Map File page</a></p>
         <p><a href="${{esc(registry.pageUrl || "#")}}" target="_blank" rel="noreferrer">YESAB Online Registry</a></p>
       `;
