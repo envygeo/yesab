@@ -24,7 +24,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_DEST = Path(r"\\envgeoserver\dev\YESAB\yesab_map-toy-maker")
+DEFAULT_DEST = Path(r"\\envgeoserver\dev\YESAB\yesab_map")
 DEFAULT_OUTDEST = Path(r"\\envgeoserver\dev\YESAB\yesab_map-toy-output")
 MANIFEST_NAME = "deploy_manifest.json"
 
