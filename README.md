@@ -53,6 +53,13 @@ Wrote QA artifacts: yesab-map-in-one.qa.html, yesab-map-in-one.qa.json
 
 [![](out/previews/yesab-map-in-one.png)](out/yesab-map-in-one.html)
 
+## Output geopackage metadata 
+
+**Summary**: Project points and areas from Yukon Environmental and Socio-economic Assessment Board, with YESAB registry metadata when a project-number match is available. Uses approximate point locations when no shapefile geometry exists.
+
+**Description**: {todo: insert data sources}
+
+
 ## Scripts
 
 - `scripts/download_project_map_archive.py` - Downloads `all.zip` only when the remote file changed.
