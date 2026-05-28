@@ -969,6 +969,10 @@ def build_html(payload: dict[str, object]) -> str:
     function renderQaSummary() {{
       const summary = DATA.qa?.summary || DATA.qaSummary || null;
       if (!summary) return "";
+      const qaArtifacts = DATA.qaArtifacts || {{
+        html: "yesab-map-in-one.qa.html",
+        json: "yesab-map-in-one.qa.json"
+      }};
       const cached = Number(summary.cachedApiProjectCount || 0);
       const mapped = Number(summary.mappedApiProjectCount || 0);
       const matched = Number(summary.matchedApiProjectCount || 0);
@@ -984,7 +988,7 @@ def build_html(payload: dict[str, object]) -> str:
           <dt>Unmapped</dt><dd>${{unmapped.toLocaleString()}} cached API project(s) still unmapped</dd>
           <dt>Linked features</dt><dd>${{linkedFeatures.toLocaleString()}} geometry feature(s) linked to cached API records</dd>
         </dl>
-        <p>Detailed QA artifacts are written next to the generated map as HTML and JSON reports.</p>
+        <p>Detailed QA sidecars, when present: <a href="${{esc(qaArtifacts.html)}}">HTML report</a> | <a href="${{esc(qaArtifacts.json)}}">JSON data</a>.</p>
       `;
     }}
 
@@ -1595,6 +1599,12 @@ def main() -> None:
         output_path = raw_output_path / "yesab-map-in-one.html"
     output_path.parent.mkdir(parents=True, exist_ok=True)
     payload = load_layers()
+    qa_json_path = output_path.with_suffix(".qa.json")
+    qa_html_path = output_path.with_suffix(".qa.html")
+    payload["qaArtifacts"] = {
+        "html": qa_html_path.name,
+        "json": qa_json_path.name,
+    }
     html = build_html(payload)
     output_path.write_text(html, encoding="utf-8")
     compressed_path = None
@@ -1610,8 +1620,6 @@ def main() -> None:
             ).name
         compressed_path.parent.mkdir(parents=True, exist_ok=True)
         compressed_path.write_text(build_compressed_html(html), encoding="utf-8")
-    qa_json_path = output_path.with_suffix(".qa.json")
-    qa_html_path = output_path.with_suffix(".qa.html")
     qa_json_path.write_text(
         json.dumps(payload["qa"], indent=2, sort_keys=True), encoding="utf-8"
     )
