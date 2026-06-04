@@ -10,8 +10,16 @@ from scripts import download_project_bundle as bundler
 
 
 class FakeRegistryClient:
-    def __init__(self, payloads: dict[str, object]) -> None:
+    def __init__(
+        self,
+        payloads: dict[str, object],
+        *,
+        upload_bodies: dict[str, bytes] | None = None,
+        upload_failures: dict[str, list[Exception]] | None = None,
+    ) -> None:
         self.payloads = payloads
+        self.upload_bodies = upload_bodies or {}
+        self.upload_failures = upload_failures or {}
         self.requested_json: list[str] = []
         self.requested_uploads: list[str] = []
 
@@ -25,8 +33,14 @@ class FakeRegistryClient:
 
     def download_upload(self, upload_id: str) -> tuple[bytes, dict[str, str]]:
         self.requested_uploads.append(upload_id)
+        failures = self.upload_failures.get(upload_id, [])
+        if failures:
+            raise failures.pop(0)
         return (
-            f"downloaded:{upload_id}".encode("ascii"),
+            self.upload_bodies.get(
+                upload_id,
+                f"downloaded:{upload_id}".encode("ascii"),
+            ),
             {
                 "content_type": "application/octet-stream",
                 "content_disposition": f'attachment; filename="{upload_id}.bin"',
@@ -186,6 +200,239 @@ class ProjectBundleTests(unittest.TestCase):
                 1760131642463 / 1000,
                 delta=2,
             )
+
+    def test_write_project_bundle_reuses_existing_manifest_attachment(self) -> None:
+        project_id = "project-1"
+        payloads: dict[str, object] = {
+            f"/api/projects/{project_id}": {
+                "project": {
+                    "projectId": project_id,
+                    "projectNumber": "2025-0001",
+                    "title": "Example Project",
+                }
+            },
+            f"/api/projects/{project_id}/documents": [
+                {
+                    "documentId": "doc-1",
+                    "documentNumber": "2025-0001-0001",
+                    "redactedUploadId": "upload-1",
+                    "fileName": "example.pdf",
+                }
+            ],
+        }
+
+        with tempfile.TemporaryDirectory() as tmp:
+            output_dir = Path(tmp)
+            first_client = FakeRegistryClient(payloads)
+            first_manifest = bundler.write_project_bundle(
+                project_id,
+                output_dir,
+                client=first_client,
+                download_delay_seconds=0,
+            )
+            first_attachment = first_manifest["attachments"][0]
+            first_path = output_dir / first_attachment["path"]
+
+            second_client = FakeRegistryClient(
+                payloads,
+                upload_bodies={"upload-1": b"new bytes that should not be fetched"},
+            )
+            second_manifest = bundler.write_project_bundle(
+                project_id,
+                output_dir,
+                client=second_client,
+                download_delay_seconds=0,
+            )
+
+            self.assertEqual(second_client.requested_uploads, [])
+            second_attachment = second_manifest["attachments"][0]
+            self.assertEqual(second_attachment["path"], first_attachment["path"])
+            self.assertEqual(second_attachment["bytes"], first_attachment["bytes"])
+            self.assertTrue(second_attachment["downloaded"])
+            self.assertTrue(second_attachment["reused"])
+            self.assertEqual(first_path.read_bytes(), b"downloaded:upload-1")
+
+    def test_force_redownloads_existing_attachment_in_place(self) -> None:
+        project_id = "project-1"
+        payloads: dict[str, object] = {
+            f"/api/projects/{project_id}": {
+                "project": {
+                    "projectId": project_id,
+                    "projectNumber": "2025-0001",
+                    "title": "Example Project",
+                }
+            },
+            f"/api/projects/{project_id}/documents": [
+                {
+                    "documentId": "doc-1",
+                    "documentNumber": "2025-0001-0001",
+                    "redactedUploadId": "upload-1",
+                    "fileName": "example.pdf",
+                }
+            ],
+        }
+
+        with tempfile.TemporaryDirectory() as tmp:
+            output_dir = Path(tmp)
+            first_client = FakeRegistryClient(
+                payloads,
+                upload_bodies={"upload-1": b"old bytes"},
+            )
+            first_manifest = bundler.write_project_bundle(
+                project_id,
+                output_dir,
+                client=first_client,
+                download_delay_seconds=0,
+            )
+            first_attachment = first_manifest["attachments"][0]
+
+            second_client = FakeRegistryClient(
+                payloads,
+                upload_bodies={"upload-1": b"new bytes"},
+            )
+            second_manifest = bundler.write_project_bundle(
+                project_id,
+                output_dir,
+                client=second_client,
+                download_delay_seconds=0,
+                force_downloads=True,
+            )
+
+            self.assertEqual(second_client.requested_uploads, ["upload-1"])
+            second_attachment = second_manifest["attachments"][0]
+            self.assertEqual(second_attachment["path"], first_attachment["path"])
+            self.assertEqual(second_attachment["bytes"], len(b"new bytes"))
+            self.assertFalse(second_attachment["reused"])
+            self.assertEqual((output_dir / second_attachment["path"]).read_bytes(), b"new bytes")
+
+    def test_size_mismatch_redownloads_existing_manifest_attachment(self) -> None:
+        project_id = "project-1"
+        payloads: dict[str, object] = {
+            f"/api/projects/{project_id}": {
+                "project": {
+                    "projectId": project_id,
+                    "projectNumber": "2025-0001",
+                    "title": "Example Project",
+                }
+            },
+            f"/api/projects/{project_id}/documents": [
+                {
+                    "documentId": "doc-1",
+                    "documentNumber": "2025-0001-0001",
+                    "redactedUploadId": "upload-1",
+                    "fileName": "example.pdf",
+                }
+            ],
+        }
+
+        with tempfile.TemporaryDirectory() as tmp:
+            output_dir = Path(tmp)
+            first_client = FakeRegistryClient(
+                payloads,
+                upload_bodies={"upload-1": b"complete bytes"},
+            )
+            first_manifest = bundler.write_project_bundle(
+                project_id,
+                output_dir,
+                client=first_client,
+                download_delay_seconds=0,
+            )
+            first_attachment = first_manifest["attachments"][0]
+            first_path = output_dir / first_attachment["path"]
+            first_path.write_bytes(b"short")
+
+            second_client = FakeRegistryClient(
+                payloads,
+                upload_bodies={"upload-1": b"complete bytes again"},
+            )
+            second_manifest = bundler.write_project_bundle(
+                project_id,
+                output_dir,
+                client=second_client,
+                download_delay_seconds=0,
+            )
+
+            self.assertEqual(second_client.requested_uploads, ["upload-1"])
+            second_attachment = second_manifest["attachments"][0]
+            self.assertEqual(second_attachment["path"], first_attachment["path"])
+            self.assertFalse(second_attachment["reused"])
+            self.assertEqual(first_path.read_bytes(), b"complete bytes again")
+
+    def test_download_attachments_retries_and_cleans_part_file(self) -> None:
+        client = FakeRegistryClient(
+            {},
+            upload_bodies={"upload-1": b"ok"},
+            upload_failures={
+                "upload-1": [bundler.BundleError("temporary failure")],
+            },
+        )
+        sleeps: list[float] = []
+
+        with tempfile.TemporaryDirectory() as tmp:
+            attachments, errors = bundler.download_attachments(
+                client=client,
+                output_dir=Path(tmp),
+                upload_refs=[
+                    {
+                        "uploadId": "upload-1",
+                        "uploadIdKey": "redactedUploadId",
+                        "sourcePath": "$.documents[0]",
+                        "sourceKind": "documents",
+                        "documentNumber": "2025-0001-0001",
+                        "originalFilename": "example.pdf",
+                    }
+                ],
+                download_delay_seconds=0,
+                retry_count=1,
+                retry_backoff_seconds=2,
+                sleep=sleeps.append,
+            )
+
+            self.assertEqual(errors, [])
+            self.assertEqual(client.requested_uploads, ["upload-1", "upload-1"])
+            self.assertEqual(sleeps, [2])
+            path = Path(tmp) / attachments[0]["path"]
+            self.assertEqual(path.read_bytes(), b"ok")
+            self.assertEqual(list(path.parent.glob("*.part")), [])
+
+    def test_download_attachments_paces_between_new_downloads(self) -> None:
+        client = FakeRegistryClient(
+            {},
+            upload_bodies={
+                "upload-1": b"one",
+                "upload-2": b"two",
+            },
+        )
+        sleeps: list[float] = []
+
+        with tempfile.TemporaryDirectory() as tmp:
+            bundler.download_attachments(
+                client=client,
+                output_dir=Path(tmp),
+                upload_refs=[
+                    {
+                        "uploadId": "upload-1",
+                        "uploadIdKey": "redactedUploadId",
+                        "sourcePath": "$.documents[0]",
+                        "sourceKind": "documents",
+                        "documentNumber": "2025-0001-0001",
+                        "originalFilename": "one.pdf",
+                    },
+                    {
+                        "uploadId": "upload-2",
+                        "uploadIdKey": "redactedUploadId",
+                        "sourcePath": "$.documents[1]",
+                        "sourceKind": "documents",
+                        "documentNumber": "2025-0001-0002",
+                        "originalFilename": "two.pdf",
+                    },
+                ],
+                download_delay_seconds=0.5,
+                sleep=sleeps.append,
+            )
+
+            self.assertEqual(client.requested_uploads, ["upload-1", "upload-2"])
+            self.assertEqual(sleeps, [0.5])
 
 
 if __name__ == "__main__":

@@ -5,7 +5,7 @@ This note documents local artifact choices made by
 truth; these rules only describe how the downloader mirrors public Registry
 content into stable local files.
 
-Last updated: 2025-06-04
+Last updated: 2026-06-04
 Changes to code after this date may not be reflected here; always check code for source of truth.
 
 ## Attachment timestamp heuristic
@@ -62,3 +62,32 @@ The `_cmt` marker distinguishes public-comment attachments from main Documents
 tab attachments while preserving one flat attachment folder. Email/notification
 payloads currently appear to be outgoing YESAB messages, so the downloader does
 not add a special email marker.
+
+## Polite and resumable attachment downloads
+
+The downloader refreshes JSON payloads on each run, but attachment downloads are
+resumable by default. Before fetching an attachment, it reads the previous
+`manifest.json` and skips the download when all of these checks pass:
+
+1. The current JSON payload includes the same `uploadId`.
+2. The previous manifest entry was marked `downloaded: true`.
+3. The manifest path is a safe relative path under `attachments/`.
+4. The local file exists and its byte count matches the manifest `bytes` value.
+
+Skipped attachments remain in the new manifest with `reused: true`, and the
+manifest-level `reusedAttachmentCount` summarizes them. Use `--force` to ignore
+the previous manifest and redownload matching attachments in place.
+
+New or forced downloads write to a sibling `*.part` file first, then use an
+atomic replace to move the complete bytes into the final attachment path. Zip
+creation excludes any stale `*.part` files.
+
+The CLI is paced by default:
+
+```powershell
+uv run .\scripts\download_project_bundle.py 2025-0069 --delay 0.25
+```
+
+`--delay` sets the pause between attachment downloads. `--retry-count` and
+`--retry-backoff` control retry attempts for transient attachment download
+failures; retry backoff doubles after each failed attempt.

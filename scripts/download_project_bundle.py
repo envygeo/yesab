@@ -29,6 +29,7 @@ import mimetypes
 import os
 import re
 import sys
+import time
 import unicodedata
 import urllib.error
 import urllib.parse
@@ -37,13 +38,16 @@ import zipfile
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 
 BASE_DIR = Path(__file__).resolve().parents[1]
 DEFAULT_BASE_URL = "https://yesabregistry.ca"
 DEFAULT_OUTPUT_ROOT = BASE_DIR / "out" / "project-bundles"
 TIMEOUT = 60
+DEFAULT_DOWNLOAD_DELAY_SECONDS = 0.25
+DEFAULT_RETRY_COUNT = 2
+DEFAULT_RETRY_BACKOFF_SECONDS = 1.0
 DATE_FIELD_PRECEDENCE = (
     "receivedDate",
     "uploadDate",
@@ -231,6 +235,28 @@ def write_json(path: Path, payload: object) -> None:
         json.dumps(payload, indent=2, ensure_ascii=False, sort_keys=True),
         encoding="utf-8",
     )
+
+
+def read_json_file(path: Path) -> object:
+    """Read one JSON file, raising BundleError with path context on failure."""
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except OSError as exc:
+        raise BundleError(f"Could not read {path}: {exc}") from exc
+    except json.JSONDecodeError as exc:
+        raise BundleError(f"{path} is not valid JSON: {exc}") from exc
+
+
+def load_existing_manifest(output_dir: Path) -> dict[str, object]:
+    """Return the previous manifest when present and valid, otherwise empty."""
+    manifest_path = output_dir / "manifest.json"
+    if not manifest_path.exists():
+        return {}
+    try:
+        payload = read_json_file(manifest_path)
+    except BundleError:
+        return {}
+    return payload if isinstance(payload, dict) else {}
 
 
 def section_file(output_dir: Path, section_name: str) -> Path:
@@ -537,32 +563,174 @@ def apply_attachment_timestamp(path: Path, metadata: dict[str, object]) -> None:
     metadata["timestampApplied"] = True
 
 
+def coerce_int(value: object) -> int | None:
+    """Return value as an int when it is an integer-like value."""
+    if isinstance(value, bool):
+        return None
+    if isinstance(value, int):
+        return value
+    if isinstance(value, str):
+        try:
+            return int(value)
+        except ValueError:
+            return None
+    return None
+
+
+def manifest_attachment_path(
+    output_dir: Path,
+    attachment: dict[str, object],
+) -> Path | None:
+    """Return a safe attachment path from a manifest entry."""
+    raw_path = attachment.get("path")
+    if not isinstance(raw_path, str) or not raw_path:
+        return None
+    relative_path = Path(raw_path)
+    if relative_path.is_absolute() or any(part == ".." for part in relative_path.parts):
+        return None
+    if not relative_path.parts or relative_path.parts[0] != "attachments":
+        return None
+    return output_dir / relative_path
+
+
+def attachment_is_reusable(output_dir: Path, attachment: dict[str, object]) -> bool:
+    """Return whether a manifest entry points to the complete local file."""
+    if not attachment.get("downloaded"):
+        return False
+    path = manifest_attachment_path(output_dir, attachment)
+    expected_bytes = coerce_int(attachment.get("bytes"))
+    if path is None or expected_bytes is None or not path.is_file():
+        return False
+    return path.stat().st_size == expected_bytes
+
+
+def manifest_attachments_by_upload_id(
+    manifest: dict[str, object],
+) -> dict[str, dict[str, object]]:
+    """Index previous manifest attachments by upload ID."""
+    attachments = manifest.get("attachments")
+    if not isinstance(attachments, list):
+        return {}
+    by_upload_id: dict[str, dict[str, object]] = {}
+    for item in attachments:
+        if not isinstance(item, dict):
+            continue
+        upload_id = item.get("uploadId")
+        if isinstance(upload_id, str) and upload_id:
+            by_upload_id.setdefault(upload_id, item)
+    return by_upload_id
+
+
+def merge_reused_attachment(
+    *,
+    ref: dict[str, str],
+    existing: dict[str, object],
+) -> dict[str, object]:
+    """Return a manifest attachment row for a skipped existing download."""
+    attachment: dict[str, object] = {**existing, **ref}
+    for key, value in date_metadata_from_ref(ref).items():
+        attachment.setdefault(key, value)
+    attachment["downloaded"] = True
+    attachment["reused"] = True
+    return attachment
+
+
+def write_bytes_atomic(path: Path, body: bytes) -> None:
+    """Write bytes through a sibling .part file then atomically replace target."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    part_path = path.with_name(f"{path.name}.part")
+    part_path.write_bytes(body)
+    os.replace(part_path, path)
+
+
+def download_upload_with_retries(
+    *,
+    client: RegistryClient | Any,
+    upload_id: str,
+    retry_count: int,
+    retry_backoff_seconds: float,
+    sleep: Callable[[float], object],
+) -> tuple[bytes, dict[str, str], int]:
+    """Download one upload, retrying BundleError with exponential backoff."""
+    attempts = 0
+    retry_count = max(0, retry_count)
+    for attempt_index in range(retry_count + 1):
+        attempts += 1
+        try:
+            body, headers = client.download_upload(upload_id)
+            return body, headers, attempts
+        except BundleError:
+            if attempt_index >= retry_count:
+                raise
+            sleep(max(0.0, retry_backoff_seconds) * (2**attempt_index))
+    raise AssertionError("retry loop exhausted without return or raise")
+
+
 def download_attachments(
     *,
-    client: RegistryClient,
+    client: RegistryClient | Any,
     output_dir: Path,
     upload_refs: list[dict[str, str]],
     project_number: str = "",
+    existing_manifest: dict[str, object] | None = None,
+    force_downloads: bool = False,
+    download_delay_seconds: float = 0.0,
+    retry_count: int = DEFAULT_RETRY_COUNT,
+    retry_backoff_seconds: float = DEFAULT_RETRY_BACKOFF_SECONDS,
+    sleep: Callable[[float], object] = time.sleep,
 ) -> tuple[list[dict[str, object]], list[dict[str, str]]]:
     """Download upload references into attachments/."""
     attachments_dir = output_dir / "attachments"
     attachments_dir.mkdir(parents=True, exist_ok=True)
     attachments: list[dict[str, object]] = []
     errors: list[dict[str, str]] = []
-    used_names: set[str] = set()
+    used_names: set[str] = {
+        path.name.lower()
+        for path in attachments_dir.iterdir()
+        if path.is_file() and not path.name.endswith(".part")
+    }
+    existing_by_upload_id = manifest_attachments_by_upload_id(existing_manifest or {})
+    new_download_count = 0
 
     for ref in upload_refs:
         upload_id = ref["uploadId"]
+        existing = existing_by_upload_id.get(upload_id)
+        existing_path = (
+            manifest_attachment_path(output_dir, existing) if existing is not None else None
+        )
+        if (
+            existing is not None
+            and not force_downloads
+            and attachment_is_reusable(output_dir, existing)
+        ):
+            attachments.append(merge_reused_attachment(ref=ref, existing=existing))
+            if existing_path is not None:
+                used_names.add(existing_path.name.lower())
+            continue
+
         try:
-            body, headers = client.download_upload(upload_id)
-            relative_name = attachment_filename(
-                ref,
-                headers,
-                used=used_names,
-                project_number=project_number,
+            if new_download_count > 0 and download_delay_seconds > 0:
+                sleep(download_delay_seconds)
+            body, headers, attempts = download_upload_with_retries(
+                client=client,
+                upload_id=upload_id,
+                retry_count=retry_count,
+                retry_backoff_seconds=retry_backoff_seconds,
+                sleep=sleep,
             )
-            attachment_path = attachments_dir / relative_name
-            attachment_path.write_bytes(body)
+            new_download_count += 1
+            if existing_path is not None:
+                attachment_path = existing_path
+                used_names.add(attachment_path.name.lower())
+            else:
+                relative_name = attachment_filename(
+                    ref,
+                    headers,
+                    used=used_names,
+                    project_number=project_number,
+                )
+                attachment_path = attachments_dir / relative_name
+            write_bytes_atomic(attachment_path, body)
             date_metadata = date_metadata_from_ref(ref)
             apply_attachment_timestamp(attachment_path, date_metadata)
             attachments.append(
@@ -573,6 +741,8 @@ def download_attachments(
                     "contentType": headers.get("content_type", ""),
                     "contentDisposition": headers.get("content_disposition", ""),
                     "downloaded": True,
+                    "reused": False,
+                    "downloadAttempts": attempts,
                     **date_metadata,
                 }
             )
@@ -582,6 +752,7 @@ def download_attachments(
                 {
                     **ref,
                     "downloaded": False,
+                    "reused": False,
                     "error": str(exc),
                     **date_metadata_from_ref(ref),
                 }
@@ -748,11 +919,16 @@ def write_project_bundle(
     client: RegistryClient | Any | None = None,
     download_files: bool = True,
     public_only: bool = True,
+    force_downloads: bool = False,
+    download_delay_seconds: float = 0.0,
+    retry_count: int = DEFAULT_RETRY_COUNT,
+    retry_backoff_seconds: float = DEFAULT_RETRY_BACKOFF_SECONDS,
 ) -> dict[str, object]:
     """Write a YESAB project bundle directory and return its manifest."""
     project_ref_id = project_id_from_ref(project_ref)
     client = client or RegistryClient()
     output_dir.mkdir(parents=True, exist_ok=True)
+    existing_manifest = load_existing_manifest(output_dir)
 
     payloads: dict[str, object] = {}
     sections: list[dict[str, object]] = []
@@ -793,6 +969,11 @@ def write_project_bundle(
             output_dir=output_dir,
             upload_refs=upload_refs,
             project_number=str(project.get("projectNumber", "")),
+            existing_manifest=existing_manifest,
+            force_downloads=force_downloads,
+            download_delay_seconds=download_delay_seconds,
+            retry_count=retry_count,
+            retry_backoff_seconds=retry_backoff_seconds,
         )
         errors.extend(download_errors)
     else:
@@ -813,6 +994,7 @@ def write_project_bundle(
         "downloadedAttachmentCount": sum(
             1 for item in attachments if item.get("downloaded")
         ),
+        "reusedAttachmentCount": sum(1 for item in attachments if item.get("reused")),
         "sections": sections,
         "attachments": attachments,
         "errors": errors,
@@ -828,7 +1010,7 @@ def create_zip(bundle_dir: Path, zip_path: Path | None = None) -> Path:
         archive_path.unlink()
     with zipfile.ZipFile(archive_path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
         for path in sorted(bundle_dir.rglob("*")):
-            if path.is_file() and path != archive_path:
+            if path.is_file() and path != archive_path and not path.name.endswith(".part"):
                 archive.write(path, path.relative_to(bundle_dir.parent))
     return archive_path
 
@@ -877,6 +1059,38 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         help="Only write JSON and manifest; do not download attachment bytes.",
     )
     parser.add_argument(
+        "--force",
+        action="store_true",
+        help="Redownload attachments even when manifest paths and byte counts match.",
+    )
+    parser.add_argument(
+        "--delay",
+        type=float,
+        default=DEFAULT_DOWNLOAD_DELAY_SECONDS,
+        help=(
+            "Seconds to wait between attachment downloads. Defaults to "
+            f"{DEFAULT_DOWNLOAD_DELAY_SECONDS}."
+        ),
+    )
+    parser.add_argument(
+        "--retry-count",
+        type=int,
+        default=DEFAULT_RETRY_COUNT,
+        help=(
+            "Retry attempts after the first failed attachment download. "
+            f"Defaults to {DEFAULT_RETRY_COUNT}."
+        ),
+    )
+    parser.add_argument(
+        "--retry-backoff",
+        type=float,
+        default=DEFAULT_RETRY_BACKOFF_SECONDS,
+        help=(
+            "Initial retry backoff in seconds; later retries double it. "
+            f"Defaults to {DEFAULT_RETRY_BACKOFF_SECONDS}."
+        ),
+    )
+    parser.add_argument(
         "--zip",
         action="store_true",
         help="Create a zip archive next to the output directory.",
@@ -910,6 +1124,10 @@ def main(argv: list[str] | None = None) -> int:
         client=client,
         download_files=not args.no_attachments,
         public_only=not args.include_unredacted_upload_ids,
+        force_downloads=args.force,
+        download_delay_seconds=args.delay,
+        retry_count=args.retry_count,
+        retry_backoff_seconds=args.retry_backoff,
     )
     print(f"Bundle directory : {output_dir}")
     print(f"Project          : {manifest.get('projectNumber') or manifest.get('projectId')}")
@@ -919,6 +1137,8 @@ def main(argv: list[str] | None = None) -> int:
         f"{manifest['downloadedAttachmentCount']}/{manifest['attachmentCount']}",
         "downloaded",
     )
+    if manifest.get("reusedAttachmentCount"):
+        print(f"Reused existing  : {manifest['reusedAttachmentCount']}")
     print(f"Manifest         : {output_dir / 'manifest.json'}")
     if args.zip:
         archive_path = create_zip(output_dir)
