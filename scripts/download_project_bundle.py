@@ -44,6 +44,15 @@ BASE_DIR = Path(__file__).resolve().parents[1]
 DEFAULT_BASE_URL = "https://yesabregistry.ca"
 DEFAULT_OUTPUT_ROOT = BASE_DIR / "out" / "project-bundles"
 TIMEOUT = 60
+DATE_FIELD_PRECEDENCE = (
+    "receivedDate",
+    "uploadDate",
+    "redactedUploadDate",
+    "submittedDate",
+    "dateSent",
+    "sentDate",
+)
+DATE_VALUE_MIN_EPOCH_MS = 24 * 60 * 60 * 1000
 
 
 class BundleError(RuntimeError):
@@ -293,6 +302,33 @@ def ref_filename(value: dict[str, object]) -> str:
     return ""
 
 
+def source_kind_from_path(path: str) -> str:
+    """Return a stable source bucket name for one nested upload JSON path."""
+    if path.startswith("$.comments"):
+        return "comments"
+    if path.startswith("$.documents"):
+        return "documents"
+    if path.startswith("$.emails"):
+        return "emails"
+    if path.startswith("$.activity_feed"):
+        return "activity"
+    if path.startswith("$.notes"):
+        return "notes"
+    if path.startswith("$.correspondence"):
+        return "correspondence"
+    if path.startswith("$.document_groups"):
+        return "document_groups"
+    if path.startswith("$.information_requests"):
+        return "information_requests"
+    if path.startswith("$.simplified_information_requests"):
+        return "simplified_information_requests"
+    if path.startswith("$.hearings"):
+        return "hearings"
+    if path.startswith("$.intervenors"):
+        return "intervenors"
+    return "unknown"
+
+
 def collect_upload_refs(payload: object, *, public_only: bool = True) -> list[dict[str, str]]:
     """Collect upload references from nested API payloads.
 
@@ -324,6 +360,7 @@ def collect_upload_refs(payload: object, *, public_only: bool = True) -> list[di
                     "uploadId": upload_id,
                     "uploadIdKey": upload_key,
                     "sourcePath": path,
+                    "sourceKind": source_kind_from_path(path),
                 }
                 for key in (
                     "documentId",
@@ -335,6 +372,7 @@ def collect_upload_refs(payload: object, *, public_only: bool = True) -> list[di
                     "description",
                     "fileName",
                     "redactedFileName",
+                    *DATE_FIELD_PRECEDENCE,
                 ):
                     child = value.get(key)
                     if child is not None:
@@ -406,18 +444,44 @@ def unique_path(directory: Path, filename: str, used: set[str]) -> Path:
     return path
 
 
+def normalized_document_number(document_number: str, project_number: str) -> str:
+    """Return a full project document number when possible."""
+    document_number = document_number.strip()
+    project_number = project_number.strip()
+    if not document_number:
+        return ""
+    if project_number and document_number.startswith(f"{project_number}-"):
+        return document_number
+    if project_number and re.fullmatch(r"\d{4}", document_number):
+        return f"{project_number}-{document_number}"
+    return document_number
+
+
+def filename_prefix(ref: dict[str, str], project_number: str) -> str:
+    """Return the preferred local filename prefix for one attachment."""
+    document_number = normalized_document_number(
+        ref.get("documentNumber", ""),
+        project_number,
+    )
+    prefix = document_number or ref.get("documentId", "") or ref["uploadId"]
+    if ref.get("sourceKind") == "comments":
+        prefix = f"{prefix}_cmt"
+    return prefix
+
+
 def attachment_filename(
     ref: dict[str, str],
     headers: dict[str, str],
     *,
     used: set[str],
+    project_number: str = "",
 ) -> Path:
     """Return a unique ASCII local filename for one attachment."""
     header_name = filename_from_content_disposition(headers.get("content_disposition", ""))
     visible_name = ref.get("originalFilename") or ref.get("fileName") or header_name
     if not visible_name:
         visible_name = ref["uploadId"]
-    prefix = ref.get("documentNumber") or ref.get("documentId") or ref["uploadId"]
+    prefix = filename_prefix(ref, project_number)
     safe_prefix = safe_filename(prefix, fallback=ref["uploadId"])
     safe_visible = safe_filename(visible_name, fallback=ref["uploadId"])
     if not safe_visible.lower().startswith(safe_prefix.lower()):
@@ -426,11 +490,59 @@ def attachment_filename(
     return unique_path(Path(), safe_visible, used)
 
 
+def epoch_ms_from_ref(ref: dict[str, str]) -> tuple[str, int | None]:
+    """Return the preferred timestamp field and epoch milliseconds from a ref."""
+    for field in DATE_FIELD_PRECEDENCE:
+        value = ref.get(field)
+        if value is None:
+            continue
+        try:
+            epoch_ms = int(float(value))
+        except ValueError:
+            continue
+        if epoch_ms >= DATE_VALUE_MIN_EPOCH_MS:
+            return field, epoch_ms
+    return "", None
+
+
+def date_metadata_from_ref(ref: dict[str, str]) -> dict[str, object]:
+    """Return manifest timestamp metadata derived from one upload ref."""
+    field, epoch_ms = epoch_ms_from_ref(ref)
+    if epoch_ms is None:
+        return {
+            "timestampField": "",
+            "timestampEpochMs": None,
+            "timestampIso": "",
+            "timestampApplied": False,
+        }
+    timestamp = datetime.fromtimestamp(epoch_ms / 1000, UTC)
+    return {
+        "timestampField": field,
+        "timestampEpochMs": epoch_ms,
+        "timestampIso": timestamp.replace(microsecond=0).isoformat().replace(
+            "+00:00",
+            "Z",
+        ),
+        "timestampApplied": False,
+    }
+
+
+def apply_attachment_timestamp(path: Path, metadata: dict[str, object]) -> None:
+    """Set a downloaded attachment's mtime from Registry date metadata."""
+    epoch_ms = metadata.get("timestampEpochMs")
+    if not isinstance(epoch_ms, int):
+        return
+    timestamp = epoch_ms / 1000
+    os.utime(path, (timestamp, timestamp))
+    metadata["timestampApplied"] = True
+
+
 def download_attachments(
     *,
     client: RegistryClient,
     output_dir: Path,
     upload_refs: list[dict[str, str]],
+    project_number: str = "",
 ) -> tuple[list[dict[str, object]], list[dict[str, str]]]:
     """Download upload references into attachments/."""
     attachments_dir = output_dir / "attachments"
@@ -443,9 +555,16 @@ def download_attachments(
         upload_id = ref["uploadId"]
         try:
             body, headers = client.download_upload(upload_id)
-            relative_name = attachment_filename(ref, headers, used=used_names)
+            relative_name = attachment_filename(
+                ref,
+                headers,
+                used=used_names,
+                project_number=project_number,
+            )
             attachment_path = attachments_dir / relative_name
             attachment_path.write_bytes(body)
+            date_metadata = date_metadata_from_ref(ref)
+            apply_attachment_timestamp(attachment_path, date_metadata)
             attachments.append(
                 {
                     **ref,
@@ -454,11 +573,19 @@ def download_attachments(
                     "contentType": headers.get("content_type", ""),
                     "contentDisposition": headers.get("content_disposition", ""),
                     "downloaded": True,
+                    **date_metadata,
                 }
             )
         except BundleError as exc:
             errors.append({"uploadId": upload_id, "error": str(exc)})
-            attachments.append({**ref, "downloaded": False, "error": str(exc)})
+            attachments.append(
+                {
+                    **ref,
+                    "downloaded": False,
+                    "error": str(exc),
+                    **date_metadata_from_ref(ref),
+                }
+            )
 
     return attachments, errors
 
@@ -665,10 +792,14 @@ def write_project_bundle(
             client=client,
             output_dir=output_dir,
             upload_refs=upload_refs,
+            project_number=str(project.get("projectNumber", "")),
         )
         errors.extend(download_errors)
     else:
-        attachments = [{**ref, "downloaded": False} for ref in upload_refs]
+        attachments = [
+            {**ref, "downloaded": False, **date_metadata_from_ref(ref)}
+            for ref in upload_refs
+        ]
 
     manifest: dict[str, object] = {
         "generatedAt": utc_now_iso(),

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import tempfile
 import unittest
 from pathlib import Path
@@ -113,14 +114,18 @@ class ProjectBundleTests(unittest.TestCase):
                     "documentNumber": "2025-0001-0001",
                     "redactedUploadId": "upload-1",
                     "fileName": "Résumé β.pdf",
+                    "uploadDate": 1744742320656,
                 }
             ],
             f"/api/projects/{project_id}/comments": [{"commentId": "comment-1"}],
             f"/api/projects/{project_id}/comments/comment-1/documents": [
                 {
                     "documentId": "comment-doc",
+                    "documentNumber": "0042",
                     "redactedUploadId": "upload-2",
                     "fileName": "comment.pdf",
+                    "uploadDate": 0,
+                    "redactedUploadDate": 1760131642463,
                 }
             ],
             f"/api/projects/{project_id}/emails": [
@@ -163,10 +168,24 @@ class ProjectBundleTests(unittest.TestCase):
             self.assertEqual(manifest["attachmentCount"], 3)
 
             saved_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-            saved_paths = [Path(item["path"]).name for item in saved_manifest["attachments"]]
+            attachments = saved_manifest["attachments"]
+            saved_paths = [Path(item["path"]).name for item in attachments]
             self.assertEqual(len(saved_paths), 3)
             self.assertTrue(all(name.encode("ascii") for name in saved_paths))
             self.assertTrue(any("Resume" in name for name in saved_paths))
+            self.assertTrue(any(name.startswith("2025-0001-0042_cmt_") for name in saved_paths))
+
+            comment_attachment = next(
+                item for item in attachments if item["uploadId"] == "upload-2"
+            )
+            comment_path = Path(tmp) / comment_attachment["path"]
+            self.assertEqual(comment_attachment["timestampField"], "redactedUploadDate")
+            self.assertEqual(comment_attachment["timestampEpochMs"], 1760131642463)
+            self.assertAlmostEqual(
+                os.path.getmtime(comment_path),
+                1760131642463 / 1000,
+                delta=2,
+            )
 
 
 if __name__ == "__main__":

@@ -80,7 +80,7 @@ canonical compatibility artifact.
 
 - `scripts/download_project_map_archive.py` - Downloads `all.zip` only when the remote file changed.
 - `scripts/refresh_api_cache.py` - Caches YESAB API project records into local year-bucket Zstandard-compressed JSON files and writes a merged dataset.
-- `scripts/download_project_bundle.py` - Mirrors the public Registry project page APIs into one local JSON-plus-attachments bundle for a project URL, ID, or number.
+- `scripts/download_project_bundle.py` - Mirrors the public Registry project page APIs into one local JSON-plus-attachments bundle for a project URL, ID, or number. See `docs/project-bundle-downloads.md` for attachment filename and timestamp heuristics.
 - `scripts/build_geopackage.py` - Builds an enriched GeoPackage shapefile/API joins and approximate API-only points.
 - `scripts/refresh_and_build_geopackage.py` - wrapper for downloading the latest map archive, refreshing the API cache, and building the GeoPackage in one command.
 - `scripts/deploy_to_production.py` - Mirrors the deployable code subset to the production ETL workspace.
