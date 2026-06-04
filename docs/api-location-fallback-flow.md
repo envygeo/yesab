@@ -3,6 +3,9 @@
 This note describes how cached YESAB registry locations become approximate map
 points, and where coordinate classification happens.
 
+Last updated: 2025-06-04
+Changes to code after this date may not be reflected here; always check code for source of truth.
+
 ## Cache refresh
 
 `scripts/refresh_api_cache.py` does not generate map points or classify

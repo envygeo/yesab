@@ -5,7 +5,8 @@ This note documents local artifact choices made by
 truth; these rules only describe how the downloader mirrors public Registry
 content into stable local files.
 
-It's true as of 2025-06-04. Changes to code after this date may not be reflected here; always check code for source of truth.
+Last updated: 2025-06-04
+Changes to code after this date may not be reflected here; always check code for source of truth.
 
 ## Attachment timestamp heuristic
 
