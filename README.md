@@ -80,6 +80,7 @@ canonical compatibility artifact.
 
 - `scripts/download_project_map_archive.py` - Downloads `all.zip` only when the remote file changed.
 - `scripts/refresh_api_cache.py` - Caches YESAB API project records into local year-bucket Zstandard-compressed JSON files and writes a merged dataset.
+- `scripts/download_project_bundle.py` - Mirrors the public Registry project page APIs into one local JSON-plus-attachments bundle for a project URL, ID, or number.
 - `scripts/build_geopackage.py` - Builds an enriched GeoPackage shapefile/API joins and approximate API-only points.
 - `scripts/refresh_and_build_geopackage.py` - wrapper for downloading the latest map archive, refreshing the API cache, and building the GeoPackage in one command.
 - `scripts/deploy_to_production.py` - Mirrors the deployable code subset to the production ETL workspace.
@@ -101,6 +102,9 @@ Use `uv` with Python `3.14+`.
 
 ```powershell
 uv run .\scripts\download_project_map_archive.py
+
+uv run .\scripts\download_project_bundle.py https://yesabregistry.ca/projects/00ba642c-2cef-4a75-8412-6afa6ab76487/
+uv run .\scripts\download_project_bundle.py 2025-0069 --zip
 
 uv run .\scripts\refresh_api_cache.py
 uv run .\scripts\refresh_api_cache.py --force
@@ -177,6 +181,11 @@ Default output locations:
   - `data/api/buckets/projects_<start>-<end>.json.zst`
   - `data/api/projects_merged.json.zst`
   - `data/api/state.json`
+- `scripts/download_project_bundle.py` writes:
+  - `out/project-bundles/<project-id-or-number>/manifest.json`
+  - `out/project-bundles/<project-id-or-number>/json/`
+  - `out/project-bundles/<project-id-or-number>/attachments/`
+  - `out/project-bundles/<project-id-or-number>.zip` when `--zip` is used
 - `scripts/build_static_map_single.py` writes:
   - `out/yesab-map-in-one.html`
   - `out/yesab-map-in-one.compressed.html` when `--compressed` or `--compressed-output` is used
@@ -203,6 +212,11 @@ Older cache buckets stay on disk until you explicitly refresh them with `--force
 This keeps the sync logic simple while still updating the projects most likely to change.
 
 Refresh API cache buckets sequentially. The script uses a shared `data/api/state.json` file and is not designed for concurrent writers.
+
+As of June 4, 2026, the legacy `/api/integration/projects` endpoint used by
+`scripts/refresh_api_cache.py` returns HTTP 404. Existing cached buckets can
+still be reused, but forced refreshes or missing buckets fail until the cache
+refresh is migrated to a replacement Registry endpoint.
 
 ## Notes
 
