@@ -3,7 +3,7 @@
 YESAB is the Yukon Environmental and Socio-economic Assessment Board, which tracks assessment projects across Yukon. This repository exists to pull the published project map data and registry metadata into reproducible local artifacts so it is easier to inspect, rebuild, and share static map outputs without depending on the live services at runtime.
 
 - downloading the [YESAB Project Map](https://yesab.ca/project-map/) - [shapefile archive](https://yesab.ca/wp-content/plugins/yesab-map-wp-plugin/geojson/all.zip)
-- fetching and caching the [YESAB registry API](https://yesabregistry.ca/api/integration/projects) in year buckets
+- fetching and caching the [YESAB registry API](https://yesabregistry.ca/api/v1/integration/projects) in year buckets
 - joining the shapefile archive and registry API data into a single GeoPackage, filtering approximate locations into their own class
 - building static map outputs from the previous steps
 
@@ -214,10 +214,9 @@ This keeps the sync logic simple while still updating the projects most likely t
 
 Refresh API cache buckets sequentially. The script uses a shared `data/api/state.json` file and is not designed for concurrent writers.
 
-As of June 4, 2026, the legacy `/api/integration/projects` endpoint used by
-`scripts/refresh_api_cache.py` returns HTTP 404. Existing cached buckets can
-still be reused, but forced refreshes or missing buckets fail until the cache
-refresh is migrated to a replacement Registry endpoint.
+As of June 8, 2026, `scripts/refresh_api_cache.py` uses the versioned
+`/api/v1/integration/projects` endpoint. The cache normalizes the v1 project
+field names back to the legacy shape consumed by the map builders.
 
 ## Notes
 

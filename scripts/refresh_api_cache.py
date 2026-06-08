@@ -28,7 +28,7 @@ from pathlib import Path
 
 import compression.zstd as zstd
 
-API_BASE = "https://yesabregistry.ca/api/integration/projects"
+API_BASE = "https://yesabregistry.ca/api/v1/integration/projects"
 BASE_DIR = Path(__file__).resolve().parents[1]
 DATA_DIR = BASE_DIR / "data" / "api"
 BUCKET_DIR = DATA_DIR / "buckets"
@@ -91,26 +91,113 @@ def read_zstd_json(path: Path) -> dict:
     return loaded
 
 
+def name_list(value: object) -> list[str]:
+    """Return a list of names from legacy strings or v1 name objects."""
+    if not isinstance(value, list):
+        return []
+    names: list[str] = []
+    for item in value:
+        if isinstance(item, str):
+            name = item
+        elif isinstance(item, dict):
+            name = str(item.get("name", ""))
+        else:
+            name = ""
+        if name:
+            names.append(name)
+    return names
+
+
+def normalize_stage(value: object) -> dict:
+    """Return the legacy stage shape from either integration API version."""
+    if not isinstance(value, dict):
+        return {}
+    stage_id = value.get("stageId") or value.get("id") or ""
+    stage = dict(value)
+    if stage_id:
+        stage["stageId"] = stage_id
+        stage["id"] = stage_id
+    return stage
+
+
+def normalize_stage_history(value: object) -> list[dict]:
+    """Return legacy stage history keys from either integration API version."""
+    if not isinstance(value, list):
+        return []
+    normalized: list[dict] = []
+    for item in value:
+        if not isinstance(item, dict):
+            continue
+        stage_id = item.get("stageId") or item.get("id") or ""
+        stage_item: dict = {
+            key: item[key]
+            for key in ("name", "extended")
+            if key in item
+        }
+        if stage_id:
+            stage_item["stageId"] = stage_id
+            stage_item["id"] = stage_id
+        if "stageStart" in item:
+            stage_item["stageStart"] = item["stageStart"]
+        elif "start" in item:
+            stage_item["stageStart"] = item["start"]
+        if "stageEnd" in item:
+            stage_item["stageEnd"] = item["stageEnd"]
+        elif "end" in item:
+            stage_item["stageEnd"] = item["end"]
+        normalized.append(stage_item)
+    return normalized
+
+
+def normalize_outcomes(record: dict) -> dict:
+    """Return the legacy outcomes shape from either integration API version."""
+    outcomes = record.get("outcomes")
+    if isinstance(outcomes, dict) and outcomes:
+        return outcomes
+
+    normalized: dict[str, str] = {}
+    recommendation = record.get("recommendation")
+    if isinstance(recommendation, dict):
+        name = str(recommendation.get("name", ""))
+        if name:
+            normalized["outcomeName"] = name
+    decision = record.get("decision")
+    if isinstance(decision, dict):
+        name = str(decision.get("name", ""))
+        if name:
+            normalized["decisionName"] = name
+    return normalized
+
+
 def normalize_record(record: dict) -> dict:
     """Return a normalized record shape for downstream consumers."""
+    stage = normalize_stage(record.get("stage") or record.get("projectStage"))
+    stage_id = record.get("stageId") or stage.get("stageId", "")
     return {
         "projectId": record.get("projectId", ""),
         "projectNumber": record.get("projectNumber", ""),
-        "title": record.get("title", ""),
+        "projectURL": record.get("projectURL", ""),
+        "title": record.get("title") or record.get("projectTitle", ""),
         "projectTypeName": record.get("projectTypeName", ""),
         "projectTypeId": record.get("projectTypeId", ""),
-        "proponentName": record.get("proponentName", ""),
+        "proponentName": record.get("proponentName")
+        or record.get("projectProponent", ""),
         "assessmentDistricts": record.get("assessmentDistricts", []),
         "sectors": record.get("sectors", []),
-        "indigenousGovernments": record.get("indigenousGovernments", []),
-        "decisionBodies": record.get("decisionBodies", []),
-        "planningCommissions": record.get("planningCommissions", []),
+        "indigenousGovernments": name_list(record.get("indigenousGovernments", [])),
+        "decisionBodies": name_list(record.get("decisionBodies", [])),
+        "planningCommissions": name_list(record.get("planningCommissions", [])),
+        "ufaBoards": record.get("ufaBoards", []),
+        "recommendation": record.get("recommendation"),
+        "decision": record.get("decision"),
         "projectScope": record.get("projectScope", {}),
-        "stage": record.get("stage", {}),
-        "stageId": record.get("stageId", ""),
-        "stageHistory": record.get("stageHistory", []),
-        "outcomes": record.get("outcomes", {}),
-        "locations": record.get("locations", []),
+        "stage": stage,
+        "stageId": stage_id,
+        "stageHistory": normalize_stage_history(
+            record.get("stageHistory") or record.get("projectStageHistory")
+        ),
+        "outcomes": normalize_outcomes(record),
+        "locations": record.get("locations") or record.get("projectLocation", []),
     }
 
 

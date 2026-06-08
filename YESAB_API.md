@@ -1,19 +1,25 @@
 # YESAB API
   
-The public API is under [https://yesabregistry.ca/api/integration/projects](https://yesabregistry.ca/api/integration/projects)
+The public versioned integration API is under [https://yesabregistry.ca/api/v1/integration/projects](https://yesabregistry.ca/api/v1/integration/projects)
 
  - *Also see [YESAB project file map](https://yesab.ca/project-map)*
   
 With query parameters, such as of startYear and endYear:
-[https://yesabregistry.ca/api/integration/projects?startYear=2024&amp;endYear=2025](https://yesabregistry.ca/api/integration/projects?startYear=2024&amp;endYear=2025)
+[https://yesabregistry.ca/api/v1/integration/projects?startYear=2024&amp;endYear=2025](https://yesabregistry.ca/api/v1/integration/projects?startYear=2024&amp;endYear=2025)
+
+As of June 8, 2026, the v1 endpoint renamed a few project fields compared
+with the retired endpoint. Cache refresh normalizes `projectTitle` to `title`,
+`projectProponent` to `proponentName`, `projectLocation` to `locations`, and
+`projectStageHistory` `start`/`end` values to `stageStart`/`stageEnd` for
+existing map consumers.
 
 Get direct records by **path** and **not query** parameters (&amp; and ?):
   
 by Project Number
-[https://yesabregistry.ca/api/integration/projects/2023-0053](https://yesabregistry.ca/api/integration/projects/2023-0053)
+[https://yesabregistry.ca/api/v1/integration/projects/2023-0053](https://yesabregistry.ca/api/v1/integration/projects/2023-0053)
   
 by Project ID:
-[https://yesabregistry.ca/api/integration/projects/86edab28-da07-47d0-bc82-bf16223f9256](https://yesabregistry.ca/api/integration/projects/86edab28-da07-47d0-bc82-bf16223f9256)
+[https://yesabregistry.ca/api/v1/integration/projects/86edab28-da07-47d0-bc82-bf16223f9256](https://yesabregistry.ca/api/v1/integration/projects/86edab28-da07-47d0-bc82-bf16223f9256)
 
 The API will silently return 0 bytes but no error if it doesn't like the size the returned results. So chunk the start and end years by 2 or 3, e.g. startYear=2024&amp;endYear=2026.
 
@@ -41,7 +47,7 @@ There don't appear to be queries like "list all project ID's or Names in the sys
 | 0 | { latitude: 66.51142, longitude: -139.28963 } | 
   
   
-*From \< [https://yesabregistry.ca/api/integration/projects?startYear=2025&amp;endYear=2025](https://yesabregistry.ca/api/integration/projects?startYear=2025&amp;endYear=2025)&gt;**  
+*From \< [https://yesabregistry.ca/api/v1/integration/projects?startYear=2025&amp;endYear=2025](https://yesabregistry.ca/api/v1/integration/projects?startYear=2025&amp;endYear=2025)&gt;**  
 ***  
 ***  
 
@@ -73,4 +79,4 @@ There don't appear to be queries like "list all project ID's or Names in the sys
 | activities | "Road Construction and Upgrading\n•\tUpgrade existing trails and roads to 4 m in width (11.1 km)\n•\tNew road construction – Up to 2.8 km\n•\tVegetation stripping to occur outside of bird nesting window\n•\tPermafrost regions in riparian areas to be hand brushed and have 4 m wide by 1 m thick layer of fill/tailings as part of road construction\n•\tTemporary road and lane closures\n•\tSignage posted when any equipment working on road\n•\tThe entire length of the road will be constructed/upgraded at one time\nRoad Use and Maintenance – restricted to below 20km/hr\n•\tFor essential use only\n•\tWeekly grader maintenance\n•\tSignage posted when any equipment working on road\nCulvert Installation and Use\n•\tCulvert (1) installation on UNRLT of Dip Creek\n\n\tDiameter 45-91 cm, length 10-13 m\n\n•\tCulvert (1) installation on Casino Creek\n\n\tInstalled in creek bed \n\n•\tAnnual maintenance as required\nBorrow Pits\n•\tUp to 3 Borrow Pits (2 as contingencies) on Casino and Dip Creeks\n•\tUp to 1 500 m3 of fill to be used for Casino Creek crossing unless tailings from mining are available\n•\tDeveloped and reclaimed as needed\nFuel Use and Storage\n•\tNo additional fuel use or storage is proposed for the Project. All fuel use and storage amounts and procedures will fall within the assessed amounts and procedures identified in YESAB 2022-0057\nCamp\n•\tNo camp facilities are proposed for the Project\n•\tWorkers will be billeted in either the camp assessed as part of YESAB 2022-0057 or camp permitted as part of PM20-041-1\n\nReclamation – Road will be reclaimed when Casino Tote Road is upgraded to all-weather road or at the end of 25 years\n\n" | 
 | planningCommissions |  | 
 
-*From [https://yesabregistry.ca/api/integration/projects/86edab28-da07-47d0-bc82-bf16223f9256](https://yesabregistry.ca/api/integration/projects/86edab28-da07-47d0-bc82-bf16223f9256)**
+*From [https://yesabregistry.ca/api/v1/integration/projects/86edab28-da07-47d0-bc82-bf16223f9256](https://yesabregistry.ca/api/v1/integration/projects/86edab28-da07-47d0-bc82-bf16223f9256)**
