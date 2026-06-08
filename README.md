@@ -23,6 +23,8 @@ Reusing cached 2026-2026: /var/home/matt/dev/yesab/data/api/buckets/projects_202
 State file    : /var/home/matt/dev/yesab/data/api/state.json
 Merged cache  : 4617 projects from 7 bucket(s)
 Merged dataset: /var/home/matt/dev/yesab/data/api/projects_merged.json.zst
+Bucket changes:
+  - 2026-2026: not checked for remote changes (reused local cache; run with --force to fetch and compare)
   - 2005-2005 : /var/home/matt/dev/yesab/data/api/buckets/projects_2005-2005.json.zst
   - 2006-2010 : /var/home/matt/dev/yesab/data/api/buckets/projects_2006-2010.json.zst
   - 2011-2015 : /var/home/matt/dev/yesab/data/api/buckets/projects_2011-2015.json.zst
@@ -213,6 +215,11 @@ Older cache buckets stay on disk until you explicitly refresh them with `--force
 This keeps the sync logic simple while still updating the projects most likely to change.
 
 Refresh API cache buckets sequentially. The script uses a shared `data/api/state.json` file and is not designed for concurrent writers.
+
+Each run prints a bucket change summary for requested buckets. Fetched buckets
+are compared with the previous local bucket snapshot and report new, changed,
+and removed project records; reused buckets are marked as not checked because no
+remote request was made.
 
 As of June 8, 2026, `scripts/refresh_api_cache.py` uses the versioned
 `/api/v1/integration/projects` endpoint. The cache normalizes the v1 project

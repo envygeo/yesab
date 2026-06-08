@@ -104,6 +104,69 @@ class RefreshApiCacheTests(unittest.TestCase):
             },
         )
 
+    def test_bucket_change_report_counts_new_changed_and_removed_records(self) -> None:
+        previous = [
+            {
+                "projectId": "same-id",
+                "projectNumber": "2026-0001",
+                "title": "Unchanged",
+            },
+            {
+                "projectId": "changed-id",
+                "projectNumber": "2026-0002",
+                "title": "Old title",
+            },
+            {
+                "projectId": "removed-id",
+                "projectNumber": "2026-0003",
+                "title": "Removed",
+            },
+        ]
+        current = [
+            {
+                "projectId": "same-id",
+                "projectNumber": "2026-0001",
+                "title": "Unchanged",
+            },
+            {
+                "projectId": "changed-id",
+                "projectNumber": "2026-0002",
+                "title": "New title",
+            },
+            {
+                "projectId": "new-id",
+                "projectNumber": "2026-0004",
+                "title": "New",
+            },
+        ]
+
+        report = refresh_api_cache.build_bucket_change_report(
+            "2026-2026",
+            previous,
+            current,
+        )
+
+        self.assertEqual(report["status"], "changed")
+        self.assertEqual(report["new_count"], 1)
+        self.assertEqual(report["changed_count"], 1)
+        self.assertEqual(report["removed_count"], 1)
+        self.assertEqual(report["record_count_delta"], 0)
+        self.assertEqual(report["new_records"], ["2026-0004"])
+        self.assertEqual(report["changed_records"], ["2026-0002"])
+        self.assertEqual(report["removed_records"], ["2026-0003"])
+
+    def test_format_bucket_change_report_summarizes_unchanged_data(self) -> None:
+        report = refresh_api_cache.build_bucket_change_report(
+            "2026-2026",
+            [{"projectId": "same-id", "projectNumber": "2026-0001"}],
+            [{"projectId": "same-id", "projectNumber": "2026-0001"}],
+        )
+
+        self.assertEqual(
+            refresh_api_cache.format_bucket_change_report(report),
+            "2026-2026: no record changes (1 records, delta +0)",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

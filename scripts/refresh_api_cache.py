@@ -36,6 +36,7 @@ STATE_FILE = DATA_DIR / "state.json"
 MERGED_FILE = DATA_DIR / "projects_merged.json.zst"
 TIMEOUT = 60
 ZSTD_LEVEL = 10
+REPORT_DETAIL_LIMIT = 10
 
 
 def utc_now_iso() -> str:
@@ -74,6 +75,152 @@ def build_url(start_year: int, end_year: int) -> str:
 def sha256_text(text: str) -> str:
     """Return the SHA-256 hash for a UTF-8 text payload."""
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+def record_change_key(record: dict) -> str:
+    """Return the stable key used to compare one cached API record."""
+    return str(record.get("projectId") or record.get("projectNumber") or "")
+
+
+def record_label(record: dict, fallback: str) -> str:
+    """Return a compact human-readable record label for change reports."""
+    return str(record.get("projectNumber") or record.get("projectId") or fallback)
+
+
+def records_by_change_key(records: list[dict]) -> dict[str, dict]:
+    """Return cache records indexed by the same key used by merged cache output."""
+    keyed: dict[str, dict] = {}
+    for record in records:
+        key = record_change_key(record)
+        if key:
+            keyed[key] = record
+    return keyed
+
+
+def record_fingerprint(record: dict) -> str:
+    """Return a stable content hash for one normalized project record."""
+    return sha256_text(json.dumps(record, separators=(",", ":"), sort_keys=True))
+
+
+def sorted_record_labels(records_by_key: dict[str, dict], keys: set[str]) -> list[str]:
+    """Return sorted display labels for selected record keys."""
+    labels = [record_label(records_by_key[key], key) for key in keys]
+    return sorted(labels)
+
+
+def build_bucket_change_report(
+    key: str,
+    previous_records: list[dict],
+    current_records: list[dict],
+) -> dict:
+    """Return a record-level change report for one fetched bucket."""
+    previous_by_key = records_by_change_key(previous_records)
+    current_by_key = records_by_change_key(current_records)
+    previous_keys = set(previous_by_key)
+    current_keys = set(current_by_key)
+
+    new_keys = current_keys - previous_keys
+    removed_keys = previous_keys - current_keys
+    changed_keys = {
+        key
+        for key in previous_keys & current_keys
+        if record_fingerprint(previous_by_key[key])
+        != record_fingerprint(current_by_key[key])
+    }
+
+    status = "changed" if new_keys or removed_keys or changed_keys else "unchanged"
+    return {
+        "bucket": key,
+        "status": status,
+        "previous_record_count": len(previous_records),
+        "record_count": len(current_records),
+        "record_count_delta": len(current_records) - len(previous_records),
+        "new_count": len(new_keys),
+        "changed_count": len(changed_keys),
+        "removed_count": len(removed_keys),
+        "new_records": sorted_record_labels(current_by_key, new_keys),
+        "changed_records": sorted_record_labels(current_by_key, changed_keys),
+        "removed_records": sorted_record_labels(previous_by_key, removed_keys),
+    }
+
+
+def build_initial_bucket_report(key: str, current_records: list[dict]) -> dict:
+    """Return a change report for the first local cache write of one bucket."""
+    current_by_key = records_by_change_key(current_records)
+    current_keys = set(current_by_key)
+    return {
+        "bucket": key,
+        "status": "initialized",
+        "previous_record_count": 0,
+        "record_count": len(current_records),
+        "record_count_delta": len(current_records),
+        "new_count": len(current_keys),
+        "changed_count": 0,
+        "removed_count": 0,
+        "new_records": sorted_record_labels(current_by_key, current_keys),
+        "changed_records": [],
+        "removed_records": [],
+    }
+
+
+def build_reused_bucket_report(key: str, path: Path) -> dict:
+    """Return a report for a bucket that was not fetched this run."""
+    return {
+        "bucket": key,
+        "status": "not_checked",
+        "path": str(path),
+        "previous_record_count": None,
+        "record_count": None,
+        "record_count_delta": None,
+        "new_count": None,
+        "changed_count": None,
+        "removed_count": None,
+        "new_records": [],
+        "changed_records": [],
+        "removed_records": [],
+    }
+
+
+def format_record_labels(label: str, records: list[str]) -> str:
+    """Return a compact detail suffix for changed record labels."""
+    if not records:
+        return ""
+    shown = records[:REPORT_DETAIL_LIMIT]
+    suffix = ""
+    if len(records) > REPORT_DETAIL_LIMIT:
+        suffix = f", ... {len(records) - REPORT_DETAIL_LIMIT} more"
+    return f"; {label} {', '.join(shown)}{suffix}"
+
+
+def format_bucket_change_report(report: dict) -> str:
+    """Return one human-readable line for a bucket change report."""
+    key = report["bucket"]
+    status = report["status"]
+    if status == "not_checked":
+        return (
+            f"{key}: not checked for remote changes "
+            "(reused local cache; run with --force to fetch and compare)"
+        )
+    if status == "initialized":
+        return f"{key}: initialized cache with {report['record_count']} records"
+    if status == "unchanged":
+        return (
+            f"{key}: no record changes "
+            f"({report['record_count']} records, "
+            f"delta {report['record_count_delta']:+d})"
+        )
+
+    line = (
+        f"{key}: +{report['new_count']} new, "
+        f"~{report['changed_count']} changed, "
+        f"-{report['removed_count']} removed "
+        f"({report['record_count']} records, "
+        f"delta {report['record_count_delta']:+d})"
+    )
+    line += format_record_labels("new", report["new_records"])
+    line += format_record_labels("changed", report["changed_records"])
+    line += format_record_labels("removed", report["removed_records"])
+    return line
 
 
 def write_zstd_json(path: Path, payload: object) -> None:
@@ -418,7 +565,7 @@ def bucket_specs_from_args(args: argparse.Namespace) -> list[tuple[int, int]]:
     return hot_buckets(datetime.now().year)
 
 
-def refresh_bucket(state: dict, start_year: int, end_year: int, force: bool) -> None:
+def refresh_bucket(state: dict, start_year: int, end_year: int, force: bool) -> dict:
     """Fetch and store one bucket, or skip it if a cold bucket already exists."""
     key = bucket_key(start_year, end_year)
     path = bucket_path(start_year, end_year)
@@ -434,7 +581,11 @@ def refresh_bucket(state: dict, start_year: int, end_year: int, force: bool) -> 
             }
         )
         print(f"Reusing cached {key}: {path}")
-        return
+        return build_reused_bucket_report(key, path)
+
+    previous_records: list[dict] | None = None
+    if exists:
+        _, previous_records = read_bucket(path)
 
     print(f"Fetching bucket {key}...")
     try:
@@ -452,6 +603,9 @@ def refresh_bucket(state: dict, start_year: int, end_year: int, force: bool) -> 
         **metadata,
     }
     print(f"Stored bucket {key} with {metadata['record_count']} records: {path}")
+    if previous_records is None:
+        return build_initial_bucket_report(key, records)
+    return build_bucket_change_report(key, previous_records, records)
 
 
 def parse_args(argv: list[str]) -> argparse.Namespace:
@@ -491,14 +645,21 @@ def main(argv: list[str] | None = None) -> int:
     BUCKET_DIR.mkdir(parents=True, exist_ok=True)
     sync_state_to_bucket_files(state)
 
+    bucket_reports: list[dict] = []
     for start_year, end_year in specs:
-        refresh_bucket(state, start_year, end_year, force=args.force)
+        bucket_reports.append(
+            refresh_bucket(state, start_year, end_year, force=args.force)
+        )
 
     sync_state_to_bucket_files(state)
     summary = merge_cached_buckets(state)
     state["merged"] = {
         "path": str(MERGED_FILE),
         **summary,
+    }
+    state["lastRefresh"] = {
+        "checkedAt": utc_now_iso(),
+        "buckets": bucket_reports,
     }
     save_state(state)
     print(f"State file    : {STATE_FILE}")
@@ -509,6 +670,9 @@ def main(argv: list[str] | None = None) -> int:
         f"from {summary['bucketCount']} bucket(s)",
     )
     print(f"Merged dataset: {MERGED_FILE}")
+    print("Bucket changes:")
+    for report in bucket_reports:
+        print(f"  - {format_bucket_change_report(report)}")
 
     for key in summary["buckets"]:
         info = state["buckets"].get(key, {})
