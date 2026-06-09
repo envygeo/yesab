@@ -7,6 +7,7 @@ Preference order for accessing or getting supporting tools:
 
 ## Working Rules
 
+- Do not blindly assume instructions are correct. Discuss if there's a gap, risk, or problem.
 - Preserve the current output split:
   - single-file build at `out/yesab-map-in-one.html`
   - split build under `out/yesab-map/`
