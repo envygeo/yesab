@@ -316,6 +316,60 @@ def split_bundle_path(path_text: str) -> list[str]:
     return [part for part in re.split(r"[\\/]+", path_text) if part]
 
 
+def normalized_bundle_path(path_text: str) -> str:
+    """Return a stable POSIX-style manifest path string."""
+    return "/".join(split_bundle_path(path_text))
+
+
+def safe_bundle_path(bundle_dir: Path, path_text: str) -> Path | None:
+    """Return a manifest path only when it stays below ``bundle_dir``."""
+    parts = split_bundle_path(path_text)
+    if not parts or any(part in {".", ".."} for part in parts):
+        return None
+    try:
+        bundle_root = bundle_dir.resolve()
+        candidate = bundle_dir.joinpath(*parts).resolve()
+    except OSError:
+        return None
+    if candidate == bundle_root or bundle_root in candidate.parents:
+        return candidate
+    return None
+
+
+def read_json_or_none(path: Path) -> Any | None:
+    """Read a JSON file, returning None when it is missing or invalid."""
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+
+
+def bundle_section_entries(
+    bundle_dir: Path, sections: Any
+) -> list[dict[str, Any]]:
+    """Return manifest section rows plus optional loaded JSON payloads."""
+    if not isinstance(sections, list):
+        return []
+    entries: list[dict[str, Any]] = []
+    for section in sections:
+        if not isinstance(section, dict):
+            continue
+        path_text = text_value(section.get("path"))
+        path = safe_bundle_path(bundle_dir, path_text) if path_text else None
+        payload = read_json_or_none(path) if path is not None else None
+        entries.append(
+            {
+                "section": section,
+                "name": text_value(section.get("name")),
+                "endpoint": text_value(section.get("endpoint")),
+                "source_json_path": normalized_bundle_path(path_text),
+                "source_local_path": str(path) if path is not None else "",
+                "payload": payload,
+            }
+        )
+    return entries
+
+
 def iter_bundle_manifests(bundle_root: Path | None) -> list[tuple[Path, dict[str, Any]]]:
     """Load project bundle manifests below ``bundle_root``."""
     if bundle_root is None:
@@ -332,6 +386,160 @@ def iter_bundle_manifests(bundle_root: Path | None) -> list[tuple[Path, dict[str
         if isinstance(manifest, dict):
             manifests.append((manifest_path, manifest))
     return manifests
+
+
+def date_iso_value(value: Any) -> str:
+    """Return an ISO-like date string for registry date values."""
+    if value is None or value == "":
+        return ""
+    if isinstance(value, int | float):
+        if value <= 0:
+            return ""
+        timestamp = value / 1000 if value > 10_000_000_000 else value
+        return (
+            datetime.fromtimestamp(timestamp, UTC)
+            .replace(microsecond=0)
+            .isoformat()
+            .replace("+00:00", "Z")
+        )
+    if isinstance(value, str):
+        text = value.strip()
+        if not text:
+            return ""
+        if re.fullmatch(r"\d+(\.\d+)?", text):
+            return date_iso_value(float(text))
+        return text
+    return text_value(value)
+
+
+def first_text(item: dict[str, Any], *keys: str) -> str:
+    """Return the first non-empty text value from ``item``."""
+    for key in keys:
+        value = text_value(item.get(key)).strip()
+        if value:
+            return value
+    return ""
+
+
+def unique_csv(values: list[str]) -> str:
+    """Return comma-separated unique non-empty values, preserving order."""
+    seen: set[str] = set()
+    unique: list[str] = []
+    for value in values:
+        value = value.strip()
+        if value and value not in seen:
+            seen.add(value)
+            unique.append(value)
+    return ", ".join(unique)
+
+
+def upload_id_from_item(item: dict[str, Any]) -> str:
+    """Return the preferred public upload ID from a document-like row."""
+    return first_text(item, "redactedUploadId", "uploadId", "unredactedUploadId")
+
+
+def document_parent_for_section(
+    name: str,
+) -> tuple[str, str, str] | None:
+    """Return parent metadata for document-like bundle sections."""
+    if name in {"documents", "key_documents", "correspondence_documents"}:
+        return ("", "", "document")
+    patterns = (
+        (r"^comments/(.+)_documents$", "comment", "attachment"),
+        (r"^notes_(.+)_documents$", "note", "attachment"),
+        (r"^information[-_]requests_(.+)_documents$", "information_request", "attachment"),
+        (
+            r"^simplified[-_]information[-_]requests_(.+)_documents$",
+            "simplified_information_request",
+            "attachment",
+        ),
+        (r"^emails/(.+)$", "email", "attachment"),
+    )
+    for pattern, parent_kind, document_role in patterns:
+        match = re.match(pattern, name)
+        if match:
+            return (parent_kind, match.group(1), document_role)
+    return None
+
+
+def iter_document_items(payload: Any, default_role: str) -> list[tuple[int, str, dict[str, Any]]]:
+    """Return document-like rows from a section payload."""
+    rows: list[tuple[int, str, dict[str, Any]]] = []
+    if isinstance(payload, list):
+        for index, item in enumerate(payload):
+            if isinstance(item, dict):
+                rows.append((index, default_role, item))
+        return rows
+    if not isinstance(payload, dict):
+        return rows
+    row_index = 0
+    for role in ("documents", "questions", "responses", "replaced"):
+        children = payload.get(role)
+        if not isinstance(children, list):
+            continue
+        for item in children:
+            if isinstance(item, dict):
+                rows.append((row_index, role, item))
+                row_index += 1
+    return rows
+
+
+def message_text(message: Any) -> str:
+    """Return compact display text from an activity message payload."""
+    if isinstance(message, list):
+        parts: list[str] = []
+        for part in message:
+            if isinstance(part, dict):
+                parts.append(text_value(part.get("message")))
+            else:
+                parts.append(text_value(part))
+        return re.sub(r"\s+", " ", "".join(parts)).strip()
+    return re.sub(r"\s+", " ", text_value(message)).strip()
+
+
+def linked_document_ids(activity: dict[str, Any]) -> str:
+    """Return linked document IDs from an activity feed item."""
+    values: list[str] = []
+    message = activity.get("message")
+    if isinstance(message, list):
+        for part in message:
+            if isinstance(part, dict):
+                values.append(text_value(part.get("linkTo")))
+    documents = activity.get("documents")
+    if isinstance(documents, list):
+        for document in documents:
+            if isinstance(document, dict):
+                values.append(
+                    first_text(document, "documentId", "id", "documentNumber")
+                )
+    return unique_csv(values)
+
+
+def email_items(payload: Any) -> list[dict[str, Any]]:
+    """Flatten top-level email/notification bundle payloads."""
+    if isinstance(payload, dict):
+        return [payload] if text_value(payload.get("emailMessageId")) else []
+    if not isinstance(payload, list):
+        return []
+    rows: list[dict[str, Any]] = []
+    for day in payload:
+        if not isinstance(day, dict):
+            continue
+        email_date = text_value(day.get("emailDate"))
+        for type_group in day.get("emailTypeGroups", []):
+            if not isinstance(type_group, dict):
+                continue
+            for recipient_group in type_group.get("emailRecipientGroups", []):
+                if not isinstance(recipient_group, dict):
+                    continue
+                for email in recipient_group.get("emails", []):
+                    if not isinstance(email, dict):
+                        continue
+                    row = dict(email)
+                    if email_date and not row.get("emailDate"):
+                        row["emailDate"] = email_date
+                    rows.append(row)
+    return rows
 
 
 def create_schema(db: sqlite3.Connection) -> None:
@@ -483,6 +691,152 @@ def create_schema(db: sqlite3.Connection) -> None:
           document_id TEXT
         );
 
+        CREATE TABLE bundle_documents (
+          id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+          project_number TEXT,
+          project_id TEXT,
+          source_section TEXT,
+          source_json_path TEXT,
+          source_local_path TEXT,
+          source_row_index INTEGER,
+          parent_kind TEXT,
+          parent_id TEXT,
+          document_role TEXT,
+          document_id TEXT,
+          document_number TEXT,
+          document_type TEXT,
+          document_type_id TEXT,
+          document_state TEXT,
+          title TEXT,
+          description TEXT,
+          file_name TEXT,
+          redacted_file_name TEXT,
+          upload_id TEXT,
+          upload_date TEXT,
+          upload_date_iso TEXT,
+          key_document INTEGER NOT NULL DEFAULT 0,
+          is_historic INTEGER NOT NULL DEFAULT 0,
+          stage_uploaded TEXT,
+          raw_json TEXT
+        );
+
+        CREATE TABLE bundle_comments (
+          id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+          project_number TEXT,
+          project_id TEXT,
+          source_section TEXT,
+          source_json_path TEXT,
+          source_local_path TEXT,
+          source_row_index INTEGER,
+          comment_id TEXT,
+          document_number TEXT,
+          submitter_name TEXT,
+          first_name TEXT,
+          last_name TEXT,
+          redacted_comment TEXT,
+          stage_uploaded TEXT,
+          submitted_date TEXT,
+          submitted_date_iso TEXT,
+          document_count INTEGER NOT NULL DEFAULT 0,
+          upload_ids TEXT,
+          document_ids TEXT,
+          raw_json TEXT
+        );
+
+        CREATE TABLE bundle_activity_events (
+          id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+          project_number TEXT,
+          project_id TEXT,
+          source_section TEXT,
+          source_json_path TEXT,
+          source_local_path TEXT,
+          source_row_index INTEGER,
+          activity_date TEXT,
+          activity_date_iso TEXT,
+          activity_date_formatted TEXT,
+          message_text TEXT,
+          linked_document_ids TEXT,
+          document_count INTEGER NOT NULL DEFAULT 0,
+          secondary_sort INTEGER,
+          raw_json TEXT
+        );
+
+        CREATE TABLE bundle_notes (
+          id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+          project_number TEXT,
+          project_id TEXT,
+          source_section TEXT,
+          source_json_path TEXT,
+          source_local_path TEXT,
+          source_row_index INTEGER,
+          note_id TEXT,
+          document_number TEXT,
+          title TEXT,
+          note_html TEXT,
+          note_state TEXT,
+          stage_uploaded TEXT,
+          published_date TEXT,
+          published_date_iso TEXT,
+          upload_date TEXT,
+          upload_date_iso TEXT,
+          uploaded_by TEXT,
+          document_count INTEGER NOT NULL DEFAULT 0,
+          upload_ids TEXT,
+          document_ids TEXT,
+          raw_json TEXT
+        );
+
+        CREATE TABLE bundle_simplified_information_requests (
+          id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+          project_number TEXT,
+          project_id TEXT,
+          source_section TEXT,
+          source_json_path TEXT,
+          source_local_path TEXT,
+          source_row_index INTEGER,
+          request_id TEXT,
+          request_number INTEGER,
+          status TEXT,
+          status_date TEXT,
+          status_date_iso TEXT,
+          published_date TEXT,
+          published_date_iso TEXT,
+          answered_date TEXT,
+          answered_date_iso TEXT,
+          project_stage TEXT,
+          request_document_number TEXT,
+          response_document_number TEXT,
+          document_count INTEGER NOT NULL DEFAULT 0,
+          upload_ids TEXT,
+          document_ids TEXT,
+          raw_json TEXT
+        );
+
+        CREATE TABLE bundle_emails (
+          id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+          project_number TEXT,
+          project_id TEXT,
+          source_section TEXT,
+          source_json_path TEXT,
+          source_local_path TEXT,
+          source_row_index INTEGER,
+          email_message_id TEXT,
+          email_date TEXT,
+          sent_date TEXT,
+          sent_date_iso TEXT,
+          subject TEXT,
+          message_type TEXT,
+          message_type_id TEXT,
+          recipient_type TEXT,
+          recipient_type_id TEXT,
+          stage_uploaded TEXT,
+          content TEXT,
+          document_count INTEGER NOT NULL DEFAULT 0,
+          upload_ids TEXT,
+          document_ids TEXT,
+          raw_json TEXT
+        );
+
         CREATE TABLE explorer_summary (
           id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
           item TEXT,
@@ -500,6 +854,14 @@ def create_schema(db: sqlite3.Connection) -> None:
         CREATE INDEX idx_map_features_project ON map_features(project_number);
         CREATE INDEX idx_map_features_layer ON map_features(layer_name);
         CREATE INDEX idx_bundle_attachments_project ON bundle_attachments(project_number);
+        CREATE INDEX idx_bundle_documents_project ON bundle_documents(project_number);
+        CREATE INDEX idx_bundle_documents_number ON bundle_documents(document_number);
+        CREATE INDEX idx_bundle_documents_upload ON bundle_documents(upload_id);
+        CREATE INDEX idx_bundle_comments_project ON bundle_comments(project_number);
+        CREATE INDEX idx_bundle_activity_project ON bundle_activity_events(project_number);
+        CREATE INDEX idx_bundle_notes_project ON bundle_notes(project_number);
+        CREATE INDEX idx_bundle_sir_project ON bundle_simplified_information_requests(project_number);
+        CREATE INDEX idx_bundle_emails_project ON bundle_emails(project_number);
 
         CREATE VIEW projects_with_bundles AS
         SELECT p.project_number,
@@ -743,13 +1105,459 @@ def insert_map_features(
     return len(rows)
 
 
+def add_parent_document_summary(
+    summary: dict[tuple[str, str], dict[str, Any]],
+    parent_kind: str,
+    parent_id: str,
+    *,
+    document_id: str,
+    upload_id: str,
+) -> None:
+    """Record document identifiers for a parent bundle entity."""
+    if not parent_kind or not parent_id:
+        return
+    entry = summary.setdefault(
+        (parent_kind, parent_id),
+        {"count": 0, "document_ids": [], "upload_ids": []},
+    )
+    entry["count"] += 1
+    if document_id:
+        entry["document_ids"].append(document_id)
+    if upload_id:
+        entry["upload_ids"].append(upload_id)
+
+
+def parent_document_values(
+    summary: dict[tuple[str, str], dict[str, Any]],
+    parent_kind: str,
+    parent_id: str,
+) -> tuple[int, str, str]:
+    """Return document count, upload IDs, and document IDs for a parent."""
+    entry = summary.get((parent_kind, parent_id), {})
+    return (
+        int_value(entry.get("count")) or 0,
+        unique_csv(entry.get("upload_ids", [])),
+        unique_csv(entry.get("document_ids", [])),
+    )
+
+
+def insert_bundle_documents(
+    db: sqlite3.Connection,
+    *,
+    project_number: str,
+    project_id: str,
+    entries: list[dict[str, Any]],
+) -> tuple[int, dict[tuple[str, str], dict[str, Any]]]:
+    """Insert document-like rows from loaded bundle section JSON."""
+    count = 0
+    parent_summary: dict[tuple[str, str], dict[str, Any]] = {}
+    for entry in entries:
+        parent = document_parent_for_section(entry["name"])
+        if parent is None:
+            continue
+        parent_kind, parent_id, default_role = parent
+        for row_index, role, item in iter_document_items(
+            entry["payload"], default_role
+        ):
+            document_id = first_text(item, "documentId", "id")
+            upload_id = upload_id_from_item(item)
+            db.execute(
+                """
+                INSERT INTO bundle_documents
+                  (project_number, project_id, source_section, source_json_path,
+                   source_local_path, source_row_index, parent_kind, parent_id,
+                   document_role, document_id, document_number, document_type,
+                   document_type_id, document_state, title, description, file_name,
+                   redacted_file_name, upload_id, upload_date, upload_date_iso,
+                   key_document, is_historic, stage_uploaded, raw_json)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                        ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    project_number,
+                    project_id,
+                    entry["name"],
+                    entry["source_json_path"],
+                    entry["source_local_path"],
+                    row_index,
+                    parent_kind,
+                    parent_id,
+                    role,
+                    document_id,
+                    text_value(item.get("documentNumber")),
+                    text_value(item.get("documentType")),
+                    text_value(item.get("documentTypeId")),
+                    text_value(item.get("documentState")),
+                    first_text(item, "title", "description", "fileName"),
+                    text_value(item.get("description")),
+                    first_text(item, "fileName", "originalFilename"),
+                    text_value(item.get("redactedFileName")),
+                    upload_id,
+                    text_value(
+                        item.get("uploadDate") or item.get("redactedUploadDate")
+                    ),
+                    date_iso_value(
+                        item.get("uploadDate") or item.get("redactedUploadDate")
+                    ),
+                    bool_int(item.get("keyDocument")),
+                    bool_int(item.get("isHistoric")),
+                    text_value(item.get("stageUploaded")),
+                    compact_json(item),
+                ),
+            )
+            add_parent_document_summary(
+                parent_summary,
+                parent_kind,
+                parent_id,
+                document_id=document_id,
+                upload_id=upload_id,
+            )
+            count += 1
+    return count, parent_summary
+
+
+def insert_bundle_comments(
+    db: sqlite3.Connection,
+    *,
+    project_number: str,
+    project_id: str,
+    entries: list[dict[str, Any]],
+    parent_summary: dict[tuple[str, str], dict[str, Any]],
+) -> int:
+    """Insert public comment rows from loaded bundle section JSON."""
+    count = 0
+    for entry in entries:
+        if entry["name"] != "comments" or not isinstance(entry["payload"], list):
+            continue
+        for row_index, item in enumerate(entry["payload"]):
+            if not isinstance(item, dict):
+                continue
+            comment_id = text_value(item.get("commentId"))
+            document_count, upload_ids, document_ids = parent_document_values(
+                parent_summary, "comment", comment_id
+            )
+            first_name = text_value(item.get("firstName"))
+            last_name = text_value(item.get("lastName"))
+            submitter_name = " ".join(
+                part for part in (first_name, last_name) if part
+            ).strip()
+            submitted_date = item.get("submittedDate")
+            db.execute(
+                """
+                INSERT INTO bundle_comments
+                  (project_number, project_id, source_section, source_json_path,
+                   source_local_path, source_row_index, comment_id, document_number,
+                   submitter_name, first_name, last_name, redacted_comment,
+                   stage_uploaded, submitted_date, submitted_date_iso,
+                   document_count, upload_ids, document_ids, raw_json)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    project_number,
+                    project_id,
+                    entry["name"],
+                    entry["source_json_path"],
+                    entry["source_local_path"],
+                    row_index,
+                    comment_id,
+                    text_value(item.get("documentNumber")),
+                    submitter_name,
+                    first_name,
+                    last_name,
+                    text_value(item.get("redactedComment")),
+                    text_value(item.get("stageUploaded")),
+                    text_value(submitted_date),
+                    date_iso_value(submitted_date),
+                    document_count,
+                    upload_ids,
+                    document_ids,
+                    compact_json(item),
+                ),
+            )
+            count += 1
+    return count
+
+
+def insert_bundle_activity_events(
+    db: sqlite3.Connection,
+    *,
+    project_number: str,
+    project_id: str,
+    entries: list[dict[str, Any]],
+) -> int:
+    """Insert activity feed rows from loaded bundle section JSON."""
+    count = 0
+    for entry in entries:
+        if entry["name"] != "activity_feed" or not isinstance(entry["payload"], list):
+            continue
+        for row_index, item in enumerate(entry["payload"]):
+            if not isinstance(item, dict):
+                continue
+            documents = item.get("documents")
+            document_count = len(documents) if isinstance(documents, list) else 0
+            activity_date = item.get("activityDate")
+            db.execute(
+                """
+                INSERT INTO bundle_activity_events
+                  (project_number, project_id, source_section, source_json_path,
+                   source_local_path, source_row_index, activity_date,
+                   activity_date_iso, activity_date_formatted, message_text,
+                   linked_document_ids, document_count, secondary_sort, raw_json)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    project_number,
+                    text_value(item.get("projectId") or project_id),
+                    entry["name"],
+                    entry["source_json_path"],
+                    entry["source_local_path"],
+                    row_index,
+                    text_value(activity_date),
+                    date_iso_value(activity_date),
+                    text_value(item.get("activityDateTimeFormatted"))
+                    or text_value(item.get("activityDateFormatted")),
+                    message_text(item.get("message")),
+                    linked_document_ids(item),
+                    document_count,
+                    int_value(item.get("secondarySort")),
+                    compact_json(item),
+                ),
+            )
+            count += 1
+    return count
+
+
+def insert_bundle_notes(
+    db: sqlite3.Connection,
+    *,
+    project_number: str,
+    project_id: str,
+    entries: list[dict[str, Any]],
+    parent_summary: dict[tuple[str, str], dict[str, Any]],
+) -> int:
+    """Insert note rows from loaded bundle section JSON."""
+    count = 0
+    for entry in entries:
+        if entry["name"] != "notes" or not isinstance(entry["payload"], list):
+            continue
+        for row_index, item in enumerate(entry["payload"]):
+            if not isinstance(item, dict):
+                continue
+            note_id = text_value(item.get("noteId"))
+            document_count, upload_ids, document_ids = parent_document_values(
+                parent_summary, "note", note_id
+            )
+            published_date = item.get("publishedDate")
+            upload_date = item.get("uploadDate")
+            db.execute(
+                """
+                INSERT INTO bundle_notes
+                  (project_number, project_id, source_section, source_json_path,
+                   source_local_path, source_row_index, note_id, document_number,
+                   title, note_html, note_state, stage_uploaded, published_date,
+                   published_date_iso, upload_date, upload_date_iso, uploaded_by,
+                   document_count, upload_ids, document_ids, raw_json)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    project_number,
+                    text_value(item.get("projectId") or project_id),
+                    entry["name"],
+                    entry["source_json_path"],
+                    entry["source_local_path"],
+                    row_index,
+                    note_id,
+                    text_value(item.get("documentNumber")),
+                    text_value(item.get("title")),
+                    text_value(item.get("note")),
+                    text_value(item.get("noteState")),
+                    text_value(item.get("stageUploaded")),
+                    text_value(published_date),
+                    date_iso_value(published_date),
+                    text_value(upload_date),
+                    date_iso_value(upload_date),
+                    text_value(item.get("uploadedBy")),
+                    document_count,
+                    upload_ids,
+                    document_ids,
+                    compact_json(item),
+                ),
+            )
+            count += 1
+    return count
+
+
+def insert_bundle_simplified_information_requests(
+    db: sqlite3.Connection,
+    *,
+    project_number: str,
+    project_id: str,
+    entries: list[dict[str, Any]],
+    parent_summary: dict[tuple[str, str], dict[str, Any]],
+) -> int:
+    """Insert simplified information request rows from bundle section JSON."""
+    count = 0
+    for entry in entries:
+        if (
+            entry["name"] != "simplified_information_requests"
+            or not isinstance(entry["payload"], list)
+        ):
+            continue
+        for row_index, item in enumerate(entry["payload"]):
+            if not isinstance(item, dict):
+                continue
+            request_id = first_text(
+                item, "simplifiedInformationRequestId", "informationRequestId", "id"
+            )
+            document_count, upload_ids, document_ids = parent_document_values(
+                parent_summary, "simplified_information_request", request_id
+            )
+            status_date = item.get("statusDate")
+            published_date = item.get("publishedDate")
+            answered_date = item.get("answeredDate")
+            db.execute(
+                """
+                INSERT INTO bundle_simplified_information_requests
+                  (project_number, project_id, source_section, source_json_path,
+                   source_local_path, source_row_index, request_id, request_number,
+                   status, status_date, status_date_iso, published_date,
+                   published_date_iso, answered_date, answered_date_iso,
+                   project_stage, request_document_number, response_document_number,
+                   document_count, upload_ids, document_ids, raw_json)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    project_number,
+                    project_id,
+                    entry["name"],
+                    entry["source_json_path"],
+                    entry["source_local_path"],
+                    row_index,
+                    request_id,
+                    int_value(item.get("number")),
+                    text_value(item.get("status")),
+                    text_value(status_date),
+                    date_iso_value(status_date),
+                    text_value(published_date),
+                    date_iso_value(published_date),
+                    text_value(answered_date),
+                    date_iso_value(answered_date),
+                    text_value(item.get("projectStage")),
+                    text_value(item.get("documentNumberRequest")),
+                    text_value(item.get("documentNumberResponse")),
+                    document_count,
+                    upload_ids,
+                    document_ids,
+                    compact_json(item),
+                ),
+            )
+            count += 1
+    return count
+
+
+def document_ids_from_email(item: dict[str, Any]) -> str:
+    """Return document IDs listed directly on an email row."""
+    documents = item.get("documents")
+    if not isinstance(documents, list):
+        return ""
+    values: list[str] = []
+    for document in documents:
+        if isinstance(document, dict):
+            values.append(first_text(document, "documentId", "id", "documentNumber"))
+    return unique_csv(values)
+
+
+def upload_ids_from_email(item: dict[str, Any]) -> str:
+    """Return upload IDs listed directly on an email row."""
+    documents = item.get("documents")
+    if not isinstance(documents, list):
+        return ""
+    values: list[str] = []
+    for document in documents:
+        if isinstance(document, dict):
+            values.append(upload_id_from_item(document))
+    return unique_csv(values)
+
+
+def insert_bundle_emails(
+    db: sqlite3.Connection,
+    *,
+    project_number: str,
+    project_id: str,
+    entries: list[dict[str, Any]],
+    parent_summary: dict[tuple[str, str], dict[str, Any]],
+) -> int:
+    """Insert email/notification rows from loaded bundle section JSON."""
+    count = 0
+    seen_email_ids: set[str] = set()
+    for entry in entries:
+        name = entry["name"]
+        if name != "emails" and not name.startswith("emails/"):
+            continue
+        for row_index, item in enumerate(email_items(entry["payload"])):
+            email_id = text_value(item.get("emailMessageId"))
+            if email_id and email_id in seen_email_ids:
+                continue
+            if email_id:
+                seen_email_ids.add(email_id)
+            documents = item.get("documents")
+            direct_document_count = len(documents) if isinstance(documents, list) else 0
+            summary_count, summary_upload_ids, summary_document_ids = (
+                parent_document_values(parent_summary, "email", email_id)
+            )
+            sent_date = item.get("sentDate")
+            db.execute(
+                """
+                INSERT INTO bundle_emails
+                  (project_number, project_id, source_section, source_json_path,
+                   source_local_path, source_row_index, email_message_id, email_date,
+                   sent_date, sent_date_iso, subject, message_type, message_type_id,
+                   recipient_type, recipient_type_id, stage_uploaded, content,
+                   document_count, upload_ids, document_ids, raw_json)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    project_number,
+                    project_id,
+                    name,
+                    entry["source_json_path"],
+                    entry["source_local_path"],
+                    row_index,
+                    email_id,
+                    text_value(item.get("emailDate")),
+                    text_value(sent_date),
+                    date_iso_value(sent_date),
+                    text_value(item.get("subject")),
+                    text_value(item.get("emailMessageType")),
+                    text_value(item.get("emailMessageTypeId")),
+                    text_value(item.get("emailRecipientType")),
+                    text_value(item.get("emailRecipientTypeId")),
+                    text_value(item.get("stageUploaded")),
+                    text_value(item.get("content")),
+                    direct_document_count or summary_count,
+                    upload_ids_from_email(item) or summary_upload_ids,
+                    document_ids_from_email(item) or summary_document_ids,
+                    compact_json(item),
+                ),
+            )
+            count += 1
+    return count
+
+
 def insert_bundles(db: sqlite3.Connection, bundle_root: Path | None) -> dict[str, int]:
     """Insert locally downloaded project bundle manifest summaries."""
     bundle_count = 0
     section_count = 0
     attachment_count = 0
+    document_count = 0
+    comment_count = 0
+    activity_count = 0
+    note_count = 0
+    simplified_information_request_count = 0
+    email_count = 0
     for manifest_path, manifest in iter_bundle_manifests(bundle_root):
         project_number = text_value(manifest.get("projectNumber"))
+        project_id = text_value(manifest.get("projectId"))
         bundle_dir = manifest_path.parent
         db.execute(
             """
@@ -761,7 +1569,7 @@ def insert_bundles(db: sqlite3.Connection, bundle_root: Path | None) -> dict[str
             """,
             (
                 project_number,
-                text_value(manifest.get("projectId")),
+                project_id,
                 text_value(manifest.get("projectRef")),
                 text_value(manifest.get("title")),
                 text_value(manifest.get("generatedAt")),
@@ -778,30 +1586,68 @@ def insert_bundles(db: sqlite3.Connection, bundle_root: Path | None) -> dict[str
         )
         bundle_count += 1
 
-        sections = manifest.get("sections")
-        if isinstance(sections, list):
-            for section in sections:
-                if not isinstance(section, dict):
-                    continue
-                section_path = text_value(section.get("path"))
-                local_path = ""
-                if section_path:
-                    local_path = str(bundle_dir.joinpath(*split_bundle_path(section_path)))
-                db.execute(
-                    """
-                    INSERT INTO bundle_sections
-                      (project_number, name, endpoint, local_path, row_count)
-                    VALUES (?, ?, ?, ?, ?)
-                    """,
-                    (
-                        project_number,
-                        text_value(section.get("name")),
-                        text_value(section.get("endpoint")),
-                        local_path,
-                        int_value(section.get("count")),
-                    ),
-                )
-                section_count += 1
+        entries = bundle_section_entries(bundle_dir, manifest.get("sections"))
+        for entry in entries:
+            section = entry["section"]
+            db.execute(
+                """
+                INSERT INTO bundle_sections
+                  (project_number, name, endpoint, local_path, row_count)
+                VALUES (?, ?, ?, ?, ?)
+                """,
+                (
+                    project_number,
+                    entry["name"],
+                    entry["endpoint"],
+                    entry["source_local_path"],
+                    int_value(section.get("count")),
+                ),
+            )
+            section_count += 1
+
+        current_document_count, parent_summary = insert_bundle_documents(
+            db,
+            project_number=project_number,
+            project_id=project_id,
+            entries=entries,
+        )
+        document_count += current_document_count
+        comment_count += insert_bundle_comments(
+            db,
+            project_number=project_number,
+            project_id=project_id,
+            entries=entries,
+            parent_summary=parent_summary,
+        )
+        activity_count += insert_bundle_activity_events(
+            db,
+            project_number=project_number,
+            project_id=project_id,
+            entries=entries,
+        )
+        note_count += insert_bundle_notes(
+            db,
+            project_number=project_number,
+            project_id=project_id,
+            entries=entries,
+            parent_summary=parent_summary,
+        )
+        simplified_information_request_count += (
+            insert_bundle_simplified_information_requests(
+                db,
+                project_number=project_number,
+                project_id=project_id,
+                entries=entries,
+                parent_summary=parent_summary,
+            )
+        )
+        email_count += insert_bundle_emails(
+            db,
+            project_number=project_number,
+            project_id=project_id,
+            entries=entries,
+            parent_summary=parent_summary,
+        )
 
         attachments = manifest.get("attachments")
         if isinstance(attachments, list):
@@ -848,6 +1694,14 @@ def insert_bundles(db: sqlite3.Connection, bundle_root: Path | None) -> dict[str
         "project_bundles": bundle_count,
         "bundle_sections": section_count,
         "bundle_attachments": attachment_count,
+        "bundle_documents": document_count,
+        "bundle_comments": comment_count,
+        "bundle_activity_events": activity_count,
+        "bundle_notes": note_count,
+        "bundle_simplified_information_requests": (
+            simplified_information_request_count
+        ),
+        "bundle_emails": email_count,
     }
 
 
