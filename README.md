@@ -6,6 +6,7 @@ YESAB is the Yukon Environmental and Socio-economic Assessment Board, which trac
 - fetching and caching the [YESAB registry API](https://yesabregistry.ca/api/v1/integration/projects) in year buckets
 - joining the shapefile archive and registry API data into a single GeoPackage, filtering approximate locations into their own class
 - building static map outputs from the previous steps
+- building a query-friendly SQLite database and Datasette metadata file for ad-hoc offline exploration
 
 The workhorse or main value of the project is the combined shapefile and registry API data in a single geospatial package. It is one step of a larger internal ETL (extract, transform, load) pipeline. The maps are demos, toys made to quickly view the data and illustrate the concept of a self-contained dynamic map.
 
@@ -71,6 +72,20 @@ canonical compatibility artifact.
 
 [![](out/previews/yesab-map-in-one.png)](out/yesab-map-in-one.html)
 
+Example of building and opening the optional Datasette explorer:
+
+```powershell
+uv run --python 3.14 .\scripts\build_datasette_explorer.py
+uvx --with datasette-cluster-map datasette .\out\yesab-explorer.db -m .\out\yesab-explorer.metadata.json
+```
+
+The explorer output is meant for questions that are heavier than the static
+web map but too small to justify a custom script. It creates normalized project,
+location, sector, district, map-feature, and downloaded-project-bundle tables,
+adds full-text search on projects, and writes Datasette facets plus canned
+queries for active projects, counts by sector/district, map join summaries,
+unmapped projects, and downloaded bundle documents.
+
 ## Output geopackage metadata 
 
 **Summary**: Project points and areas from Yukon Environmental and Socio-economic Assessment Board, with YESAB registry metadata when a project-number match is available. Uses approximate point locations when no shapefile geometry exists.
@@ -88,6 +103,7 @@ canonical compatibility artifact.
 - `scripts/deploy_to_production.py` - Mirrors the deployable code subset to the production ETL workspace.
 - `scripts/build_static_map_single.py` - Builds a single self-contained HTML file, with an optional compressed wrapper.
 - `scripts/build_static_map_split.py` - Builds a multi-file static site with separate HTML, CSS, JS, and layer data files.
+- `scripts/build_datasette_explorer.py` - Builds `out/yesab-explorer.db` and Datasette metadata for searchable offline project exploration.
 
 ## Usage
 
@@ -121,6 +137,10 @@ uv run .\scripts\build_static_map_single.py .\some-output-dir --compressed-outpu
 
 uv run .\scripts\build_static_map_split.py
 uv run .\scripts\build_static_map_split.py .\some-output-dir
+
+uv run .\scripts\build_datasette_explorer.py
+uv run .\scripts\build_datasette_explorer.py .\out\custom-explorer.db --no-map-features
+uvx --with datasette-cluster-map datasette .\out\yesab-explorer.db -m .\out\yesab-explorer.metadata.json
 
 uv run .\scripts\build_geopackage.py
 uv run .\scripts\build_geopackage.py .\some-output.gpkg
@@ -203,6 +223,9 @@ Default output locations:
   - `out/yesab-map/qa_report.json`
 - `scripts/build_geopackage.py` writes:
   - `out/yesab-projects.gpkg`
+- `scripts/build_datasette_explorer.py` writes:
+  - `out/yesab-explorer.db`
+  - `out/yesab-explorer.metadata.json`
 - `scripts/refresh_and_build_geopackage.py` writes the same download, API cache, and GeoPackage outputs as the three scripts it chains.
 
 The split builder removes and recreates only its own target directory before writing files.
