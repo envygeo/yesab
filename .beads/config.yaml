@@ -55,4 +55,4 @@
 
 export.auto: false
 
-sync.remote: "https://github.com/maphew/yesab.git"
+sync.remote: "https://github.com/envygeo/yesab.git"
