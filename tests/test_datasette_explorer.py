@@ -106,6 +106,62 @@ def sample_map_payload() -> dict[str, object]:
 
 
 class DatasetteExplorerTests(unittest.TestCase):
+    def test_bundle_attachment_link_fields_quote_paths_and_reject_escape(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            bundle_root = Path(tmp) / "project-bundles"
+            bundle_dir = bundle_root / "2025-0069"
+            bundle_dir.mkdir(parents=True)
+
+            fields = explorer.bundle_attachment_link_fields(
+                bundle_root,
+                bundle_dir,
+                r"attachments\Proposal final #1.pdf",
+            )
+
+            self.assertEqual(
+                fields["local_path"],
+                str(bundle_dir / "attachments" / "Proposal final #1.pdf"),
+            )
+            self.assertEqual(
+                fields["bundle_path"],
+                "2025-0069/attachments/Proposal%20final%20%231.pdf",
+            )
+            self.assertEqual(
+                fields["datasette_url"],
+                "/bundles/2025-0069/attachments/Proposal%20final%20%231.pdf",
+            )
+
+            custom_mount = explorer.bundle_attachment_link_fields(
+                bundle_root,
+                bundle_dir,
+                "attachments/site-plan 1.png",
+                static_mount="files",
+            )
+            self.assertEqual(
+                custom_mount["datasette_url"],
+                "/files/2025-0069/attachments/site-plan%201.png",
+            )
+
+            self.assertEqual(
+                explorer.bundle_attachment_link_fields(
+                    bundle_root,
+                    bundle_dir,
+                    "../outside.pdf",
+                ),
+                {"local_path": "", "bundle_path": "", "datasette_url": ""},
+            )
+
+            outside_bundle_dir = Path(tmp) / "outside" / "2025-0069"
+            outside_bundle_dir.mkdir(parents=True)
+            self.assertEqual(
+                explorer.bundle_attachment_link_fields(
+                    bundle_root,
+                    outside_bundle_dir,
+                    "attachments/outside.pdf",
+                ),
+                {"local_path": "", "bundle_path": "", "datasette_url": ""},
+            )
+
     def test_write_explorer_db_builds_queryable_project_tables(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             db_path = Path(tmp) / "yesab-explorer.db"
@@ -208,13 +264,21 @@ class DatasetteExplorerTests(unittest.TestCase):
 
                 attachment = db.execute(
                     """
-                    SELECT description, local_path
+                    SELECT description, local_path, bundle_path, datasette_url
                       FROM bundle_attachments
                      WHERE project_number = '2025-0069'
                     """
                 ).fetchone()
                 self.assertEqual(attachment["description"], "Project proposal")
                 self.assertIn("2025-0069-0001_proposal.pdf", attachment["local_path"])
+                self.assertEqual(
+                    attachment["bundle_path"],
+                    "2025-0069/attachments/2025-0069-0001_proposal.pdf",
+                )
+                self.assertEqual(
+                    attachment["datasette_url"],
+                    "/bundles/2025-0069/attachments/2025-0069-0001_proposal.pdf",
+                )
 
                 metadata = explorer.datasette_metadata("yesab")
                 for query in metadata["databases"]["yesab"]["queries"].values():
@@ -542,6 +606,10 @@ class DatasetteExplorerTests(unittest.TestCase):
             self.assertIn("active_projects", queries)
             self.assertIn("projects_by_sector", queries)
             self.assertIn("downloaded_bundle_documents", queries)
+            self.assertIn(
+                "datasette_url",
+                queries["downloaded_bundle_documents"]["sql"],
+            )
 
     def test_yukon_basemap_tile_export_url_targets_arcgis_export(self) -> None:
         bbox = yesab_yukon_basemap.web_mercator_tile_bbox(0, 0, 0)

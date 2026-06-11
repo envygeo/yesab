@@ -22,6 +22,7 @@ from contextlib import closing
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
+from urllib.parse import quote
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
@@ -31,6 +32,7 @@ if str(ROOT) not in sys.path:
 DEFAULT_OUTPUT_PATH = Path("./out/yesab-explorer.db")
 DEFAULT_API_CACHE_PATH = Path("./data/api/projects_merged.json.zst")
 DEFAULT_BUNDLE_ROOT = Path("./out/project-bundles")
+DEFAULT_BUNDLE_STATIC_MOUNT = "/bundles/"
 
 PROJECT_NUMBER_FIELDS = ("ProjectID", "Prj_ID", "YESAB_PROJ", "Number")
 YUKON_BASEMAP_TILE_LAYER = "/-/yesab-yukon-basemap/topo/{z}/{x}/{y}.png"
@@ -329,6 +331,18 @@ def normalized_bundle_path(path_text: str) -> str:
     return "/".join(split_bundle_path(path_text))
 
 
+def normalized_static_mount(static_mount: str) -> str:
+    """Return a root-relative Datasette static mount path with trailing slash."""
+    mount = static_mount.strip().replace("\\", "/")
+    mount = mount.strip("/")
+    return f"/{mount}/" if mount else "/"
+
+
+def quoted_posix_path(parts: tuple[str, ...]) -> str:
+    """Return URL-encoded POSIX path text from already validated path parts."""
+    return "/".join(quote(part, safe="") for part in parts)
+
+
 def safe_bundle_path(bundle_dir: Path, path_text: str) -> Path | None:
     """Return a manifest path only when it stays below ``bundle_dir``."""
     parts = split_bundle_path(path_text)
@@ -342,6 +356,50 @@ def safe_bundle_path(bundle_dir: Path, path_text: str) -> Path | None:
     if candidate == bundle_root or bundle_root in candidate.parents:
         return candidate
     return None
+
+
+def empty_bundle_attachment_link_fields() -> dict[str, str]:
+    """Return blank attachment link fields for unsafe or missing paths."""
+    return {"local_path": "", "bundle_path": "", "datasette_url": ""}
+
+
+def bundle_attachment_link_fields(
+    bundle_root: Path | None,
+    bundle_dir: Path,
+    path_text: str,
+    *,
+    static_mount: str = DEFAULT_BUNDLE_STATIC_MOUNT,
+) -> dict[str, str]:
+    """Return safe filesystem and Datasette static-link fields for an attachment.
+
+    ``bundle_path`` is URL-encoded relative to the configured bundle root. The
+    ``datasette_url`` prefixes that path with the explicit Datasette static
+    mount. Blank fields are returned if the manifest path would resolve outside
+    either the project bundle directory or the configured bundle root.
+    """
+    if bundle_root is None or not path_text:
+        return empty_bundle_attachment_link_fields()
+
+    local_path = safe_bundle_path(bundle_dir, path_text)
+    if local_path is None:
+        return empty_bundle_attachment_link_fields()
+
+    try:
+        resolved_root = repo_path(bundle_root).resolve()
+        resolved_local_path = local_path.resolve()
+        relative_path = resolved_local_path.relative_to(resolved_root)
+    except (OSError, ValueError):
+        return empty_bundle_attachment_link_fields()
+
+    if any(part in {"", ".", ".."} for part in relative_path.parts):
+        return empty_bundle_attachment_link_fields()
+
+    bundle_path = quoted_posix_path(relative_path.parts)
+    return {
+        "local_path": str(resolved_local_path),
+        "bundle_path": bundle_path,
+        "datasette_url": f"{normalized_static_mount(static_mount)}{bundle_path}",
+    }
 
 
 def read_json_or_none(path: Path) -> Any | None:
@@ -691,6 +749,8 @@ def create_schema(db: sqlite3.Connection) -> None:
           description TEXT,
           file_name TEXT,
           local_path TEXT,
+          bundle_path TEXT,
+          datasette_url TEXT,
           bytes INTEGER,
           content_type TEXT,
           downloaded INTEGER NOT NULL DEFAULT 0,
@@ -1554,6 +1614,9 @@ def insert_bundle_emails(
 
 def insert_bundles(db: sqlite3.Connection, bundle_root: Path | None) -> dict[str, int]:
     """Insert locally downloaded project bundle manifest summaries."""
+    resolved_bundle_root = (
+        repo_path(bundle_root).resolve() if bundle_root is not None else None
+    )
     bundle_count = 0
     section_count = 0
     attachment_count = 0
@@ -1663,18 +1726,19 @@ def insert_bundles(db: sqlite3.Connection, bundle_root: Path | None) -> dict[str
                 if not isinstance(attachment, dict):
                     continue
                 attachment_path = text_value(attachment.get("path"))
-                local_path = ""
-                if attachment_path:
-                    local_path = str(
-                        bundle_dir.joinpath(*split_bundle_path(attachment_path))
-                    )
+                link_fields = bundle_attachment_link_fields(
+                    resolved_bundle_root,
+                    bundle_dir,
+                    attachment_path,
+                )
                 db.execute(
                     """
                     INSERT INTO bundle_attachments
                       (project_number, document_number, document_type, source_kind,
-                       description, file_name, local_path, bytes, content_type,
+                       description, file_name, local_path, bundle_path, datasette_url,
+                       bytes, content_type,
                        downloaded, timestamp_iso, upload_id, document_id)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     """,
                     (
                         project_number,
@@ -1687,7 +1751,9 @@ def insert_bundles(db: sqlite3.Connection, bundle_root: Path | None) -> dict[str
                             or attachment.get("originalFilename")
                             or attachment.get("redactedFileName")
                         ),
-                        local_path,
+                        link_fields["local_path"],
+                        link_fields["bundle_path"],
+                        link_fields["datasette_url"],
                         int_value(attachment.get("bytes")),
                         text_value(attachment.get("contentType")),
                         bool_int(attachment.get("downloaded")),
@@ -1898,8 +1964,8 @@ def datasette_metadata(database_name: str) -> dict[str, Any]:
                         "title": "Downloaded project bundle attachments",
                         "sql": """
                             SELECT project_number, document_number, document_type,
-                                   source_kind, description, file_name, local_path,
-                                   bytes, timestamp_iso
+                                   source_kind, description, file_name, datasette_url,
+                                   local_path, bytes, timestamp_iso
                               FROM bundle_attachments
                              WHERE downloaded = 1
                              ORDER BY project_number DESC, document_number
@@ -2016,12 +2082,15 @@ def main(argv: list[str] | None = None) -> int:
     """Build the Datasette explorer outputs."""
     args = parse_args(argv)
     output_path = repo_path(args.output)
-    metadata_path = repo_path(args.metadata_output or default_metadata_path(output_path))
+    metadata_path = repo_path(
+        args.metadata_output or default_metadata_path(output_path)
+    )
+    bundle_root = None if args.no_bundles else repo_path(args.bundle_root)
     counts = build_explorer(
         output_path,
         metadata_output=metadata_path,
         api_cache_path=args.api_cache,
-        bundle_root=None if args.no_bundles else args.bundle_root,
+        bundle_root=bundle_root,
         include_map_features=not args.no_map_features,
     )
     print(f"Wrote {output_path}")
@@ -2030,10 +2099,13 @@ def main(argv: list[str] | None = None) -> int:
         print(f"  {item}: {count}")
     print()
     print("Run with Datasette, for example:")
-    print(
+    command = (
         "  uvx --with datasette-cluster-map datasette "
         f"{output_path} -m {metadata_path} --plugins-dir {ROOT / 'datasette_plugins'}"
     )
+    if bundle_root is not None:
+        command += f" --static bundles:{bundle_root}"
+    print(command)
     return 0
 
 
