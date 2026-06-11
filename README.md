@@ -76,7 +76,7 @@ Example of building and opening the optional Datasette explorer:
 
 ```powershell
 uv run --python 3.14 .\scripts\build_datasette_explorer.py
-uvx --with datasette-cluster-map datasette .\out\yesab-explorer.db -m .\out\yesab-explorer.metadata.json
+uvx --with datasette-cluster-map datasette .\out\yesab-explorer.db -m .\out\yesab-explorer.metadata.json --plugins-dir .\datasette_plugins
 ```
 
 The explorer output is meant for questions that are heavier than the static
@@ -84,7 +84,10 @@ web map but too small to justify a custom script. It creates normalized project,
 location, sector, district, map-feature, and downloaded-project-bundle tables,
 adds full-text search on projects, and writes Datasette facets plus canned
 queries for active projects, counts by sector/district, map join summaries,
-unmapped projects, and downloaded bundle documents.
+unmapped projects, and downloaded bundle documents. Its cluster maps use a
+local Datasette plugin to redirect Leaflet XYZ tile requests to Government of
+Yukon ArcGIS export URLs for the same topographic and shaded-relief basemap
+services used by the static map.
 
 ## Output geopackage metadata 
 
@@ -140,7 +143,7 @@ uv run .\scripts\build_static_map_split.py .\some-output-dir
 
 uv run .\scripts\build_datasette_explorer.py
 uv run .\scripts\build_datasette_explorer.py .\out\custom-explorer.db --no-map-features
-uvx --with datasette-cluster-map datasette .\out\yesab-explorer.db -m .\out\yesab-explorer.metadata.json
+uvx --with datasette-cluster-map datasette .\out\yesab-explorer.db -m .\out\yesab-explorer.metadata.json --plugins-dir .\datasette_plugins
 
 uv run .\scripts\build_geopackage.py
 uv run .\scripts\build_geopackage.py .\some-output.gpkg

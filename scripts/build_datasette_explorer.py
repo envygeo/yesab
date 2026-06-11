@@ -33,6 +33,14 @@ DEFAULT_API_CACHE_PATH = Path("./data/api/projects_merged.json.zst")
 DEFAULT_BUNDLE_ROOT = Path("./out/project-bundles")
 
 PROJECT_NUMBER_FIELDS = ("ProjectID", "Prj_ID", "YESAB_PROJ", "Number")
+YUKON_BASEMAP_TILE_LAYER = "/-/yesab-yukon-basemap/topo/{z}/{x}/{y}.png"
+YUKON_BASEMAP_ATTRIBUTION = (
+    'Basemap: &copy; <a href="https://yukon.ca/">Government of Yukon</a>'
+)
+YUKON_BASEMAP_TILE_OPTIONS = {
+    "attribution": YUKON_BASEMAP_ATTRIBUTION,
+    "maxZoom": 19,
+}
 
 
 def repo_path(path: Path) -> Path:
@@ -1781,6 +1789,10 @@ def write_explorer_db(
 
 def datasette_metadata(database_name: str) -> dict[str, Any]:
     """Return Datasette metadata/config for the generated database."""
+    cluster_map_config = {
+        "tile_layer": YUKON_BASEMAP_TILE_LAYER,
+        "tile_layer_options": YUKON_BASEMAP_TILE_OPTIONS,
+    }
     return {
         "title": "YESAB Offline Explorer",
         "description": (
@@ -1791,6 +1803,9 @@ def datasette_metadata(database_name: str) -> dict[str, Any]:
         "license_url": "https://open.yukon.ca/open-government-licence-yukon",
         "source": "YESAB Registry and YESAB Project Map",
         "source_url": "https://yesabregistry.ca/",
+        "plugins": {
+            "datasette-cluster-map": cluster_map_config,
+        },
         "databases": {
             database_name: {
                 "tables": {
@@ -1805,6 +1820,7 @@ def datasette_metadata(database_name: str) -> dict[str, Any]:
                         ],
                         "plugins": {
                             "datasette-cluster-map": {
+                                **cluster_map_config,
                                 "latitude_column": "first_latitude",
                                 "longitude_column": "first_longitude",
                             }
@@ -2016,7 +2032,7 @@ def main(argv: list[str] | None = None) -> int:
     print("Run with Datasette, for example:")
     print(
         "  uvx --with datasette-cluster-map datasette "
-        f"{output_path} -m {metadata_path}"
+        f"{output_path} -m {metadata_path} --plugins-dir {ROOT / 'datasette_plugins'}"
     )
     return 0
 

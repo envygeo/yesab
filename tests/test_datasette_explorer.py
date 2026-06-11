@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import sys
 import sqlite3
 import tempfile
 import unittest
@@ -8,6 +9,9 @@ from contextlib import closing
 from pathlib import Path
 
 from scripts import build_datasette_explorer as explorer
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "datasette_plugins"))
+import yesab_yukon_basemap  # noqa: E402
 
 
 def write_json(path: Path, payload: object) -> None:
@@ -521,10 +525,37 @@ class DatasetteExplorerTests(unittest.TestCase):
                 projects_table["plugins"]["datasette-cluster-map"]["latitude_column"],
                 "first_latitude",
             )
+            top_level_plugins = metadata["plugins"]
+            cluster_map = top_level_plugins["datasette-cluster-map"]
+            self.assertEqual(
+                cluster_map["tile_layer"],
+                "/-/yesab-yukon-basemap/topo/{z}/{x}/{y}.png",
+            )
+            self.assertIn(
+                "Government of Yukon", cluster_map["tile_layer_options"]["attribution"]
+            )
+            self.assertEqual(
+                projects_table["plugins"]["datasette-cluster-map"]["tile_layer"],
+                cluster_map["tile_layer"],
+            )
             queries = metadata["databases"]["yesab"]["queries"]
             self.assertIn("active_projects", queries)
             self.assertIn("projects_by_sector", queries)
             self.assertIn("downloaded_bundle_documents", queries)
+
+    def test_yukon_basemap_tile_export_url_targets_arcgis_export(self) -> None:
+        bbox = yesab_yukon_basemap.web_mercator_tile_bbox(0, 0, 0)
+
+        self.assertAlmostEqual(bbox[0], -20037508.342789244)
+        self.assertAlmostEqual(bbox[1], -20037508.342789244)
+        self.assertAlmostEqual(bbox[2], 20037508.342789244)
+        self.assertAlmostEqual(bbox[3], 20037508.342789244)
+
+        url = yesab_yukon_basemap.arcgis_export_url("topo", 6, 8, 17)
+        self.assertIn("Yukon_Basemap_Cache/MapServer/export", url)
+        self.assertIn("bboxSR=3857", url)
+        self.assertIn("imageSR=3857", url)
+        self.assertIn("size=256%2C256", url)
 
 
 if __name__ == "__main__":
