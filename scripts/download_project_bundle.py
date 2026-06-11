@@ -28,6 +28,7 @@ import json
 import mimetypes
 import os
 import re
+import shutil
 import sys
 import time
 import unicodedata
@@ -37,7 +38,7 @@ import urllib.request
 import zipfile
 from dataclasses import dataclass
 from datetime import UTC, datetime
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any, Callable
 
 
@@ -57,6 +58,47 @@ DATE_FIELD_PRECEDENCE = (
     "sentDate",
 )
 DATE_VALUE_MIN_EPOCH_MS = 24 * 60 * 60 * 1000
+ARCHIVE_EXTENSIONS = {".zip"}
+WINDOWS_RESERVED_FILENAMES = {
+    "CON",
+    "PRN",
+    "AUX",
+    "NUL",
+    *(f"COM{index}" for index in range(1, 10)),
+    *(f"LPT{index}" for index in range(1, 10)),
+}
+GENERIC_SHAPEFILE_STEMS = {
+    "line",
+    "lines",
+    "multipatch",
+    "multipoint",
+    "point",
+    "points",
+    "polygon",
+    "polygons",
+    "polyline",
+    "polylines",
+}
+SHAPEFILE_SIDECAR_EXTENSIONS = {
+    ".ain",
+    ".aih",
+    ".atx",
+    ".cpg",
+    ".dbf",
+    ".fbn",
+    ".fbx",
+    ".fix",
+    ".idx",
+    ".ixs",
+    ".mxs",
+    ".prj",
+    ".qix",
+    ".sbn",
+    ".sbx",
+    ".shp",
+    ".shp.xml",
+    ".shx",
+}
 
 
 class BundleError(RuntimeError):
@@ -442,8 +484,15 @@ def safe_filename(value: str, *, fallback: str) -> str:
     normalized = re.sub(r"\s+", "_", normalized)
     normalized = re.sub(r"_+", "_", normalized)
     normalized = normalized.strip(" ._-")
+    suffix = Path(normalized).suffix
+    if suffix:
+        stem = normalized[: -len(suffix)].rstrip(" ._-")
+        normalized = f"{stem}{suffix}" if stem else normalized.lstrip(" ._-")
     if not normalized:
-        normalized = fallback
+        normalized = safe_filename(fallback, fallback="item") if fallback != "item" else "item"
+    stem = Path(normalized).stem if Path(normalized).suffix else normalized
+    if stem.upper() in WINDOWS_RESERVED_FILENAMES:
+        normalized = f"{stem}_file{Path(normalized).suffix}"
     return normalized[:180]
 
 
@@ -643,6 +692,254 @@ def write_bytes_atomic(path: Path, body: bytes) -> None:
     os.replace(part_path, path)
 
 
+def path_for_manifest(path: Path) -> str:
+    """Return a stable POSIX-style relative manifest path string."""
+    return path.as_posix()
+
+
+def is_archive_path(path: Path) -> bool:
+    """Return whether a downloaded attachment is a supported archive."""
+    return path.suffix.lower() in ARCHIVE_EXTENSIONS
+
+
+def safe_zip_member_parts(member_name: str) -> list[str]:
+    """Return sanitized relative path parts for a zip member, or empty for unsafe."""
+    if member_name.startswith(("/", "\\")):
+        return []
+    parts: list[str] = []
+    for part in PurePosixPath(member_name.replace("\\", "/")).parts:
+        if part in {"", "."}:
+            continue
+        if part == "..":
+            return []
+        safe_part = safe_filename(part, fallback="item")
+        if safe_part:
+            parts.append(safe_part)
+    return parts
+
+
+def has_existing_file_parent(path: Path, root: Path) -> bool:
+    """Return whether any existing parent between root and path is a file."""
+    current = root
+    try:
+        relative_parts = path.relative_to(root).parts[:-1]
+    except ValueError:
+        return True
+    for part in relative_parts:
+        current = current / part
+        if current.exists() and not current.is_dir():
+            return True
+    return False
+
+
+def matching_sidecar_suffix(path: Path) -> str:
+    """Return the shapefile sidecar suffix for a path, including .shp.xml."""
+    lower_name = path.name.lower()
+    if lower_name.endswith(".shp.xml"):
+        return ".shp.xml"
+    return path.suffix.lower()
+
+
+def shapefile_logical_stem(path: Path) -> str:
+    """Return the shapefile stem for primary and sidecar files."""
+    if path.name.lower().endswith(".shp.xml"):
+        return path.name[: -len(".shp.xml")]
+    return path.stem
+
+
+def shapefile_sidecars(shp_path: Path) -> list[Path]:
+    """Return files belonging to one shapefile stem."""
+    stem_lower = shp_path.stem.lower()
+    sidecars: list[Path] = []
+    for candidate in shp_path.parent.iterdir():
+        if not candidate.is_file():
+            continue
+        if shapefile_logical_stem(candidate).lower() != stem_lower:
+            continue
+        if matching_sidecar_suffix(candidate) in SHAPEFILE_SIDECAR_EXTENSIONS:
+            sidecars.append(candidate)
+    return sidecars
+
+
+def unique_shapefile_stem(directory: Path, desired_stem: str, old_stem: str) -> str:
+    """Return a non-conflicting shapefile stem in a directory."""
+    existing = {
+        candidate.name.lower()
+        for candidate in directory.iterdir()
+        if candidate.is_file()
+        and shapefile_logical_stem(candidate).lower() != old_stem.lower()
+    }
+    candidate_stem = desired_stem
+    counter = 2
+    while any(
+        f"{candidate_stem}{suffix}".lower() in existing
+        for suffix in SHAPEFILE_SIDECAR_EXTENSIONS
+    ):
+        candidate_stem = f"{desired_stem}-{counter}"
+        counter += 1
+    return candidate_stem
+
+
+def rename_generic_shapefile_set(shp_path: Path, desired_stem: str) -> Path:
+    """Rename a generic shapefile and sidecars to the extraction folder stem."""
+    old_stem = shp_path.stem
+    if old_stem.lower() not in GENERIC_SHAPEFILE_STEMS:
+        return shp_path
+
+    new_stem = unique_shapefile_stem(shp_path.parent, desired_stem, old_stem)
+    renamed_shp = shp_path.with_name(f"{new_stem}{shp_path.suffix.lower()}")
+    for sidecar in sorted(shapefile_sidecars(shp_path), key=lambda item: item.name.lower()):
+        suffix = matching_sidecar_suffix(sidecar)
+        target = sidecar.with_name(f"{new_stem}{suffix}")
+        if sidecar == target:
+            continue
+        sidecar.rename(target)
+        if sidecar == shp_path:
+            renamed_shp = target
+    return renamed_shp
+
+
+def find_case_insensitive_sidecar(shp_path: Path, suffix: str) -> Path | None:
+    """Return a sidecar path for a shapefile, ignoring suffix case."""
+    expected_name = f"{shp_path.stem}{suffix}".lower()
+    for candidate in shp_path.parent.iterdir():
+        if candidate.is_file() and candidate.name.lower() == expected_name:
+            return candidate
+    return None
+
+
+def dbf_field_names(data: bytes, header_len: int) -> list[str]:
+    """Return DBF field names from a dBASE header."""
+    names: list[str] = []
+    offset = 32
+    while offset + 32 <= header_len and offset < len(data):
+        if data[offset] == 0x0D:
+            break
+        descriptor = data[offset : offset + 32]
+        names.append(
+            descriptor[:11].split(b"\x00", maxsplit=1)[0].decode(
+                "ascii",
+                errors="ignore",
+            )
+        )
+        offset += 32
+    return names
+
+
+def add_project_id_to_dbf(dbf_path: Path, project_id: str) -> bool:
+    """Add and populate a ProjectID DBF field when it does not already exist."""
+    if not project_id:
+        return False
+    data = dbf_path.read_bytes()
+    if len(data) < 33:
+        raise BundleError(f"{dbf_path} is too small to be a DBF file")
+    record_count = int.from_bytes(data[4:8], "little")
+    header_len = int.from_bytes(data[8:10], "little")
+    record_len = int.from_bytes(data[10:12], "little")
+    if header_len <= 32 or record_len <= 1 or len(data) < header_len:
+        raise BundleError(f"{dbf_path} has an invalid DBF header")
+    if any(name.lower() == "projectid" for name in dbf_field_names(data, header_len)):
+        return False
+
+    terminator = data.find(b"\r", 32, header_len)
+    if terminator == -1:
+        raise BundleError(f"{dbf_path} has no DBF field terminator")
+
+    field_len = min(254, max(10, len(project_id)))
+    descriptor = bytearray(32)
+    descriptor[:9] = b"ProjectID"
+    descriptor[11] = ord("C")
+    descriptor[16] = field_len
+
+    new_header_len = header_len + 32
+    new_record_len = record_len + field_len
+    new_data = bytearray()
+    header = bytearray(data[:terminator] + descriptor + data[terminator:header_len])
+    header[8:10] = new_header_len.to_bytes(2, "little")
+    header[10:12] = new_record_len.to_bytes(2, "little")
+    new_data.extend(header)
+
+    value = project_id.encode("ascii", errors="ignore")[:field_len].ljust(field_len)
+    records_start = header_len
+    records_end = records_start + (record_count * record_len)
+    for index in range(record_count):
+        start = records_start + (index * record_len)
+        end = start + record_len
+        record = data[start:end]
+        if len(record) < record_len:
+            raise BundleError(f"{dbf_path} has a truncated DBF record")
+        new_data.extend(record)
+        new_data.extend(value)
+    new_data.extend(data[records_end:])
+    dbf_path.write_bytes(bytes(new_data))
+    return True
+
+
+def postprocess_extracted_shapefiles(extract_dir: Path, project_id: str) -> None:
+    """Rename generic shapefiles and add missing ProjectID attributes."""
+    for shp_path in sorted(extract_dir.rglob("*"), key=lambda item: str(item).lower()):
+        if shp_path.is_file() and shp_path.suffix.lower() == ".shp":
+            rename_generic_shapefile_set(shp_path, extract_dir.name)
+
+    for shp_path in sorted(extract_dir.rglob("*"), key=lambda item: str(item).lower()):
+        if not shp_path.is_file() or shp_path.suffix.lower() != ".shp":
+            continue
+        dbf_path = find_case_insensitive_sidecar(shp_path, ".dbf")
+        if dbf_path is not None:
+            add_project_id_to_dbf(dbf_path, project_id)
+
+
+def extract_archive_attachment(
+    *,
+    archive_path: Path,
+    output_dir: Path,
+    project_id: str,
+) -> dict[str, object]:
+    """Extract a supported archive next to the download and post-process shapefiles."""
+    if not is_archive_path(archive_path):
+        return {}
+
+    extract_dir = archive_path.with_suffix("")
+    if extract_dir.exists():
+        if not extract_dir.is_dir():
+            raise BundleError(f"Cannot extract {archive_path}; {extract_dir} is not a directory")
+        shutil.rmtree(extract_dir)
+    extract_dir.mkdir(parents=True, exist_ok=True)
+
+    try:
+        with zipfile.ZipFile(archive_path) as archive:
+            for member in archive.infolist():
+                if member.is_dir():
+                    continue
+                parts = safe_zip_member_parts(member.filename)
+                if not parts:
+                    continue
+                target = extract_dir.joinpath(*parts)
+                try:
+                    target.resolve().relative_to(extract_dir.resolve())
+                except ValueError:
+                    continue
+                if has_existing_file_parent(target, extract_dir):
+                    continue
+                target.parent.mkdir(parents=True, exist_ok=True)
+                if target.exists():
+                    target = unique_path(target.parent, target.name, set())
+                with archive.open(member) as source, target.open("wb") as destination:
+                    shutil.copyfileobj(source, destination)
+    except zipfile.BadZipFile as exc:
+        raise BundleError(f"{archive_path} is not a valid zip archive") from exc
+    except (OSError, RuntimeError) as exc:
+        raise BundleError(f"Could not extract {archive_path}: {exc}") from exc
+
+    postprocess_extracted_shapefiles(extract_dir, project_id)
+    extracted_count = sum(1 for path in extract_dir.rglob("*") if path.is_file())
+    return {
+        "extracted": True,
+        "extractedPath": path_for_manifest(extract_dir.relative_to(output_dir)),
+        "extractedFileCount": extracted_count,
+    }
+
+
 def download_upload_with_retries(
     *,
     client: RegistryClient | Any,
@@ -703,9 +1000,21 @@ def download_attachments(
             and not force_downloads
             and attachment_is_reusable(output_dir, existing)
         ):
-            attachments.append(merge_reused_attachment(ref=ref, existing=existing))
+            attachment = merge_reused_attachment(ref=ref, existing=existing)
             if existing_path is not None:
                 used_names.add(existing_path.name.lower())
+                try:
+                    attachment.update(
+                        extract_archive_attachment(
+                            archive_path=existing_path,
+                            output_dir=output_dir,
+                            project_id=project_number,
+                        )
+                    )
+                except BundleError as exc:
+                    attachment["extractionError"] = str(exc)
+                    errors.append({"uploadId": upload_id, "error": str(exc)})
+            attachments.append(attachment)
             continue
 
         try:
@@ -733,19 +1042,29 @@ def download_attachments(
             write_bytes_atomic(attachment_path, body)
             date_metadata = date_metadata_from_ref(ref)
             apply_attachment_timestamp(attachment_path, date_metadata)
-            attachments.append(
-                {
-                    **ref,
-                    "path": str(attachment_path.relative_to(output_dir)),
-                    "bytes": len(body),
-                    "contentType": headers.get("content_type", ""),
-                    "contentDisposition": headers.get("content_disposition", ""),
-                    "downloaded": True,
-                    "reused": False,
-                    "downloadAttempts": attempts,
-                    **date_metadata,
-                }
-            )
+            attachment: dict[str, object] = {
+                **ref,
+                "path": str(attachment_path.relative_to(output_dir)),
+                "bytes": len(body),
+                "contentType": headers.get("content_type", ""),
+                "contentDisposition": headers.get("content_disposition", ""),
+                "downloaded": True,
+                "reused": False,
+                "downloadAttempts": attempts,
+                **date_metadata,
+            }
+            try:
+                attachment.update(
+                    extract_archive_attachment(
+                        archive_path=attachment_path,
+                        output_dir=output_dir,
+                        project_id=project_number,
+                    )
+                )
+            except BundleError as exc:
+                attachment["extractionError"] = str(exc)
+                errors.append({"uploadId": upload_id, "error": str(exc)})
+            attachments.append(attachment)
         except BundleError as exc:
             errors.append({"uploadId": upload_id, "error": str(exc)})
             attachments.append(

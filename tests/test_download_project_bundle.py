@@ -4,6 +4,8 @@ import json
 import os
 import tempfile
 import unittest
+import zipfile
+from datetime import UTC, datetime
 from pathlib import Path
 
 from scripts import download_project_bundle as bundler
@@ -49,6 +51,59 @@ class FakeRegistryClient:
 
 
 class ProjectBundleTests(unittest.TestCase):
+    def minimal_dbf(self, records: list[dict[str, str]]) -> bytes:
+        fields = [("Name", 10)]
+        if any("ProjectID" in record for record in records):
+            fields.append(("ProjectID", 10))
+        today = datetime.now(UTC)
+        header_len = 32 + (32 * len(fields)) + 1
+        record_len = 1 + sum(length for _, length in fields)
+        header = bytearray(32)
+        header[0] = 0x03
+        header[1] = today.year - 1900
+        header[2] = today.month
+        header[3] = today.day
+        header[4:8] = len(records).to_bytes(4, "little")
+        header[8:10] = header_len.to_bytes(2, "little")
+        header[10:12] = record_len.to_bytes(2, "little")
+        body = bytearray(header)
+        for name, length in fields:
+            descriptor = bytearray(32)
+            descriptor[:11] = name.encode("ascii")[:11].ljust(11, b"\x00")
+            descriptor[11] = ord("C")
+            descriptor[16] = length
+            body.extend(descriptor)
+        body.extend(b"\r")
+        for record in records:
+            body.extend(b" ")
+            for name, length in fields:
+                body.extend(record.get(name, "").encode("ascii")[:length].ljust(length))
+        body.extend(b"\x1a")
+        return bytes(body)
+
+    def dbf_fields_and_rows(self, path: Path) -> tuple[list[str], list[dict[str, str]]]:
+        data = path.read_bytes()
+        record_count = int.from_bytes(data[4:8], "little")
+        header_len = int.from_bytes(data[8:10], "little")
+        record_len = int.from_bytes(data[10:12], "little")
+        fields: list[tuple[str, int]] = []
+        offset = 32
+        while offset < header_len - 1 and data[offset] != 0x0D:
+            descriptor = data[offset : offset + 32]
+            name = descriptor[:11].split(b"\x00", 1)[0].decode("ascii")
+            fields.append((name, descriptor[16]))
+            offset += 32
+        rows: list[dict[str, str]] = []
+        for index in range(record_count):
+            record = data[header_len + (index * record_len) : header_len + ((index + 1) * record_len)]
+            position = 1
+            row: dict[str, str] = {}
+            for name, length in fields:
+                row[name] = record[position : position + length].decode("ascii").strip()
+                position += length
+            rows.append(row)
+        return [name for name, _ in fields], rows
+
     def test_project_id_from_ref_accepts_registry_url_or_raw_id(self) -> None:
         project_id = "00ba642c-2cef-4a75-8412-6afa6ab76487"
 
@@ -59,6 +114,13 @@ class ProjectBundleTests(unittest.TestCase):
             project_id,
         )
         self.assertEqual(bundler.project_id_from_ref(project_id), project_id)
+
+    def test_safe_filename_cleans_duplicate_and_trailing_underscores(self) -> None:
+        self.assertEqual(
+            bundler.safe_filename("Export__SHP_-_Trail_.zip", fallback="fallback"),
+            "Export_SHP_-_Trail.zip",
+        )
+        self.assertEqual(bundler.safe_filename("CON_.txt", fallback="fallback"), "CON_file.txt")
 
     def test_collect_upload_refs_prefers_public_redacted_upload_ids(self) -> None:
         refs = bundler.collect_upload_refs(
@@ -433,6 +495,123 @@ class ProjectBundleTests(unittest.TestCase):
 
             self.assertEqual(client.requested_uploads, ["upload-1", "upload-2"])
             self.assertEqual(sleeps, [0.5])
+
+    def test_zip_attachment_is_extracted_and_generic_shapefile_is_renamed(self) -> None:
+        archive_name = "2025-0069-0056_Export_SHP_-_GEM_and_Sprague_Cks_Trail_.zip"
+        archive_stem = "2025-0069-0056_Export_SHP_-_GEM_and_Sprague_Cks_Trail"
+        with tempfile.TemporaryDirectory() as tmp:
+            zip_path = Path(tmp) / archive_name
+            with zipfile.ZipFile(zip_path, "w") as archive:
+                archive.writestr("Polygon.shp", b"dummy shp bytes")
+                archive.writestr("Polygon.dbf", self.minimal_dbf([{"Name": "first"}]))
+                archive.writestr("Polygon.shx", b"dummy shx bytes")
+                archive.writestr("Polygon.docx", b"document bytes")
+
+            client = FakeRegistryClient(
+                {},
+                upload_bodies={"upload-1": zip_path.read_bytes()},
+            )
+            attachments, errors = bundler.download_attachments(
+                client=client,
+                output_dir=Path(tmp) / "bundle",
+                project_number="2025-0069",
+                upload_refs=[
+                    {
+                        "uploadId": "upload-1",
+                        "uploadIdKey": "redactedUploadId",
+                        "sourcePath": "$.documents[0]",
+                        "sourceKind": "documents",
+                        "documentNumber": "2025-0069-0056",
+                        "originalFilename": archive_name,
+                    }
+                ],
+                download_delay_seconds=0,
+            )
+
+            self.assertEqual(errors, [])
+            self.assertEqual(
+                Path(attachments[0]["path"]).name,
+                "2025-0069-0056_Export_SHP_-_GEM_and_Sprague_Cks_Trail.zip",
+            )
+            extract_dir = Path(tmp) / "bundle" / "attachments" / archive_stem
+            self.assertTrue(extract_dir.is_dir())
+            self.assertTrue((extract_dir / f"{archive_stem}.shp").exists())
+            self.assertTrue((extract_dir / f"{archive_stem}.shx").exists())
+            self.assertTrue((extract_dir / "Polygon.docx").exists())
+            self.assertFalse((extract_dir / "Polygon.shp").exists())
+            fields, rows = self.dbf_fields_and_rows(extract_dir / f"{archive_stem}.dbf")
+            self.assertIn("ProjectID", fields)
+            self.assertEqual(rows, [{"Name": "first", "ProjectID": "2025-0069"}])
+            self.assertEqual(
+                attachments[0]["extractedPath"],
+                f"attachments/{archive_stem}",
+            )
+
+    def test_zip_extraction_skips_unsafe_paths_and_file_parent_collisions(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            zip_path = Path(tmp) / "bundle.zip"
+            with zipfile.ZipFile(zip_path, "w") as archive:
+                archive.writestr("../outside.txt", b"bad")
+                archive.writestr("/absolute.txt", b"bad")
+                archive.writestr("folder", b"file not directory")
+                archive.writestr("folder/child.txt", b"skipped")
+                archive.writestr("safe/child.txt", b"kept")
+
+            result = bundler.extract_archive_attachment(
+                archive_path=zip_path,
+                output_dir=Path(tmp),
+                project_id="2025-0069",
+            )
+
+            extract_dir = Path(tmp) / "bundle"
+            self.assertEqual(result["extractedPath"], "bundle")
+            self.assertFalse((Path(tmp) / "outside.txt").exists())
+            self.assertFalse((Path(tmp) / "absolute.txt").exists())
+            self.assertEqual((extract_dir / "folder").read_bytes(), b"file not directory")
+            self.assertFalse((extract_dir / "folder" / "child.txt").exists())
+            self.assertEqual((extract_dir / "safe" / "child.txt").read_bytes(), b"kept")
+
+    def test_existing_project_id_dbf_field_is_not_overwritten(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            dbf_path = Path(tmp) / "Polygon.dbf"
+            dbf_path.write_bytes(
+                self.minimal_dbf([{"Name": "first", "ProjectID": "existing"}])
+            )
+
+            changed = bundler.add_project_id_to_dbf(dbf_path, "2025-0069")
+
+            fields, rows = self.dbf_fields_and_rows(dbf_path)
+            self.assertFalse(changed)
+            self.assertEqual(fields, ["Name", "ProjectID"])
+            self.assertEqual(rows, [{"Name": "first", "ProjectID": "existing"}])
+
+    def test_invalid_zip_keeps_downloaded_attachment_with_extraction_error(self) -> None:
+        client = FakeRegistryClient(
+            {},
+            upload_bodies={"upload-1": b"not a zip"},
+        )
+
+        with tempfile.TemporaryDirectory() as tmp:
+            output_dir = Path(tmp)
+            attachments, errors = bundler.download_attachments(
+                client=client,
+                output_dir=output_dir,
+                project_number="2025-0069",
+                upload_refs=[
+                    {
+                        "uploadId": "upload-1",
+                        "uploadIdKey": "redactedUploadId",
+                        "sourcePath": "$.documents[0]",
+                        "sourceKind": "documents",
+                        "originalFilename": "bad.zip",
+                    }
+                ],
+            )
+
+            self.assertEqual(len(errors), 1)
+            self.assertTrue(attachments[0]["downloaded"])
+            self.assertIn("extractionError", attachments[0])
+            self.assertEqual((output_dir / attachments[0]["path"]).read_bytes(), b"not a zip")
 
 
 if __name__ == "__main__":
