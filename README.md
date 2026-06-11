@@ -78,7 +78,7 @@ Example of building and opening the optional Datasette explorer:
 
 ```powershell
 uv run --python 3.14 .\scripts\build_datasette_explorer.py
-uvx --with datasette-cluster-map datasette .\out\yesab-explorer.db -m .\out\yesab-explorer.metadata.json --plugins-dir .\datasette_plugins --static bundles:out/project-bundles
+yesab-explorer
 ```
 
 The explorer output is meant for questions that are heavier than the static
@@ -91,7 +91,14 @@ local Datasette plugin to redirect Leaflet XYZ tile requests to Government of
 Yukon ArcGIS export URLs for the same topographic and shaded-relief basemap
 services used by the static map.
 
-The `--static bundles:out/project-bundles` option serves downloaded bundle
+The `yesab-explorer` launcher starts Datasette with the generated default
+database, metadata, local plugins, `datasette-cluster-map`, and bundle static
+file mount. It also builds missing default explorer artifacts before starting
+Datasette. Use wrapper options such as `--db`, `--metadata`, `--plugins-dir`,
+`--bundle-root`, `--rebuild`, or any Datasette option such as `--port 8011` for
+tuning.
+
+The launcher serves downloaded bundle
 attachments below `/bundles/`. The explorer stores both the local filesystem
 path and a URL-encoded Datasette path such as
 `/bundles/2025-0069/attachments/proposal.pdf`; PDFs and images open in the
@@ -151,7 +158,9 @@ uv run .\scripts\build_static_map_split.py .\some-output-dir
 
 uv run .\scripts\build_datasette_explorer.py
 uv run .\scripts\build_datasette_explorer.py .\out\custom-explorer.db --no-map-features
-uvx --with datasette-cluster-map datasette .\out\yesab-explorer.db -m .\out\yesab-explorer.metadata.json --plugins-dir .\datasette_plugins --static bundles:out/project-bundles
+yesab-explorer
+yesab-explorer --port 8011
+yesab-explorer --db .\out\custom-explorer.db --metadata .\out\custom-explorer.metadata.json
 
 uv run .\scripts\build_geopackage.py
 uv run .\scripts\build_geopackage.py .\some-output.gpkg

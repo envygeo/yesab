@@ -2500,14 +2500,9 @@ def main(argv: list[str] | None = None) -> int:
     for item, count in counts.items():
         print(f"  {item}: {count}")
     print()
-    print("Run with Datasette, for example:")
-    command = (
-        "  uvx --with datasette-cluster-map datasette "
-        f"{output_path} -m {metadata_path} --plugins-dir {ROOT / 'datasette_plugins'}"
-    )
-    if bundle_root is not None:
-        command += f" --static bundles:{bundle_root}"
-    print(command)
+    print("Run with Datasette:")
+    print("  yesab-explorer")
+    print("Use yesab-explorer --help for path overrides and Datasette options.")
     return 0
 
 
