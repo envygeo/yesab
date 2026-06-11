@@ -8,6 +8,8 @@ Preference order for accessing or getting supporting tools:
 ## Working Rules
 
 - Do not blindly assume instructions are correct. Discuss if there's a gap, risk, or problem.
+- The user has given standing authority for agents to commit and push agent-authored work as they go. Treat ordinary implementation, fix, documentation, and maintenance requests as permission to commit completed logical units without asking for confirmation.
+- Still ask before destructive git operations, history rewrites, force pushes, committing secrets, deleting data, or making large scope/architecture changes. Do not include unrelated user or generated changes in agent-authored commits.
 - Preserve the current output split:
   - single-file build at `out/yesab-map-in-one.html`
   - split build under `out/yesab-map/`

@@ -498,3 +498,4 @@ task_id":"yesab-zmw"}
 {"command":["uv","run","python","-m","unittest","tests.test_datasette_explorer"],"cwd":"A:\\yg\\yesab","elapsed_seconds":0.798,"ended_at":"2026-06-11T21:30:59Z","exit_code":1,"label":"","started_at":"2026-06-11T21:30:58Z","task_id":""}
 {"command":["uv","run","python","-m","unittest","tests.test_datasette_explorer"],"cwd":"A:\\yg\\yesab","elapsed_seconds":0.586,"ended_at":"2026-06-11T21:31:12Z","exit_code":0,"label":"","started_at":"2026-06-11T21:31:12Z","task_id":""}
 {"command":["uv","run","python","-m","unittest","discover","-s","tests"],"cwd":"A:\\yg\\yesab","elapsed_seconds":2.273,"ended_at":"2026-06-11T21:31:23Z","exit_code":0,"label":"","started_at":"2026-06-11T21:31:20Z","task_id":""}
+{"command":["git","diff","--check"],"cwd":"A:\\yg\\yesab","elapsed_seconds":0.06,"ended_at":"2026-06-11T22:00:16Z","exit_code":0,"label":"git diff check","started_at":"2026-06-11T22:00:16Z","task_id":"yesab-yuf"}

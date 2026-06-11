@@ -2,6 +2,11 @@
 
 This file provides instructions and context for AI coding agents working on this project.
 
+## Commit And Push Authority
+
+- The user has given standing authority for agents to commit and push agent-authored work as they go. Treat ordinary implementation, fix, documentation, and maintenance requests as permission to commit completed logical units without asking for confirmation.
+- Still ask before destructive git operations, history rewrites, force pushes, committing secrets, deleting data, or making large scope/architecture changes. Do not include unrelated user or generated changes in agent-authored commits.
+
 <!-- BEGIN BEADS INTEGRATION v:1 profile:minimal hash:ca08a54f -->
 ## Beads Issue Tracker
 
