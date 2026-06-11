@@ -2,6 +2,8 @@
 
 YESAB is the Yukon Environmental and Socio-economic Assessment Board, which tracks assessment projects across Yukon. This repository exists to pull the published project map data and registry metadata into reproducible local artifacts so it is easier to inspect, rebuild, and share static map outputs without depending on the live services at runtime.
 
+These tools are an independent consumer of YESAB information, it is not associated with YESAB.
+
 - downloading the [YESAB Project Map](https://yesab.ca/project-map/) - [shapefile archive](https://yesab.ca/wp-content/plugins/yesab-map-wp-plugin/geojson/all.zip)
 - fetching and caching the [YESAB registry API](https://yesabregistry.ca/api/v1/integration/projects) in year buckets
 - joining the shapefile archive and registry API data into a single GeoPackage, filtering approximate locations into their own class
