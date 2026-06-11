@@ -746,6 +746,7 @@ def create_schema(db: sqlite3.Connection) -> None:
           document_number TEXT,
           document_type TEXT,
           source_kind TEXT,
+          source_path TEXT,
           description TEXT,
           file_name TEXT,
           local_path TEXT,
@@ -757,6 +758,34 @@ def create_schema(db: sqlite3.Connection) -> None:
           timestamp_iso TEXT,
           upload_id TEXT,
           document_id TEXT
+        );
+
+        CREATE TABLE bundle_attachment_links (
+          id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+          project_number TEXT,
+          source_table TEXT,
+          source_row_id INTEGER,
+          attachment_id INTEGER,
+          match_field TEXT,
+          match_value TEXT,
+          document_id TEXT,
+          document_number TEXT,
+          upload_id TEXT,
+          datasette_url TEXT,
+          local_path TEXT
+        );
+
+        CREATE TABLE bundle_attachment_link_qa (
+          id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+          project_number TEXT,
+          source_table TEXT,
+          source_row_id INTEGER,
+          attachment_id INTEGER,
+          issue TEXT,
+          match_field TEXT,
+          match_value TEXT,
+          candidate_attachment_ids TEXT,
+          qa_note TEXT
         );
 
         CREATE TABLE bundle_documents (
@@ -922,6 +951,12 @@ def create_schema(db: sqlite3.Connection) -> None:
         CREATE INDEX idx_map_features_project ON map_features(project_number);
         CREATE INDEX idx_map_features_layer ON map_features(layer_name);
         CREATE INDEX idx_bundle_attachments_project ON bundle_attachments(project_number);
+        CREATE INDEX idx_bundle_attachments_upload ON bundle_attachments(upload_id);
+        CREATE INDEX idx_bundle_attachments_document_id ON bundle_attachments(document_id);
+        CREATE INDEX idx_bundle_attachments_number ON bundle_attachments(document_number);
+        CREATE INDEX idx_bundle_attachment_links_project ON bundle_attachment_links(project_number);
+        CREATE INDEX idx_bundle_attachment_links_source ON bundle_attachment_links(source_table, source_row_id);
+        CREATE INDEX idx_bundle_attachment_links_attachment ON bundle_attachment_links(attachment_id);
         CREATE INDEX idx_bundle_documents_project ON bundle_documents(project_number);
         CREATE INDEX idx_bundle_documents_number ON bundle_documents(document_number);
         CREATE INDEX idx_bundle_documents_upload ON bundle_documents(upload_id);
@@ -980,6 +1015,54 @@ def create_schema(db: sqlite3.Connection) -> None:
           FROM projects p
           LEFT JOIN map_features f ON f.project_number = p.project_number
          WHERE f.project_number IS NULL;
+
+        CREATE VIEW bundle_documents_with_attachments AS
+        SELECT d.id AS document_row_id,
+               d.project_number,
+               d.document_id,
+               d.document_number,
+               d.document_type,
+               d.title,
+               d.source_section,
+               l.attachment_id,
+               l.match_field,
+               l.datasette_url,
+               l.local_path
+          FROM bundle_documents d
+          LEFT JOIN bundle_attachment_links l
+            ON l.source_table = 'bundle_documents'
+           AND l.source_row_id = d.id;
+
+        CREATE VIEW bundle_comments_with_attachments AS
+        SELECT c.id AS comment_row_id,
+               c.project_number,
+               c.comment_id,
+               c.document_number,
+               c.submitter_name,
+               c.document_count,
+               l.attachment_id,
+               l.match_field,
+               l.datasette_url,
+               l.local_path
+          FROM bundle_comments c
+          LEFT JOIN bundle_attachment_links l
+            ON l.source_table = 'bundle_comments'
+           AND l.source_row_id = c.id;
+
+        CREATE VIEW bundle_activity_with_attachments AS
+        SELECT a.id AS activity_row_id,
+               a.project_number,
+               a.activity_date_iso,
+               a.message_text,
+               a.linked_document_ids,
+               l.attachment_id,
+               l.match_field,
+               l.datasette_url,
+               l.local_path
+          FROM bundle_activity_events a
+          LEFT JOIN bundle_attachment_links l
+            ON l.source_table = 'bundle_activity_events'
+           AND l.source_row_id = a.id;
         """
     )
 
@@ -1207,6 +1290,306 @@ def parent_document_values(
         unique_csv(entry.get("upload_ids", [])),
         unique_csv(entry.get("document_ids", [])),
     )
+
+
+def split_csv_values(value: str) -> list[str]:
+    """Return non-empty values from a comma-separated identifier field."""
+    return [part.strip() for part in value.split(",") if part.strip()]
+
+
+def top_level_source_kind(value: str) -> str:
+    """Return the attachment source kind implied by a normalized source section."""
+    return value.split("/", 1)[0].strip()
+
+
+def bundle_source_path(source_section: str, row_index: int | None) -> str:
+    """Return the manifest sourcePath form for a normalized bundle row."""
+    if not source_section or row_index is None:
+        return ""
+    return f"$.{source_section}[{row_index}]"
+
+
+def attachment_link_sources(db: sqlite3.Connection) -> list[dict[str, Any]]:
+    """Return normalized rows that can reliably point to local attachments."""
+    sources: list[dict[str, Any]] = []
+    for row in db.execute(
+        """
+        SELECT id, project_number, document_id, document_number, upload_id,
+               source_section, source_row_index
+          FROM bundle_documents
+        """
+    ):
+        sources.append(
+            {
+                "source_table": "bundle_documents",
+                "source_row_id": row[0],
+                "project_number": row[1],
+                "document_id": row[2],
+                "document_number": row[3],
+                "upload_ids": split_csv_values(row[4] or ""),
+                "document_ids": split_csv_values(row[2] or ""),
+                "document_numbers": split_csv_values(row[3] or ""),
+                "source_kind": top_level_source_kind(row[5] or ""),
+                "source_path": bundle_source_path(row[5] or "", row[6]),
+            }
+        )
+    for table in (
+        "bundle_comments",
+        "bundle_activity_events",
+        "bundle_notes",
+        "bundle_simplified_information_requests",
+        "bundle_emails",
+    ):
+        if table == "bundle_activity_events":
+            rows = db.execute(
+                """
+                SELECT id, project_number, linked_document_ids, '' AS upload_ids,
+                       '' AS document_number, source_section
+                  FROM bundle_activity_events
+                """
+            )
+        else:
+            rows = db.execute(
+                f"""
+                SELECT id, project_number, document_ids, upload_ids,
+                       document_number, source_section
+                  FROM {table}
+                """
+                if table in {"bundle_comments", "bundle_notes"}
+                else f"""
+                SELECT id, project_number, document_ids, upload_ids,
+                       '' AS document_number, source_section
+                  FROM {table}
+                """
+            )
+        for row in rows:
+            sources.append(
+                {
+                    "source_table": table,
+                    "source_row_id": row[0],
+                    "project_number": row[1],
+                    "document_id": "",
+                    "document_number": row[4] or "",
+                    "upload_ids": split_csv_values(row[3] or ""),
+                    "document_ids": split_csv_values(row[2] or ""),
+                    "document_numbers": split_csv_values(row[4] or ""),
+                    "source_kind": top_level_source_kind(row[5] or ""),
+                    "source_path": "",
+                }
+            )
+    return sources
+
+
+def attachment_matches(
+    db: sqlite3.Connection,
+    *,
+    project_number: str,
+    field: str,
+    value: str,
+    source_kind: str = "",
+) -> list[sqlite3.Row]:
+    """Return candidate attachments for a source identifier."""
+    if not value:
+        return []
+    if field == "upload_id":
+        sql = """
+            SELECT id, document_id, document_number, upload_id, datasette_url, local_path
+              FROM bundle_attachments
+             WHERE project_number = ? AND upload_id = ?
+        """
+        return list(db.execute(sql, (project_number, value)))
+    if field == "document_id":
+        sql = """
+            SELECT id, document_id, document_number, upload_id, datasette_url, local_path
+              FROM bundle_attachments
+             WHERE project_number = ? AND document_id = ?
+        """
+        return list(db.execute(sql, (project_number, value)))
+    if field == "document_number":
+        sql = """
+            SELECT id, document_id, document_number, upload_id, datasette_url, local_path
+              FROM bundle_attachments
+             WHERE project_number = ? AND document_number = ?
+        """
+        params: tuple[str, ...]
+        params = (project_number, value)
+        if source_kind:
+            sql += " AND source_kind = ?"
+            params = (project_number, value, source_kind)
+        return list(db.execute(sql, params))
+    if field == "source_path":
+        sql = """
+            SELECT id, document_id, document_number, upload_id, datasette_url, local_path
+              FROM bundle_attachments
+             WHERE project_number = ? AND source_path = ?
+        """
+        return list(db.execute(sql, (project_number, value)))
+    return []
+
+
+def insert_attachment_link(
+    db: sqlite3.Connection,
+    source: dict[str, Any],
+    attachment: sqlite3.Row,
+    *,
+    match_field: str,
+    match_value: str,
+) -> bool:
+    """Insert one source-to-attachment link unless it already exists."""
+    exists = db.execute(
+        """
+        SELECT 1
+          FROM bundle_attachment_links
+         WHERE source_table = ? AND source_row_id = ? AND attachment_id = ?
+        """,
+        (source["source_table"], source["source_row_id"], attachment[0]),
+    ).fetchone()
+    if exists:
+        return False
+    db.execute(
+        """
+        INSERT INTO bundle_attachment_links
+          (project_number, source_table, source_row_id, attachment_id, match_field,
+           match_value, document_id, document_number, upload_id, datasette_url,
+           local_path)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """,
+        (
+            source["project_number"],
+            source["source_table"],
+            source["source_row_id"],
+            attachment[0],
+            match_field,
+            match_value,
+            attachment[1] or source.get("document_id", ""),
+            attachment[2] or source.get("document_number", ""),
+            (attachment[3] or match_value)
+            if match_field == "upload_id"
+            else attachment[3],
+            attachment[4],
+            attachment[5],
+        ),
+    )
+    return True
+
+
+def insert_attachment_link_qa(
+    db: sqlite3.Connection,
+    *,
+    project_number: str,
+    source_table: str = "",
+    source_row_id: int | None = None,
+    attachment_id: int | None = None,
+    issue: str,
+    match_field: str = "",
+    match_value: str = "",
+    candidate_attachment_ids: list[str] | None = None,
+    qa_note: str = "",
+) -> None:
+    """Insert one attachment-link QA row."""
+    db.execute(
+        """
+        INSERT INTO bundle_attachment_link_qa
+          (project_number, source_table, source_row_id, attachment_id, issue,
+           match_field, match_value, candidate_attachment_ids, qa_note)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """,
+        (
+            project_number,
+            source_table,
+            source_row_id,
+            attachment_id,
+            issue,
+            match_field,
+            match_value,
+            unique_csv(candidate_attachment_ids or []),
+            qa_note,
+        ),
+    )
+
+
+def insert_bundle_attachment_links(db: sqlite3.Connection) -> dict[str, int]:
+    """Link normalized bundle records to downloaded local attachments."""
+    link_count = 0
+    qa_count = 0
+    for source in attachment_link_sources(db):
+        matched = False
+        ambiguous = False
+        identifiers: list[tuple[str, str]] = []
+        identifiers.extend(("upload_id", value) for value in source["upload_ids"])
+        identifiers.extend(("document_id", value) for value in source["document_ids"])
+        if source.get("source_path"):
+            identifiers.append(("source_path", source["source_path"]))
+        identifiers.extend(("document_number", value) for value in source["document_numbers"])
+        for field, value in identifiers:
+            candidates = attachment_matches(
+                db,
+                project_number=source["project_number"],
+                field=field,
+                value=value,
+                source_kind=source.get("source_kind", ""),
+            )
+            if len(candidates) == 1:
+                if insert_attachment_link(
+                    db,
+                    source,
+                    candidates[0],
+                    match_field=field,
+                    match_value=value,
+                ):
+                    link_count += 1
+                matched = True
+                continue
+            if len(candidates) > 1:
+                insert_attachment_link_qa(
+                    db,
+                    project_number=source["project_number"],
+                    source_table=source["source_table"],
+                    source_row_id=source["source_row_id"],
+                    issue="ambiguous_source_match",
+                    match_field=field,
+                    match_value=value,
+                    candidate_attachment_ids=[str(candidate[0]) for candidate in candidates],
+                    qa_note="Multiple attachments matched this source identifier.",
+                )
+                qa_count += 1
+                ambiguous = True
+                break
+        if not matched and not ambiguous and identifiers:
+            insert_attachment_link_qa(
+                db,
+                project_number=source["project_number"],
+                source_table=source["source_table"],
+                source_row_id=source["source_row_id"],
+                issue="unmatched_source",
+                match_field=identifiers[0][0],
+                match_value=identifiers[0][1],
+                qa_note="No attachment matched this source row.",
+            )
+            qa_count += 1
+
+    linked_attachment_ids = {
+        row[0] for row in db.execute("SELECT DISTINCT attachment_id FROM bundle_attachment_links")
+    }
+    for row in db.execute(
+        "SELECT id, project_number, upload_id, document_id, document_number FROM bundle_attachments"
+    ):
+        if row[0] in linked_attachment_ids:
+            continue
+        insert_attachment_link_qa(
+            db,
+            project_number=row[1],
+            attachment_id=row[0],
+            issue="unmatched_attachment",
+            match_field="upload_id",
+            match_value=row[2] or row[3] or row[4] or "",
+            qa_note="No normalized bundle row matched this attachment.",
+        )
+        qa_count += 1
+    return {
+        "bundle_attachment_links": link_count,
+        "bundle_attachment_link_qa": qa_count,
+    }
 
 
 def insert_bundle_documents(
@@ -1735,16 +2118,17 @@ def insert_bundles(db: sqlite3.Connection, bundle_root: Path | None) -> dict[str
                     """
                     INSERT INTO bundle_attachments
                       (project_number, document_number, document_type, source_kind,
-                       description, file_name, local_path, bundle_path, datasette_url,
+                       source_path, description, file_name, local_path, bundle_path, datasette_url,
                        bytes, content_type,
                        downloaded, timestamp_iso, upload_id, document_id)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     """,
                     (
                         project_number,
                         text_value(attachment.get("documentNumber")),
                         text_value(attachment.get("documentType")),
                         text_value(attachment.get("sourceKind")),
+                        text_value(attachment.get("sourcePath")),
                         text_value(attachment.get("description")),
                         text_value(
                             attachment.get("fileName")
@@ -1764,7 +2148,7 @@ def insert_bundles(db: sqlite3.Connection, bundle_root: Path | None) -> dict[str
                 )
                 attachment_count += 1
 
-    return {
+    counts = {
         "project_bundles": bundle_count,
         "bundle_sections": section_count,
         "bundle_attachments": attachment_count,
@@ -1777,6 +2161,8 @@ def insert_bundles(db: sqlite3.Connection, bundle_root: Path | None) -> dict[str
         ),
         "bundle_emails": email_count,
     }
+    counts.update(insert_bundle_attachment_links(db))
+    return counts
 
 
 def create_fts(db: sqlite3.Connection) -> None:
@@ -1910,6 +2296,12 @@ def datasette_metadata(database_name: str) -> dict[str, Any]:
                             "downloaded",
                         ]
                     },
+                    "bundle_attachment_links": {
+                        "facets": ["project_number", "source_table", "match_field"]
+                    },
+                    "bundle_attachment_link_qa": {
+                        "facets": ["project_number", "issue", "source_table"]
+                    },
                 },
                 "queries": {
                     "active_projects": {
@@ -1969,6 +2361,16 @@ def datasette_metadata(database_name: str) -> dict[str, Any]:
                               FROM bundle_attachments
                              WHERE downloaded = 1
                              ORDER BY project_number DESC, document_number
+                        """,
+                    },
+                    "linked_bundle_attachments": {
+                        "title": "Bundle records linked to local attachments",
+                        "sql": """
+                            SELECT project_number, source_table, source_row_id,
+                                   document_number, match_field, datasette_url,
+                                   local_path
+                              FROM bundle_attachment_links
+                             ORDER BY project_number DESC, source_table, source_row_id
                         """,
                     },
                 },

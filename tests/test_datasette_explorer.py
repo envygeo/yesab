@@ -304,6 +304,13 @@ class DatasetteExplorerTests(unittest.TestCase):
                         "keyDocument": True,
                         "redactedUploadId": "upload-doc",
                         "uploadDate": 1744742320656,
+                    },
+                    {
+                        "description": "Source path only document",
+                        "documentId": "source-path-doc",
+                        "documentNumber": "2025-0069-0002",
+                        "documentType": "Project Document",
+                        "fileName": "source-path.pdf",
                     }
                 ],
             )
@@ -331,6 +338,14 @@ class DatasetteExplorerTests(unittest.TestCase):
                         "documentType": "Comment Document",
                         "fileName": "comment.pdf",
                         "redactedUploadId": "upload-comment",
+                    },
+                    {
+                        "description": "Second comment attachment",
+                        "documentId": "comment-doc-2",
+                        "documentNumber": "0043",
+                        "documentType": "Comment Document",
+                        "fileName": "comment-2.pdf",
+                        "redactedUploadId": "upload-comment-2",
                     }
                 ],
             )
@@ -411,7 +426,7 @@ class DatasetteExplorerTests(unittest.TestCase):
             write_json(
                 bundle_dir / "manifest.json",
                 {
-                    "attachmentCount": 2,
+                    "attachmentCount": 6,
                     "attachments": [
                         {
                             "documentId": "doc-1",
@@ -430,8 +445,36 @@ class DatasetteExplorerTests(unittest.TestCase):
                             "sourcePath": "$.comments/comment-1_documents[0]",
                             "uploadId": "upload-comment",
                         },
+                        {
+                            "documentId": "comment-doc-2",
+                            "documentNumber": "0043",
+                            "downloaded": True,
+                            "path": "attachments/comment-2.pdf",
+                            "sourceKind": "comments",
+                            "sourcePath": "$.comments/comment-1_documents[1]",
+                            "uploadId": "upload-comment-2",
+                        },
+                        {
+                            "downloaded": True,
+                            "path": "attachments/source-path.pdf",
+                            "sourceKind": "documents",
+                            "sourcePath": "$.documents[1]",
+                        },
+                        {
+                            "documentNumber": "2025-0069-0018",
+                            "downloaded": True,
+                            "path": "attachments/note.pdf",
+                            "sourceKind": "notes",
+                        },
+                        {
+                            "documentNumber": "2025-0069-9999",
+                            "downloaded": True,
+                            "path": "attachments/orphan.pdf",
+                            "sourceKind": "documents",
+                            "uploadId": "orphan-upload",
+                        },
                     ],
-                    "downloadedAttachmentCount": 2,
+                    "downloadedAttachmentCount": 6,
                     "errors": [],
                     "generatedAt": "2026-06-04T22:48:04Z",
                     "projectId": "project-1",
@@ -440,7 +483,7 @@ class DatasetteExplorerTests(unittest.TestCase):
                     "sectionCount": 8,
                     "sections": [
                         {
-                            "count": 1,
+                            "count": 2,
                             "endpoint": "/api/projects/project-1/documents",
                             "name": "documents",
                             "path": "json/documents.json",
@@ -452,7 +495,7 @@ class DatasetteExplorerTests(unittest.TestCase):
                             "path": "json/key_documents.json",
                         },
                         {
-                            "count": 1,
+                            "count": 2,
                             "endpoint": "/api/projects/project-1/comments",
                             "name": "comments",
                             "path": "json/comments.json",
@@ -500,19 +543,21 @@ class DatasetteExplorerTests(unittest.TestCase):
                 bundle_root=bundle_root,
             )
 
-            self.assertEqual(counts["bundle_documents"], 2)
+            self.assertEqual(counts["bundle_documents"], 4)
             self.assertEqual(counts["bundle_comments"], 1)
             self.assertEqual(counts["bundle_activity_events"], 1)
             self.assertEqual(counts["bundle_notes"], 1)
             self.assertEqual(counts["bundle_simplified_information_requests"], 1)
             self.assertEqual(counts["bundle_emails"], 1)
+            self.assertEqual(counts["bundle_attachment_links"], 8)
+            self.assertEqual(counts["bundle_attachment_link_qa"], 1)
 
             with closing(sqlite3.connect(db_path)) as db:
                 db.row_factory = sqlite3.Row
 
                 document = db.execute(
                     """
-                    SELECT document_number, upload_id, source_section, source_json_path
+                    SELECT id, document_number, upload_id, source_section, source_json_path
                       FROM bundle_documents
                      WHERE document_id = 'doc-1'
                     """
@@ -541,8 +586,8 @@ class DatasetteExplorerTests(unittest.TestCase):
                     """
                 ).fetchone()
                 self.assertEqual(comment["submitter_name"], "Jane Reader")
-                self.assertEqual(comment["document_count"], 1)
-                self.assertEqual(comment["upload_ids"], "upload-comment")
+                self.assertEqual(comment["document_count"], 2)
+                self.assertEqual(comment["upload_ids"], "upload-comment, upload-comment-2")
 
                 activity = db.execute(
                     """
@@ -574,6 +619,113 @@ class DatasetteExplorerTests(unittest.TestCase):
                 self.assertEqual(email["subject"], "Public comment period open")
                 self.assertEqual(email["message_type"], "Notification")
                 self.assertEqual(email["recipient_type"], "Followers")
+
+                links = [
+                    dict(row)
+                    for row in db.execute(
+                        """
+                        SELECT source_table, source_row_id, match_field, match_value,
+                               document_number, upload_id, datasette_url
+                          FROM bundle_attachment_links
+                         ORDER BY source_table, source_row_id, attachment_id
+                        """
+                    )
+                ]
+                self.assertIn(
+                    {
+                        "source_table": "bundle_documents",
+                        "source_row_id": document["id"],
+                        "match_field": "upload_id",
+                        "match_value": "upload-doc",
+                        "document_number": "2025-0069-0001",
+                        "upload_id": "upload-doc",
+                        "datasette_url": "/bundles/2025-0069/attachments/proposal.pdf",
+                    },
+                    links,
+                )
+
+                comment_links = [
+                    dict(row)
+                    for row in db.execute(
+                    """
+                    SELECT l.match_field, l.match_value, l.datasette_url
+                      FROM bundle_attachment_links l
+                      JOIN bundle_comments c
+                        ON c.id = l.source_row_id
+                       AND l.source_table = 'bundle_comments'
+                     WHERE c.comment_id = 'comment-1'
+                     ORDER BY l.match_value
+                    """
+                    )
+                ]
+                self.assertEqual(
+                    comment_links,
+                    [
+                        {
+                            "match_field": "upload_id",
+                            "match_value": "upload-comment",
+                            "datasette_url": "/bundles/2025-0069/attachments/comment.pdf",
+                        },
+                        {
+                            "match_field": "upload_id",
+                            "match_value": "upload-comment-2",
+                            "datasette_url": "/bundles/2025-0069/attachments/comment-2.pdf",
+                        },
+                    ],
+                )
+
+                note_link = db.execute(
+                    """
+                    SELECT l.match_field, l.match_value, l.datasette_url
+                      FROM bundle_attachment_links l
+                      JOIN bundle_notes n
+                        ON n.id = l.source_row_id
+                       AND l.source_table = 'bundle_notes'
+                     WHERE n.note_id = 'note-1'
+                    """
+                ).fetchone()
+                self.assertEqual(note_link["match_field"], "document_number")
+                self.assertEqual(note_link["match_value"], "2025-0069-0018")
+                self.assertEqual(
+                    note_link["datasette_url"],
+                    "/bundles/2025-0069/attachments/note.pdf",
+                )
+
+                activity_link = db.execute(
+                    """
+                    SELECT match_field, match_value, datasette_url
+                      FROM bundle_attachment_links
+                     WHERE source_table = 'bundle_activity_events'
+                    """
+                ).fetchone()
+                self.assertEqual(activity_link["match_field"], "document_id")
+                self.assertEqual(activity_link["match_value"], "doc-1")
+                self.assertEqual(
+                    activity_link["datasette_url"],
+                    "/bundles/2025-0069/attachments/proposal.pdf",
+                )
+
+                source_path_link = db.execute(
+                    """
+                    SELECT match_field, match_value, datasette_url
+                      FROM bundle_attachment_links
+                     WHERE match_value = '$.documents[1]'
+                    """
+                ).fetchone()
+                self.assertEqual(source_path_link["match_field"], "source_path")
+                self.assertEqual(
+                    source_path_link["datasette_url"],
+                    "/bundles/2025-0069/attachments/source-path.pdf",
+                )
+
+                qa = db.execute(
+                    """
+                    SELECT issue, attachment_id, match_value
+                      FROM bundle_attachment_link_qa
+                    """
+                ).fetchone()
+                self.assertEqual(qa["issue"], "unmatched_attachment")
+                self.assertEqual(qa["match_value"], "orphan-upload")
 
     def test_write_datasette_metadata_includes_facets_and_canned_queries(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
